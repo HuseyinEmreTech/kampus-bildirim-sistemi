@@ -1,0 +1,10 @@
+# Bu yollar değişirse Hüseyin Emre'nin onayı zorunludur (main koruması: require_code_owner_reviews).
+/packages/domain/        @HuseyinEmreTech
+/packages/application/   @HuseyinEmreTech
+/packages/contracts/     @HuseyinEmreTech
+/test/                   @HuseyinEmreTech
+/.github/                @HuseyinEmreTech
+/AGENTS.md               @HuseyinEmreTech
+/CLAUDE.md               @HuseyinEmreTech
+/analysis_options.yaml   @HuseyinEmreTech
+/pubspec.yaml            @HuseyinEmreTech

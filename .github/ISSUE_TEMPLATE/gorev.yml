@@ -1,0 +1,36 @@
+name: Görev
+description: Bir kişiye atanacak, tek PR'lık iş
+title: "[Hafta NN] "
+body:
+  - type: textarea
+    id: amac
+    attributes:
+      label: Amaç
+      description: Bu görev bitince ne çalışıyor olacak?
+    validations:
+      required: true
+  - type: textarea
+    id: kabul
+    attributes:
+      label: Kabul ölçütü
+      description: "Verilen / olduğunda / o zaman; bağlı kabul testleri"
+    validations:
+      required: true
+  - type: textarea
+    id: dosyalar
+    attributes:
+      label: Dokunulacak dosyalar
+    validations:
+      required: true
+  - type: textarea
+    id: dokunma
+    attributes:
+      label: Dokunulmayacak dosyalar
+      value: "packages/domain, packages/application, packages/contracts, test/, .github/ (issue'da aksi yazmıyorsa)"
+    validations:
+      required: true
+  - type: textarea
+    id: kaynak
+    attributes:
+      label: Okunacaklar
+      description: İlgili doküman, kural (Rule NN), hikaye (USR NN)
