@@ -1,0 +1,13 @@
+name: campus_server
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  campus_domain: any
+  campus_application: any
+  campus_infrastructure: any
+  campus_contracts: any
+dev_dependencies:
+  test: ^1.31.1

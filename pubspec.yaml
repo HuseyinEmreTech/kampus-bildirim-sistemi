@@ -1,0 +1,15 @@
+name: campus_report_workspace
+publish_to: none
+environment:
+  sdk: ^3.13.0
+workspace:
+  - packages/domain
+  - packages/application
+  - packages/contracts
+  - packages/infrastructure
+  - packages/server
+  - packages/app
+dev_dependencies:
+  lints: ^6.1.0
+  test: ^1.31.1
+  yaml: ^3.1.4
