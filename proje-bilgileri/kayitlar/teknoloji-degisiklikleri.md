@@ -44,7 +44,7 @@ Projede teknoloji yığınına eklenen, değiştirilen veya elenen her şey bura
 | 2026-09-30 | Bilgi grafiği | Yok | Graphify değerlendirmeye alındı | LLM'lerin projeyi daha iyi anlaması; kod oluşunca denenecek |
 | 2026-10-02 | Repo düzeni | Tek klasör varsayımı | Dart pub workspace, katman başına paket; Flutter 3.47.0 ile yerelde denendi | Katman ihlalini derleme ve mimari testle engellemek ([korumalar](../11-kod-mimarisi-ve-korumalar.md)) |
 | 2026-10-02 | Konum | Yalnızca GPS | GPS; izin yoksa bina listesi | Kullanıcı izin vermezse de bildirim açılabilsin |
-| 2026-10-02 | Kayıt sistemi | Commit başına kayıt dosyası ve betik | PR açıklaması kayıt; kişisel günlükler | 4 kişide ortak indeks dosyası merge çakışması üretir |
+| 2026-10-02 | Kayıt sistemi | Commit başına kayıt dosyası ve betik | PR açıklaması kayıt; kişi başına günlük rapor (`ekip/raporlar/`) | 4 kişide ortak indeks dosyası merge çakışması üretir |
 
 ## Elenenler
 

@@ -35,7 +35,7 @@ Kaynak: [dart.dev/language](https://dart.dev/language). Shelf: [pub.dev/packages
 ### Hafta 3 (28 Eyl - 4 Eki)
 - Kurulum; Dart dil turu (yukarıdaki tablo ve kaynak).
 - **Kampüs bilgisi:** haritadan İSTE kampüsünü kapsayan dikdörtgenin güneybatı ve kuzeydoğu köşe koordinatları ve kampüsteki 5 bina (ad, merkez koordinat). [Domain tasarımına](../03-domain-design.md) tablo olarak ekleyen bir doküman PR'ı.
-- Günlük satırı.
+- İlk PR: [şablonla](../Templates/gunluk-rapor.md) ilk günlük raporun (`raporlar/murat-yaman/`) ve plan dosyandaki Raporlar listesine bağlantısı.
 
 ### Hafta 4 (5 - 11 Eki): contracts
 - `packages/contracts`: `LoginRequest`, `LoginResponse`, `ReportResponse`, `ReportListResponse`, `NotificationResponse`, `NotificationListResponse`, `BuildingResponse`, `ErrorResponse`, `ErrorCode`. Her biri `fromJson` ve `toJson` (elle; kod üretimi yok).
@@ -82,8 +82,10 @@ Kaynak: [dart.dev/language](https://dart.dev/language). Shelf: [pub.dev/packages
 ### Hafta 15 (21 - 27 Ara): teslim
 - Katkı raporu, sunumdaki kendi bölümün.
 
-## Günlük
+## Raporlar
 
-| Hafta | Yaptıklarım (PR) | Öğrendiğim | Yapay zeka | Takıldığım yer |
-| --- | --- | --- | --- | --- |
-| 3 | | | | |
+Çalıştığın **her gün** için bir rapor: `ekip/raporlar/murat-yaman/YYYY-AA-GG.md`. Şablon: [günlük rapor şablonu](../Templates/gunluk-rapor.md). Rapor o günün iş branch'inde, işin PR'ıyla birlikte girer; PR açılmayan günün raporu bir sonraki PR'a eklenir. Yalnızca kendi klasörüne yaz. Dönem sonundaki katkı raporun bu raporlardan derlenir.
+
+Yeni rapor ekleyince bu listeye bir satır ekle (en yeni üstte):
+
+- (İlk raporun hafta 3'te buraya eklenecek.)

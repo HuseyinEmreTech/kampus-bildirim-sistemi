@@ -24,7 +24,7 @@ Roller kişilerin bildiği dillere göre verildi: Ertuğrul Dart ve PostgreSQL, 
 ## 2. Takvim
 
 - Dönem 15 ders haftası; ders **cuma** günü. 16. haftada ders yok, plana girmez.
-- Sprint **Pazartesi-Pazar**. Kapanış **Pazar 23:59**: o haftanın PR'ları birleşmiş, kişisel günlükler yazılmış olur.
+- Sprint **Pazartesi-Pazar**. Kapanış **Pazar 23:59**: o haftanın PR'ları birleşmiş, günlük raporlar girmiş olur.
 - **Cuma dersi:** herkes bir önceki sprintte ne yaptığını 1 dakikada anlatır; hafta ortası durum konuşulur.
 - **Pazartesi:** 15 dakikalık çevrimiçi planlama; o haftanın issue'ları kişilere atanır.
 - Tarihlerin dayanağı: 1. hafta 18 Eylül 2026 cuma. **Doğrulanmadı:** sunum tarihleri ve 25 Aralık'ta ders olup olmadığı.
@@ -92,7 +92,7 @@ Yapılmayanlar: Wiki (dokümanlar repoda), Discussions (konuşma issue'larda ve 
 | Kayıt | Kim yazar | Ne zaman |
 | --- | --- | --- |
 | PR açıklaması (şablon) | PR'ı açan | Her PR; commit başına kayıt yerine geçer |
-| Kişisel günlük (kişisel plan dosyasının sonu) | Herkes yalnızca kendi dosyasını | Her Pazar; katkı raporunun kaynağı |
+| **Günlük rapor** (`ekip/raporlar/<kişi>/YYYY-AA-GG.md`, [şablon](Templates/gunluk-rapor.md)) | Herkes yalnızca kendi klasörüne | Çalışılan her gün; o günün PR'ıyla birlikte. Ne yaptım, ne yapamadım ve neden, plandan ne değişti, hangi tercihi neden yaptım, yapay zeka, takıldığım yer, sıradaki. Katkı raporunun kaynağı |
 | Haftalık kayıt (`haftalik/`) | Hüseyin Emre | Her Pazar; birleşen PR listesinden derlenir |
 | Hata, teknoloji, SonarQube, Skill kayıtları (`kayitlar/`) | İlgili PR'ın sahibi | Olduğu PR'da |
 | ADR (`adr/`) | Hüseyin Emre (taslağı herkes önerebilir) | Geri dönülmesi zor kararda |

@@ -20,7 +20,7 @@ son-guncelleme: 2026-10-02
 - Git geçmişini temiz başlat: `main`'den `docs/proje-bilgileri` branch'i, yalnızca dokümanlar, README, `.gitignore`, `AGENTS.md`, `CLAUDE.md`.
 - GitHub: `main` koruması (2 Ekim'de kuruldu), etiketler, milestone'lar (Hafta 03-15), Projects panosu, hafta 3-4 issue'ları.
 - Yusuf Ekenel'i davet et (GitHub adı alınınca).
-- `ekip/` dosyalarını ve ilk PR görevini (herkes kendi plan dosyasına günlük yazar) duyur.
+- `ekip/` dosyalarını ve ilk PR görevini (herkes ilk günlük raporunu yazar) duyur.
 
 ### Hafta 4 (5 - 11 Eki)
 - **Repo iskeleti** ([uygulama planı](../planlar/2026-10-02-repo-iskeleti.md)): workspace, 6 paket, mimari test, CI, `CODEOWNERS`, PR ve issue şablonları.
@@ -77,10 +77,10 @@ son-guncelleme: 2026-10-02
 ### Hafta 15 (21 - 27 Ara): teslim
 - Final README, sunum, katkı raporu; teslim dersinde 2. sunum.
 
-## Günlük
+## Raporlar
 
-Her Pazar: ne yaptım (PR numaraları), ne öğrendim, yapay zekayı nerede kullandım, nerede takıldım.
+Çalıştığın **her gün** için bir rapor: `ekip/raporlar/huseyin-emre/YYYY-AA-GG.md`. Şablon: [günlük rapor şablonu](../Templates/gunluk-rapor.md). Rapor o günün iş branch'inde, işin PR'ıyla birlikte girer; PR açılmayan günün raporu bir sonraki PR'a eklenir. Yalnızca kendi klasörüne yaz. Dönem sonundaki katkı raporun bu raporlardan derlenir.
 
-| Hafta | Yaptıklarım | Yapay zeka | Takıldığım yer |
-| --- | --- | --- | --- |
-| 3 | | | |
+Yeni rapor ekleyince bu listeye bir satır ekle (en yeni üstte):
+
+- [2026-10-02](raporlar/huseyin-emre/2026-10-02.md): ekip kuruldu, `main` koruması, planlar ve korumalar yazıldı

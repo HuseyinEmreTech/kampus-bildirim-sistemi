@@ -27,7 +27,7 @@ son-guncelleme: 2026-10-02
 
 ### Hafta 3 (28 Eyl - 4 Eki)
 - Kurulum ([rehber](00-baslangic-rehberi.md#2-kurulum)), `flutter doctor`.
-- **İlk PR:** bu dosyanın Günlük bölümüne hafta 3 satırı. Amaç Git akışını bir kez baştan sona yaşamak.
+- **İlk PR:** [şablonla](../Templates/gunluk-rapor.md) ilk günlük raporun (`raporlar/yusuf-ekenel/`) ve bu dosyadaki Raporlar listesine bağlantısı. Amaç Git akışını bir kez baştan sona yaşamak.
 
 ### Hafta 4 (5 - 11 Eki): test senaryoları ve sahte veri
 - `proje-bilgileri/test-senaryolari.md`: her kullanıcı hikayesi (USR 01-07) için elle test adımları. Biçim: "Ön koşul / Adımlar / Beklenen sonuç". En az 3 senaryo her hikayede: normal yol, hatalı giriş, boş durum.
@@ -71,8 +71,10 @@ son-guncelleme: 2026-10-02
 ### Hafta 15 (21 - 27 Ara): teslim
 - Katkı raporu, sunumdaki kendi bölümün (kullanıcı akışı ve test).
 
-## Günlük
+## Raporlar
 
-| Hafta | Yaptıklarım (PR) | Öğrendiğim | Yapay zeka | Takıldığım yer |
-| --- | --- | --- | --- | --- |
-| 3 | | | | |
+Çalıştığın **her gün** için bir rapor: `ekip/raporlar/yusuf-ekenel/YYYY-AA-GG.md`. Şablon: [günlük rapor şablonu](../Templates/gunluk-rapor.md). Rapor o günün iş branch'inde, işin PR'ıyla birlikte girer; PR açılmayan günün raporu bir sonraki PR'a eklenir. Yalnızca kendi klasörüne yaz. Dönem sonundaki katkı raporun bu raporlardan derlenir.
+
+Yeni rapor ekleyince bu listeye bir satır ekle (en yeni üstte):
+
+- (İlk raporun hafta 3'te buraya eklenecek.)

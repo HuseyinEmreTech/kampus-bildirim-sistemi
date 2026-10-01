@@ -289,7 +289,7 @@ Gerçek ilerleme: [haftalık kayıtlar](proje-bilgileri/haftalik/00-haftalik-ind
 
 ## 17. Dokümantasyon haritası
 
-Tüm dokümanlar [`proje-bilgileri/`](proje-bilgileri/) klasöründedir; buradan başla: [`00-index.md`](proje-bilgileri/00-index.md). Klasör [Obsidian](https://obsidian.md) vault'u olarak da açılabilir; bağlantılar standart Markdown olduğu için GitHub'da da çalışır.
+Tüm dokümanlar `proje-bilgileri/` klasöründedir; nasıl inceleneceği ve kimin nereden başlayacağı: [vault rehberi](proje-bilgileri/README.md), doküman listesi: [`00-index.md`](proje-bilgileri/00-index.md). Klasör [Obsidian](https://obsidian.md) vault'u olarak da açılabilir; bağlantılar standart Markdown olduğu için GitHub'da da çalışır.
 
 | Grup | Dosyalar |
 | --- | --- |

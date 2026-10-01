@@ -25,7 +25,7 @@ son-guncelleme: 2026-10-02
   podman run --rm -d --name pg-deneme -e POSTGRES_PASSWORD=deneme -p 5440:5432 postgres:16
   podman exec -it pg-deneme psql -U postgres -c "select version();"
   ```
-- İlk PR: kendi plan dosyanın **Günlük** bölümüne hafta 3 satırı.
+- İlk PR: [şablonla](../Templates/gunluk-rapor.md) ilk günlük raporun (`raporlar/ertugrul-pekdemir/`) ve plan dosyandaki Raporlar listesine bağlantısı.
 
 ### Hafta 4 (5 - 11 Eki): şema ve seed
 - `compose.yaml`: yalnızca PostgreSQL 16, host portu `5440`, şifre `.env`'den; `.env.example` (gerçek şifre yok).
@@ -78,10 +78,12 @@ son-guncelleme: 2026-10-02
 - Entegrasyon testlerinin tamamı, yarış testi 20 kez üst üste, temiz veritabanından kurulum denemesi.
 
 ### Hafta 15 (21 - 27 Ara): teslim
-- Katkı raporu (Günlük bölümünden), sunumdaki kendi bölümün.
+- Katkı raporu (günlük raporlarından), sunumdaki kendi bölümün.
 
-## Günlük
+## Raporlar
 
-| Hafta | Yaptıklarım (PR) | Öğrendiğim | Yapay zeka | Takıldığım yer |
-| --- | --- | --- | --- | --- |
-| 3 | | | | |
+Çalıştığın **her gün** için bir rapor: `ekip/raporlar/ertugrul-pekdemir/YYYY-AA-GG.md`. Şablon: [günlük rapor şablonu](../Templates/gunluk-rapor.md). Rapor o günün iş branch'inde, işin PR'ıyla birlikte girer; PR açılmayan günün raporu bir sonraki PR'a eklenir. Yalnızca kendi klasörüne yaz. Dönem sonundaki katkı raporun bu raporlardan derlenir.
+
+Yeni rapor ekleyince bu listeye bir satır ekle (en yeni üstte):
+
+- (İlk raporun hafta 3'te buraya eklenecek.)

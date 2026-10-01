@@ -124,6 +124,10 @@ Yasaklar:
 - Hata mesajını yapay zekaya da, ekibe de **olduğu gibi** yapıştır; özetleme.
 - Kurulum sorunları için `flutter doctor -v` çıktısını ekle.
 
-## 7. Her pazar
+## 7. Her çalıştığın gün: günlük rapor
 
-Kendi plan dosyanın sonundaki **Günlük** bölümüne o haftayı yaz: ne yaptın (PR numaralarıyla), neyi öğrendin, yapay zekayı nerede kullandın, nerede takıldın. Dönem sonunda katkı raporun buradan çıkacak.
+[Şablonu](../Templates/gunluk-rapor.md) kopyala, `ekip/raporlar/<adin-soyadin>/YYYY-AA-GG.md` olarak kaydet ve doldur: ne yaptın (issue ve PR numarasıyla), ne yapamadın ve neden, plandan ne değişti, hangi tercihi neden yaptın, yapay zekayı nasıl kullandın, nerede takıldın, sıradaki iş. 5-10 dakika sürer.
+
+- Rapor o günün iş branch'inde commit'lenir, işin PR'ıyla birlikte girer. PR açmadığın günün raporu bir sonraki PR'a eklenir.
+- Plan dosyandaki **Raporlar** listesine bir satır ekle.
+- Yalnızca kendi klasörüne yaz. Hoca kimin ne yaptığını sorduğunda bu raporlar ve PR'lar cevaptır; dönem sonundaki katkı raporun da buradan derlenir.

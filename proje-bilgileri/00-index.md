@@ -12,6 +12,7 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 
 ## Buradan başla
 
+0. Vault nasıl incelenir, kim nereden başlar: [Vault rehberi](README.md)
 1. Proje ne ve neden: [Proje kapsamı ve amacı](01-project-scope.md)
 2. Bu hafta ne oldu: [Haftalık kayıtlar](haftalik/00-haftalik-index.md)
 3. Ekibe yeni katıldıysan: [Başlangıç rehberi](ekip/00-baslangic-rehberi.md)
@@ -44,7 +45,7 @@ Projede olan biten her şey bu kayıtlarda tutulur.
 | Kayıt | Ne tutulur |
 | --- | --- |
 | [Haftalık kayıtlar](haftalik/00-haftalik-index.md) | Haftanın proje kararları, teknoloji yığını değişiklikleri, gün gün yapılanlar |
-| Kişisel günlükler ([Hüseyin](ekip/huseyin-emre.md), [Ertuğrul](ekip/ertugrul-pekdemir.md), [Murat](ekip/murat-yaman.md), [Yusuf](ekip/yusuf-ekenel.md)) | Her üyenin haftalık işi; katkı raporunun kaynağı |
+| Günlük raporlar ([Hüseyin](ekip/huseyin-emre.md#raporlar), [Ertuğrul](ekip/ertugrul-pekdemir.md#raporlar), [Murat](ekip/murat-yaman.md#raporlar), [Yusuf](ekip/yusuf-ekenel.md#raporlar)) | Her üyenin çalıştığı her gün: ne yaptı, ne yapamadı, ne değişti, neyi neden seçti; katkı raporunun kaynağı |
 | [Teknoloji değişiklikleri](kayitlar/teknoloji-degisiklikleri.md) | Yığına giren, değişen ve elenen her şey |
 | [Hata kayıtları](kayitlar/hata-kayitlari.md) | Yapay zekanın ve bizim yaptığımız hatalar, düzeltmeler, dersler |
 | [SonarQube puanları](kayitlar/sonarqube-puanlari.md) | Tarama puanları ve bulgu çözüm günlüğü |
