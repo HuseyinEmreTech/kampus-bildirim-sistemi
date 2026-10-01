@@ -10,7 +10,7 @@ son-guncelleme: 2026-10-02
 
 **Sorumluluk:** Test senaryoları ve sahte veri (projenin "kullanıcı gözü"); Flutter'da **öğrenci ekranları** (giriş, bildirimlerim, bildirim detayı, çözüldü haberleri); test haftasında elle test turu.
 
-**Neden böyle başlıyor:** Programlamaya yenisin. İlk iki hafta kod yazmadan projeye gerçek katkı veriyorsun (test senaryoları ve sahte veri herkesin kullandığı şeyler), bu sürede Dart ve Git öğreniyorsun. Hafta 5'ten itibaren her hafta bir ekran; ekranlar önce **sahte veriyle** yapılıyor, yani sunucuyu beklemiyorsun ve bir şeyi bozma ihtimalin yok.
+**Neden böyle başlıyor:** İlk iki hafta kod yazmadan projeye gerçek katkı veriyorsun (test senaryoları ve sahte veri herkesin kullandığı şeyler), bu sürede Dart ve Git öğreniyorsun. Hafta 5'ten itibaren her hafta bir ekran; ekranlar önce **sahte veriyle** yapılıyor, yani sunucuyu beklemiyorsun ve bir şeyi bozma ihtimalin yok.
 
 **Dokunmayacağın yerler:** `packages/app` dışındaki tüm kod klasörleri. `packages/app` içinde de yalnızca issue'da yazan dosyalar.
 

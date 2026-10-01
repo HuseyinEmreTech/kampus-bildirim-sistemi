@@ -21,7 +21,7 @@ Bu doküman projenin **neden** var olduğunu, **kimin için** yapıldığını, 
 | İstemci | Flutter (Dart) |
 | Sunucu | Dart (Shelf) ve PostgreSQL, öneri: [ADR-01](adr/01-dart-backend-postgresql.md) |
 | Geliştirme yaklaşımı | Feature branch ile küçük iterasyonlar, spec önce ([süreç](08-development-process.md)) |
-| Durum | Hoca olumlu yanıt verdi (1 Ekim 2026), dört kişilik ekip kuruldu |
+| Durum | Onaylandı, dört kişilik ekip kuruldu |
 
 ## 2. Problem
 

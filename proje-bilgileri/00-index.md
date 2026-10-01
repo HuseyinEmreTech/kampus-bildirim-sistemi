@@ -8,7 +8,7 @@ son-guncelleme: 2026-09-30
 
 Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf ve konumla bildirir, görevli üstlenir ve çözer, çözülünce öğrenciye sistemde haber gider.
 
-> **Durum (2 Ekim 2026):** Hoca projeye ve teknoloji seçimine olumlu yanıt verdi, ekiple yürütülmesini istedi; dört kişilik ekip kuruldu. Kod henüz yok; ilk iş [repo iskeleti](planlar/2026-10-02-repo-iskeleti.md).
+> **Durum (2 Ekim 2026):** Proje onaylandı, dört kişilik ekip kuruldu. Kod henüz yok; ilk iş [repo iskeleti](planlar/2026-10-02-repo-iskeleti.md).
 
 ## Buradan başla
 
@@ -82,7 +82,7 @@ Bu dokümanların güncel kalması projenin bir parçasıdır.
 | Backend dili ve veritabanı | Dart (Shelf) ve PostgreSQL | Kabul ([ADR-01](adr/01-dart-backend-postgresql.md)) |
 | Takım büyüklüğü ve süre | 4 kişi, 15 ders haftası | Kabul ([ekip](10-ekip-ve-yol-haritasi.md)) |
 | Konum alma | GPS; izin yoksa bina listesi | Kabul ([mimari](11-kod-mimarisi-ve-korumalar.md#5-konum)) |
-| Çözümde sonuç fotoğrafı | Zorunlu | Kabul (hocaya e-postadaki söz) |
+| Çözümde sonuç fotoğrafı | Zorunlu | Kabul |
 | Sunum ve teslim tarihleri | Hafta 9 ve 15 varsayımı | Hoca'ya sorulacak |
 | Kampüs sınırı koordinatları | Yapılandırma dosyasında dikdörtgen | Açık |
 | `OUTSIDE_CAMPUS` HTTP durumu | `422` | Öneri |

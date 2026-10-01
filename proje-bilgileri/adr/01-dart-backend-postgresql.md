@@ -10,7 +10,7 @@ son-guncelleme: 2026-10-02
 
 ## Durum
 
-**Kabul edildi (2 Ekim 2026).** Hoca 1 Ekim e-postasında teknoloji seçimini "yerinde" buldu; ekip 4 kişi, süre 15 ders haftası. Dart için SonarQube sorusu [ADR-02](02-kalite-araci-sonarqube-cloud.md)'de açık.
+**Kabul edildi (2 Ekim 2026).** Proje ve teknoloji seçimi onaylandı; ekip 4 kişi, süre 15 ders haftası. Dart için SonarQube sorusu [ADR-02](02-kalite-araci-sonarqube-cloud.md)'de açık.
 
 ## Bağlam
 
@@ -50,7 +50,7 @@ Kritik iş kuralları:
 
 ## Açık sorular
 
-- ~~Hocanın görüşü: Dart backend kabul mü?~~ Cevaplandı: teknoloji seçimi uygun (1 Ekim 2026).
+- ~~Hocanın görüşü: Dart backend kabul mü?~~ Cevaplandı: teknoloji seçimi onaylandı.
 - SonarQube Cloud (ücretsiz plan) ile Dart taraması kabul mü, yoksa yerel SonarQube mi bekleniyor?
 
 ## Değişiklik geçmişi
@@ -60,4 +60,4 @@ Kritik iş kuralları:
 | 2026-09-30 | İlk taslak, durum: Önerildi |
 | 2026-09-30 | SonarQube doğrulandı: Community'de Dart dili yok; değiş tokuş ve açık soru güncellendi |
 | 2026-09-30 | İnternet araştırması: Dart desteği Developer Edition ve SonarQube Cloud'da var; ücretsiz Cloud planı öneriliyor |
-| 2026-10-02 | Durum: Kabul edildi (hoca olumlu yanıt, ekip kuruldu); C# (ASP.NET) alternatifi yeniden değerlendirildi (derleyiciyle katman koruması, yerel SonarQube); Dart'ta kalındı: tek dil, ekipte iki Dart bilen; katman koruması paket bağımlılıkları ve mimari testle sağlanır ([korumalar](../11-kod-mimarisi-ve-korumalar.md)) |
+| 2026-10-02 | Durum: Kabul edildi (proje onaylandı, ekip kuruldu); C# (ASP.NET) alternatifi yeniden değerlendirildi (derleyiciyle katman koruması, yerel SonarQube); Dart'ta kalındı: istemci ve sunucuda tek dil; katman koruması paket bağımlılıkları ve mimari testle sağlanır ([korumalar](../11-kod-mimarisi-ve-korumalar.md)) |

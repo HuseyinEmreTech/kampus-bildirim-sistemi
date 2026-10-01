@@ -10,7 +10,7 @@ son-guncelleme: 2026-10-02
 
 **Sorumluluk:** `packages/contracts` sınıflarının yazımı (Hüseyin onaylar), `packages/server` (Shelf endpoint'leri, kimlik doğrulama ara katmanı, hata eşleme, `bin/main.dart`); hafta 8'den sonra Flutter'da **görevli ekranları**.
 
-**Neden sen:** C# biliyorsun; Dart'ın sözdizimi C#'a çok yakın (sınıf, `final`, `async`/`await`, null güvenliği). Sunucu katmanı ince: isteği oku, servisi çağır, sonucu JSON'a çevir. İş kuralı yazmazsın, kuralı servis uygular.
+**İpucu:** C# bilen biri için Dart'ın sözdizimi çok tanıdıktır (sınıf, `final`, `async`/`await`, null güvenliği). Sunucu katmanı ince: isteği oku, servisi çağır, sonucu JSON'a çevir. İş kuralı yazmazsın, kuralı servis uygular.
 
 **Dokunmayacağın yerler (sorulmadan):** `packages/domain`, `packages/application`, `packages/infrastructure`, `test/architecture_test.dart`, `.github/`. Bir endpoint için servis eksikse issue'da yaz.
 

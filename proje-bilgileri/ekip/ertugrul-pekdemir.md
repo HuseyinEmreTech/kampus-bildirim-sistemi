@@ -10,7 +10,7 @@ son-guncelleme: 2026-10-02
 
 **Sorumluluk:** `packages/infrastructure` (PostgreSQL repository'leri, dosya depolama, EXIF temizleme, parola hash), `db/migrations`, `db/seed`, `compose.yaml`; hafta 8'den sonra Flutter'da **yeni bildirim ekranı** (kamera, GPS, bina listesi).
 
-**Neden sen:** Ekipte Dart ve PostgreSQL bilen tek kişisin. Projenin en kritik iki kuralı (Rule 02 yarış, Rule 04 tek işlem) veritabanında çözülüyor.
+**Neden önemli:** Projenin en kritik iki kuralı (Rule 02 yarış, Rule 04 tek işlem) veritabanında çözülüyor.
 
 **Dokunmayacağın yerler (sorulmadan):** `packages/domain`, `packages/application`, `packages/contracts`, `test/architecture_test.dart`, `.github/`. Arayüz (imza) değişmesi gerekiyorsa issue'da Hüseyin'e yaz; arayüzü sen değiştirme.
 

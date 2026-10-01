@@ -4,11 +4,9 @@
 
 *Yapay Zeka Destekli Yazılım Geliştirme dersi dönem projesi. Dört kişilik ekip: Hüseyin Emre, Yusuf Ekenel, Murat Yaman, Ertuğrul Pekdemir.*
 
-> **Durum (1 Ekim 2026):** Proje fikri hocaya iletildi, hoca olumlu yanıt verdi ("faydalı ve çevreci", teknoloji seçimi "yerinde"; 1 Ekim e-postası); hoca projeyi takımla yürütmemizi önerdi, ekip kuruldu. Bu repo'da henüz **proje kodu yok**; tasarım, dokümantasyon ve izleme sistemi var. Aşağıdaki teknoloji seçimleri **öneridir**, kesinleşince güncellenir. Kurulum ve çalıştırma bölümleri kod eklenince tamamlanacaktır.
-
 ## Ekip ve çalışma düzeni
 
-Hoca projenin ekiple ve GitHub üzerinde, branch ve Pull Request ile yürütülmesini istedi; kodları ve kimin ne yaptığını soracağını söyledi. Ders cuma günleri; dönem 15 ders haftası, şu an 3. haftadayız. Ekibe yeni katılan: [Başlangıç rehberi](proje-bilgileri/ekip/00-baslangic-rehberi.md).
+Proje ekiple, GitHub üzerinde branch ve Pull Request ile yürütülür. Ders cuma günleri; dönem 15 ders haftası, şu an 3. haftadayız. Ekibe yeni katılan: [Başlangıç rehberi](proje-bilgileri/ekip/00-baslangic-rehberi.md).
 
 | Kişi | Rol (öneri) | Ana sorumluluk |
 | --- | --- | --- |

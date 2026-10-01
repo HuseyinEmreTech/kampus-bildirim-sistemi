@@ -8,7 +8,7 @@ son-guncelleme: 2026-10-02
 
 ← [İndeks](00-index.md)
 
-Hoca projenin ekiple ve GitHub üzerinden (branch, Pull Request) yürütülmesini istedi ve **kodları soracağını, kimin ne yaptığını denetleyeceğini** söyledi. Bu doküman ekibin nasıl çalıştığını, GitHub'da neyi nasıl kullandığını ve haftalık hedefleri tanımlar. Kod yapısı ve korumalar: [Kod mimarisi ve korumalar](11-kod-mimarisi-ve-korumalar.md). Yeni katılan biri için: [Başlangıç rehberi](ekip/00-baslangic-rehberi.md).
+Proje ekiple ve GitHub üzerinden (branch, Pull Request) yürütülür; **herkes kendi yazdığı kodu anlatabilmeli ve kimin ne yaptığı GitHub geçmişinden görülebilmelidir.** Bu doküman ekibin nasıl çalıştığını, GitHub'da neyi nasıl kullandığını ve haftalık hedefleri tanımlar. Kod yapısı ve korumalar: [Kod mimarisi ve korumalar](11-kod-mimarisi-ve-korumalar.md). Yeni katılan biri için: [Başlangıç rehberi](ekip/00-baslangic-rehberi.md).
 
 ## 1. Ekip
 
@@ -19,7 +19,7 @@ Hoca projenin ekiple ve GitHub üzerinden (branch, Pull Request) yürütülmesin
 | Murat Yaman | `yamanmurat761` | Sunucu (API) | `server` (endpoint'ler, kimlik doğrulama, hata eşleme); sonra görevli ekranları | [Plan](ekip/murat-yaman.md) |
 | Yusuf Ekenel | (davet edilecek) | Uygulama ve test | Test senaryoları, sahte veri; öğrenci ekranları | [Plan](ekip/yusuf-ekenel.md) |
 
-Roller kişilerin bildiği dillere göre verildi: Ertuğrul Dart ve PostgreSQL, Murat C#, C++ ve SQL biliyor; Yusuf programlamaya yeni olduğu için görevleri küçük ve rehberli kesildi.
+Görevler, her iş bağımsız ilerleyebilecek ve tek PR'a sığacak büyüklükte kesildi; ilk haftalar herkes için kurulum ve ısınmadır.
 
 ## 2. Takvim
 
