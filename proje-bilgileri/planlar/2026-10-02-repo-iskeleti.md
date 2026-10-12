@@ -426,8 +426,9 @@ git commit -m "ci: biçim, analiz, mimari test ve testler"
 /.github/                @HuseyinEmreTech
 /AGENTS.md               @HuseyinEmreTech
 /CLAUDE.md               @HuseyinEmreTech
-/analysis_options.yaml   @HuseyinEmreTech
-/pubspec.yaml            @HuseyinEmreTech
+# Her klasördeki bağımlılık ve analiz ayarı: yeni paket eklemek veya kuralı gevşetmek onay ister.
+pubspec.yaml             @HuseyinEmreTech
+analysis_options.yaml    @HuseyinEmreTech
 ```
 
 - [ ] **Adım 2: `.github/pull_request_template.md`**
