@@ -1,26 +1,50 @@
 # Güvenlik Politikası
 
-Bu depo, **ders kapsamında geliştirilen bir demo sistemdir**; üretim sistemi değildir. Yalnızca `main` dalı desteklenir.
+**Campus Report** — kampüs sorun bildirim sistemi (Flutter istemci + Dart/Shelf sunucu + PostgreSQL 16). Bu depo, Yapay Zeka Destekli Yazılım Geliştirme dersi kapsamında geliştirilen bir **öğrenci projesidir**; ticari veya üretim sistemi değildir. Yine de güvenlik bildirimlerini ciddiye alıyoruz.
+
+## Desteklenen sürümler
+
+| Sürüm | Destek |
+| --- | --- |
+| `main` dalı (güncel geliştirme) | Evet |
+| Eski sürümler / etiketli sürümler | Hayır |
 
 ## Güvenlik açığı bildirimi
 
-Bir güvenlik açığı bulduysan **herkese açık issue açma**. Bunun yerine:
+Lütfen güvenlik açıklarını **herkese açık issue açarak bildirmeyin.** İki yol vardır:
 
-1. GitHub'da **özel güvenlik bildirimi** kullan: depoda **Security → Report a vulnerability**, veya
-2. E-posta: `huseyinemre.tech@gmail.com`
+1. **Özel güvenlik bildirimi (tercih edilen).** Bu depoda **Security → Report a vulnerability**. Bildirim gizli kalır ve yalnızca proje ekibi görür.
+2. **E-posta:** `huseyinemre.tech@gmail.com` — konu satırına `[GÜVENLİK]` yazın.
 
-Bildirimde bulunması faydalı olanlar:
+### Bildirimde neler bulunmalı
 
-- Etkilenen bölüm (endpoint, dosya, ekran)
-- Adım adım yeniden üretme
-- Olası etki ve önerilen düzeltme
+- Açığın türü ve etkilenen bölüm (API ucu, dosya, ekran)
+- Adım adım yeniden üretme (mümkünse örnek istek/yanıt)
+- Olası etki ve varsa önerilen düzeltme
+- İsteğe bağlı: nasıl anılmak istediğiniz
 
-Bildirimleri gizli tutarız; düzeltme için bir zaman çizelgesi vermeye çalışırız.
+### Süreç
 
-## Kapsam ve kurallar
+- Bildirimi mümkün olan en kısa sürede (hedefimiz **3 iş günü**) yanıtlar ve değerlendiririz.
+- Doğrulanan açıkları, düzeltme yayımlanmadan önce kamuya açıklamayız; sizinle koordinasyonu koruruz.
+- Düzeltmeden sonra, isterseniz katkınızı anarız.
 
-- **Sırlar repoya girmez.** Şifre, token, `.env` ve gerçek kişi verisi commit edilmez; `.env` `.gitignore`'dadır.
-- Bir sır sızdığında ilgili token/anahtar **derhal iptal edilir** ve yenisi yalnızca GitHub Secrets'ta tutulur.
-- Kod kalitesi ve güvenlik taraması PR'larda **SonarQube Cloud** ile yapılır; sır taraması GitHub'ın yerleşik taramasıyla izlenir.
+## Kapsam
 
-Daha geniş güvenlik ve gizlilik notları: [proje-bilgileri/06-security-and-privacy.md](proje-bilgileri/06-security-and-privacy.md).
+**Kapsam içi:** API uçları, kimlik doğrulama ve yetkilendirme, dosya yükleme/indirme, veritabanı erişimi, mobil/web istemci.
+
+**Kapsam dışı:** Üçüncü taraf hizmetler (SonarQube Cloud, GitHub), sosyal mühendislik, hizmet dışı bırakma (DoS) testleri, otomatik tarayıcı gürültüsü.
+
+## Uyguladığımız güvenlik uygulamaları
+
+- **Sır yönetimi:** Şifre, token ve `.env` repoya girmez (`.gitignore`); bir sır sızarsa ilgili anahtar derhal iptal edilir ve yalnızca GitHub Secrets'ta tutulur.
+- **Statik analiz ve kalite:** Her push/PR'da SonarQube Cloud ile Dart analizi; Quality Gate zorunlu kontrol.
+- **Sır taraması:** GitHub secret scanning açıktır.
+- **Bağımlılıklar:** GitHub Dependabot uyarıları açıktır.
+- **Dal koruması:** `main` yalnızca incelenmiş Pull Request ile değişir; doğrudan commit yoktur.
+
+Ayrıntılı güvenlik ve gizlilik notları: [proje-bilgileri/06-security-and-privacy.md](proje-bilgileri/06-security-and-privacy.md). Mimari korumalar: [proje-bilgileri/11-kod-mimarisi-ve-korumalar.md](proje-bilgileri/11-kod-mimarisi-ve-korumalar.md).
+
+## İletişim
+
+Proje ekibi, roller ve GitHub hesapları: [README — Ekip ve çalışma düzeni](README.md).
