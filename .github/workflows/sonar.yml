@@ -22,6 +22,6 @@ jobs:
       - name: Bağımlılıklar
         run: flutter pub get
       - name: SonarQube Cloud taraması
-        uses: SonarSource/sonarqube-scan-action@v7
+        uses: SonarSource/sonarqube-scan-action@v8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
