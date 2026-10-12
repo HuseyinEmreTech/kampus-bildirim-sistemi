@@ -9,6 +9,7 @@
 # Her klasördeki bağımlılık ve analiz ayarı: yeni paket eklemek veya kuralı gevşetmek onay ister.
 pubspec.yaml             @HuseyinEmreTech
 analysis_options.yaml    @HuseyinEmreTech
+/sonar-project.properties @HuseyinEmreTech
 
 # Infrastructure - Ertuğrul
 /packages/infrastructure/ @ertrlpkdmr
@@ -19,3 +20,8 @@ analysis_options.yaml    @HuseyinEmreTech
 # Flutter App - Yusuf (mobil), Fatma (web)
 /packages/app/lib/        @yusufekenel @muberrayener
 /packages/app/web/        @muberrayener
+
+# Veritabanı ve yerel geliştirme ortamı - Ertuğrul
+/db/                      @ertrlpkdmr
+/compose.yaml             @ertrlpkdmr
+/.env.example             @ertrlpkdmr
