@@ -1,7 +1,7 @@
 ---
 title: Ekip ve 15 Haftalık Yol Haritası
 durum: Onaylandı
-son-guncelleme: 2026-10-02
+son-guncelleme: 2026-10-12
 ---
 
 # Ekip ve 15 Haftalık Yol Haritası
@@ -14,10 +14,12 @@ Proje ekiple ve GitHub üzerinden (branch, Pull Request) yürütülür; **herkes
 
 | Kişi | GitHub | Rol | Ana sorumluluk | Kişisel plan |
 | --- | --- | --- | --- | --- |
-| Hüseyin Emre | `HuseyinEmreTech` | Teknik lider | `domain`, `application`, `contracts`, CI, kabul testleri, PR incelemesi | [Plan](ekip/huseyin-emre.md) |
-| Ertuğrul Pekdemir | `ertrlpkdmr` | Veri ve altyapı | `infrastructure` (PostgreSQL, dosya depolama), SQL, compose; sonra yeni bildirim ekranı | [Plan](ekip/ertugrul-pekdemir.md) |
-| Murat Yaman | `yamanmurat761` | Sunucu (API) | `server` (endpoint'ler, kimlik doğrulama, hata eşleme); sonra görevli ekranları | [Plan](ekip/murat-yaman.md) |
-| Yusuf Ekenel | (davet edilecek) | Uygulama ve test | Test senaryoları, sahte veri; öğrenci ekranları | [Plan](ekip/yusuf-ekenel.md) |
+| Hüseyin Emre | `HuseyinEmreTech` | Teknik lider | `domain`, `application`, `contracts`, CI, kabul testleri, PR incelemesi, mimari kararlar | [Plan](ekip/huseyinemretech.md) |
+| Ertuğrul Pekdemir | `ertrlpkdmr` | Backend Infrastructure | `infrastructure` (PostgreSQL repository, dosya depolama, EXIF, migration, Docker) | [Plan](ekip/ertrlpkdmr.md) |
+| Çağdaş Kemal Ağca | `Cagdas3307` | Backend API / Server | `server` (Shelf endpoint'ler, auth, hata eşleme, middleware, OpenAPI) | [Plan](ekip/cagdas3307.md) |
+| Yusuf Ekenel | `yusufekenel` | Flutter Mobil (Android/iOS/Web) | `campus_app` mobil ekranları (öğrenci + görevli), platform kanalları | [Plan](ekip/yusufekenel.md) |
+| Fatma Müberra Yener | `muberrayener` | Flutter Web / Test & QA | `campus_app` web responsive, test stratejisi, SonarQube, otomasyon | [Plan](ekip/muberrayener.md) |
+| Emir Kerem Çakıcı | `KeremC23` | Esnek Destek / Test & Kalite | Kabul testleri yeşile çevirme, entegrasyon/E2E test, hata takibi, dokümantasyon | [Plan](ekip/emirkerem.md) |
 
 Görevler, her iş bağımsız ilerleyebilecek ve tek PR'a sığacak büyüklükte kesildi; ilk haftalar herkes için kurulum ve ısınmadır.
 
@@ -69,7 +71,7 @@ Kural ve test hiçbir zaman kesilmez; önce "olursa" satırı kesilir. Dağıtı
 | **Projects (Kanban)** | Haftanın durumu tek bakışta | Sütunlar: Yapılacak, Yapılıyor, İncelemede, Bitti |
 | **Branch** | Her issue kendi branch'inde | Ad: `feature/<issue-no>-<kisa-ad>`, `fix/...`, `docs/...`, `test/...` |
 | **Pull Request** | Tek yol `main`'e | Şablon doldurulur, `Closes #<issue-no>` yazılır; CI yeşil ve 1 onay olmadan birleşmez; squash ile birleşir |
-| **CODEOWNERS** | Çekirdek koruması | `domain`, `application`, `contracts`, `test/`, `.github/`, `AGENTS.md` değişikliği Hüseyin Emre onayı ister |
+| **CODEOWNERS** | Çekirdek koruması | `domain`, `application`, `contracts`, `test/`, `.github/`, `AGENTS.md` → @HuseyinEmreTech; `infrastructure` → @ertrlpkdmr; `server` → @Cagdas3307; `app` → @yusufekenel @muberrayener |
 | **Actions (CI)** | Otomatik kontrol | Biçim, analiz, mimari test, testler |
 | **Releases** | Demo APK | Hafta 12 ve 15'te APK sürüm olarak yayımlanır |
 
@@ -106,5 +108,5 @@ Herkes yalnızca kendi dosyasına yazdığı için kayıtlarda merge çakışmas
 | Sunum tarihleri ve biçimi | Hoca | Açık |
 | Teslim dersi 25 Aralık mı | Hoca | Açık |
 | Dart için SonarQube Cloud kabul mü ([ADR-02](adr/02-kalite-araci-sonarqube-cloud.md)) | Hoca | Açık |
-| Yusuf Ekenel'in GitHub kullanıcı adı ve daveti | Ekip | Açık |
 | VPS var mı | Ekip | Hafta 11'de karar |
+| Emir Kerem (KeremC23) beceri seti netleşmesi | Hüseyin Emre | Hafta 5'te belirlenecek |

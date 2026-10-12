@@ -6,5 +6,16 @@
 /.github/                @HuseyinEmreTech
 /AGENTS.md               @HuseyinEmreTech
 /CLAUDE.md               @HuseyinEmreTech
-/analysis_options.yaml   @HuseyinEmreTech
-/pubspec.yaml            @HuseyinEmreTech
+# Her klasördeki bağımlılık ve analiz ayarı: yeni paket eklemek veya kuralı gevşetmek onay ister.
+pubspec.yaml             @HuseyinEmreTech
+analysis_options.yaml    @HuseyinEmreTech
+
+# Infrastructure - Ertuğrul
+/packages/infrastructure/ @ertrlpkdmr
+
+# Server/API - Çağdaş
+/packages/server/         @Cagdas3307
+
+# Flutter App - Yusuf (mobil), Fatma (web)
+/packages/app/lib/        @yusufekenel @muberrayener
+/packages/app/web/        @muberrayener

@@ -8,7 +8,7 @@ son-guncelleme: 2026-09-30
 
 Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf ve konumla bildirir, görevli üstlenir ve çözer, çözülünce öğrenciye sistemde haber gider.
 
-> **Durum (2 Ekim 2026):** Proje onaylandı, dört kişilik ekip kuruldu. Kod henüz yok; ilk iş [repo iskeleti](planlar/2026-10-02-repo-iskeleti.md).
+> **Durum (12 Ekim 2026):** Proje onaylandı, **altı kişilik ekip kuruldu** (Hüseyin Emre, Yusuf Ekenel, Ertuğrul Pekdemir, Çağdaş Kemal Ağca, Fatma Müberra Yener, Emir Kerem Çakıcı). Kod henüz yok; hafta 5 sprinti başladı (12-18 Eki). İlk iş: Application UseCase'ler, Repository implementasyonu, Auth endpoint'ler, Web bildirim listesi.
 
 ## Buradan başla
 
@@ -31,7 +31,7 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 | 07 | [Geliştirme ortamı](07-development-environment.md) | Makine, araçlar, kurulum | Güncel |
 | 08 | [Geliştirme süreci](08-development-process.md) | Yöntem, feature branch akışı, kalite, test | Taslak |
 | 09 | [Yapay zeka kullanımı](09-ai-usage.md) | Çalışma ilkeleri, review süresi, prompt'lar | Güncel |
-| 10 | [Ekip ve yol haritası](10-ekip-ve-yol-haritasi.md) | Ekip, roller, GitHub kullanımı, 15 haftalık plan | Onaylandı |
+| 10 | [Ekip ve yol haritası](10-ekip-ve-yol-haritasi.md) | Ekip, roller, GitHub kullanımı, 15 haftalık plan | Onaylandı (12.10.2026: 6 kişiye güncellendi) |
 | 11 | [Kod mimarisi ve korumalar](11-kod-mimarisi-ve-korumalar.md) | Paketler, izinli bağımlılıklar, hatayı önleyen korumalar | Onaylandı |
 | - | [Uygulama planı: repo iskeleti](planlar/2026-10-02-repo-iskeleti.md) | Hafta 4'ün ilk işi, adım adım | Onay bekliyor |
 | - | [ADR-01: Dart backend ve PostgreSQL](adr/01-dart-backend-postgresql.md) | Geri dönülmesi zor karar | Önerildi |
