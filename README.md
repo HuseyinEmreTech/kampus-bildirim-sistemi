@@ -215,6 +215,12 @@ podman compose up -d        # veya: docker compose up -d
 
 PostgreSQL `localhost:5440` adresinde açılır; `db/migrations/` içindeki SQL dosyaları ilk açılışta sırayla çalışır.
 
+Sahte örnek veri (5 bina, 2 öğrenci, 2 görevli, 3 bildirim; parola `Demo.1234`):
+
+```bash
+podman compose exec -T db psql -U campus -d campus < db/seed/001_ornek.sql
+```
+
 **Yapılandırma (planlanan)**
 
 | Değişken | Varsayılan | Açıklama |
