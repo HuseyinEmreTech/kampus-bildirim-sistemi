@@ -33,6 +33,7 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 | 09 | [Yapay zeka kullanımı](09-ai-usage.md) | Çalışma ilkeleri, review süresi, prompt'lar | Güncel |
 | 10 | [Ekip ve yol haritası](10-ekip-ve-yol-haritasi.md) | Ekip, roller, GitHub kullanımı, 15 haftalık plan | Onaylandı (12.10.2026: 6 kişiye güncellendi) |
 | 11 | [Kod mimarisi ve korumalar](11-kod-mimarisi-ve-korumalar.md) | Paketler, izinli bağımlılıklar, hatayı önleyen korumalar | Onaylandı |
+| - | [Başlangıç kuralları](ekip/BASLANGIC_KURALLARI.md) | Her üye için roller, kurallar, onay tablosu | Onaylandı |
 | - | [Uygulama planı: repo iskeleti](planlar/2026-10-02-repo-iskeleti.md) | Hafta 4'ün ilk işi, adım adım | Onay bekliyor |
 | - | [ADR-01: Dart backend ve PostgreSQL](adr/01-dart-backend-postgresql.md) | Geri dönülmesi zor karar | Önerildi |
 | - | [ADR-02: Kod kalitesi aracı](adr/02-kalite-araci-sonarqube-cloud.md) | SonarQube Cloud ve yerel analiz kararı, karşılaştırma matrisi | Önerildi |
@@ -45,7 +46,7 @@ Projede olan biten her şey bu kayıtlarda tutulur.
 | Kayıt | Ne tutulur |
 | --- | --- |
 | [Haftalık kayıtlar](haftalik/00-haftalik-index.md) | Haftanın proje kararları, teknoloji yığını değişiklikleri, gün gün yapılanlar |
-| Günlük raporlar ([Hüseyin](ekip/huseyin-emre.md#raporlar), [Ertuğrul](ekip/ertugrul-pekdemir.md#raporlar), [Murat](ekip/murat-yaman.md#raporlar), [Yusuf](ekip/yusuf-ekenel.md#raporlar)) | Her üyenin çalıştığı her gün: ne yaptı, ne yapamadı, ne değişti, neyi neden seçti; katkı raporunun kaynağı |
+| Günlük raporlar ([Hüseyin](ekip/huseyinemretech.md#raporlar), [Ertuğrul](ekip/ertrlpkdmr.md#raporlar), [Çağdaş](ekip/cagdas3307.md#raporlar), [Yusuf](ekip/yusufekenel.md#raporlar), [Fatma](ekip/muberrayener.md#raporlar), [Emir](ekip/emirkerem.md#raporlar)) | Her üyenin çalıştığı her gün: ne yaptı, ne yapamadı, ne değişti, neyi neden seçti; katkı raporunun kaynağı |
 | [Teknoloji değişiklikleri](kayitlar/teknoloji-degisiklikleri.md) | Yığına giren, değişen ve elenen her şey |
 | [Hata kayıtları](kayitlar/hata-kayitlari.md) | Yapay zekanın ve bizim yaptığımız hatalar, düzeltmeler, dersler |
 | [SonarQube puanları](kayitlar/sonarqube-puanlari.md) | Tarama puanları ve bulgu çözüm günlüğü |

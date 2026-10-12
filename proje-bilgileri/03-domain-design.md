@@ -79,7 +79,7 @@ Konum izni verilmediğinde seçilen kampüs binası. Seed veriden yüklenir; ilk
 | name | Text | 2-100 karakter, benzersiz |
 | latitude, longitude | Double | Kampüs sınırı içinde |
 
-Gerçek kampüs sınırı ve bina listesi hafta 3'te belirlenir (Murat Yaman); o zamana kadar örnek değerler kullanılır.
+Gerçek kampüs sınırı ve bina listesi hafta 3'te belirlenir (Çağdaş Kemal Ağca); o zamana kadar örnek değerler kullanılır.
 
 ## Notification (Entity)
 

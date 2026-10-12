@@ -17,7 +17,7 @@ Ekibe yeni katıldıysan buradan başla. Sırayla oku ve uygula; her adımın so
 3. [Domain tasarımı](../03-domain-design.md): bildirimin durumları ve kurallar (Rule 00-07).
 4. [Kod mimarisi ve korumalar](../11-kod-mimarisi-ve-korumalar.md): kod nereye yazılır, nereye yazılmaz.
 5. [Ekip ve yol haritası](../10-ekip-ve-yol-haritasi.md): kim ne yapıyor, nasıl çalışıyoruz.
-6. Kendi plan dosyan: [Hüseyin Emre](huseyin-emre.md), [Ertuğrul Pekdemir](ertugrul-pekdemir.md), [Murat Yaman](murat-yaman.md), [Yusuf Ekenel](yusuf-ekenel.md).
+6. Kendi plan dosyan: [Hüseyin Emre](huseyinemretech.md), [Ertuğrul Pekdemir](ertrlpkdmr.md), [Çağdaş Kemal Ağca](cagdas3307.md), [Yusuf Ekenel](yusufekenel.md), [Fatma Müberra Yener](muberrayener.md), [Emir Kerem Çakıcı](emirkerem.md).
 
 ## 2. Kurulum
 

@@ -2,18 +2,20 @@
 
 **Kampüs sorun bildirim sistemi.** Öğrenci kampüste gördüğü sorunu fotoğraf ve konumla bildirir, görevli "ilgileniyorum" diyerek üstlenir ve çözer, çözülünce öğrenciye sistemde haber gider.
 
-*Yapay Zeka Destekli Yazılım Geliştirme dersi dönem projesi. Dört kişilik ekip: Hüseyin Emre, Yusuf Ekenel, Murat Yaman, Ertuğrul Pekdemir.*
+*Yapay Zeka Destekli Yazılım Geliştirme dersi dönem projesi. **Altı kişilik ekip**: Hüseyin Emre, Yusuf Ekenel, Ertuğrul Pekdemir, Çağdaş Kemal Ağca, Fatma Müberra Yener, Emir Kerem Çakıcı.*
 
 ## Ekip ve çalışma düzeni
 
 Proje ekiple, GitHub üzerinde branch ve Pull Request ile yürütülür. Ders cuma günleri; dönem 15 ders haftası, şu an 3. haftadayız. Ekibe yeni katılan: [Başlangıç rehberi](proje-bilgileri/ekip/00-baslangic-rehberi.md).
 
-| Kişi | Rol (öneri) | Ana sorumluluk |
-| --- | --- | --- |
-| Hüseyin Emre | Teknik lider | `domain`, `application`, `contracts`, CI, kabul testleri, PR incelemesi |
-| Ertuğrul Pekdemir | Veri ve altyapı | PostgreSQL, SQL şeması, dosya depolama; yeni bildirim ekranı |
-| Murat Yaman | Sunucu (API) | Endpoint'ler, kimlik doğrulama, hata eşleme; görevli ekranları |
-| Yusuf Ekenel | Uygulama ve test | Test senaryoları, sahte veri; öğrenci ekranları |
+| Kişi | GitHub | Rol | Ana sorumluluk |
+| --- | --- | --- | --- |
+| Hüseyin Emre | `HuseyinEmreTech` | Teknik lider | `domain`, `application`, `contracts`, CI, kabul testleri, PR incelemesi, mimari kararlar |
+| Ertuğrul Pekdemir | `ertrlpkdmr` | Backend Infrastructure | `infrastructure` (PostgreSQL, dosya depolama, EXIF, migration, Docker) |
+| Çağdaş Kemal Ağca | `Cagdas3307` | Backend API / Server | `server` (Shelf endpoint'ler, auth, hata eşleme, middleware, OpenAPI) |
+| Yusuf Ekenel | `yusufekenel` | Flutter Mobil | `campus_app` mobil ekranları (Android, iOS, Web), platform kanalları |
+| Fatma Müberra Yener | `muberrayener` | Flutter Web / Test & QA | `campus_app` web responsive, test stratejisi, SonarQube, otomasyon |
+| Emir Kerem Çakıcı | `KeremC23` | Esnek Destek / Test & Kalite | Kabul testleri, entegrasyon/E2E test, hata takibi, dokümantasyon |
 
 **Kurallar:** `main`'e doğrudan commit yok; her iş kendi branch'inde küçük PR ile gelir, en az bir kişi inceler. Herkes her hafta en az bir anlamlı commit atar. Commit mesajı önekli ve Türkçe (`feat:`, `fix:`, `docs:`, `test:`). Şifre, token ve gerçek öğrenci verisi repo'ya girmez. Haftalık hedefler, kişi bazlı görevler ve takvim: [Ekip ve 15 haftalık yol haritası](proje-bilgileri/10-ekip-ve-yol-haritasi.md).
 
