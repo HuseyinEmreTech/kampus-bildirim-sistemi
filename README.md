@@ -1,5 +1,7 @@
 # Campus Report
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=HuseyinEmreTech_Yapay-Zeka-Destekli-Yazilim-Gelistirme&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=HuseyinEmreTech_Yapay-Zeka-Destekli-Yazilim-Gelistirme) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=HuseyinEmreTech_Yapay-Zeka-Destekli-Yazilim-Gelistirme&metric=coverage)](https://sonarcloud.io/summary/new_code?id=HuseyinEmreTech_Yapay-Zeka-Destekli-Yazilim-Gelistirme)
+
 **Kampüs sorun bildirim sistemi.** Öğrenci kampüste gördüğü sorunu fotoğraf ve konumla bildirir, görevli "ilgileniyorum" diyerek üstlenir ve çözer, çözülünce öğrenciye sistemde haber gider.
 
 *Yapay Zeka Destekli Yazılım Geliştirme dersi dönem projesi. **Altı kişilik ekip**: Hüseyin Emre, Yusuf Ekenel, Ertuğrul Pekdemir, Çağdaş Kemal Ağca, Fatma Müberra Yener, Emir Kerem Çakıcı.*
@@ -133,8 +135,8 @@ Bağımlılıklar arayüzle verilir; bağlama `main.dart` içinde yapılır. Zen
 | Veritabanı erişimi | `postgres` paketi, parametreli sorgu | Öneri |
 | Şema yönetimi | Elle SQL dosyaları (`db/migrations/`) | Öneri |
 | Test | Dart `test`, `mocktail`; entegrasyon testi gerçek PostgreSQL konteyneriyle | Öneri |
-| Konteyner | Podman, podman-compose | Kabul |
-| Kod kalitesi | Yerelde `dart analyze`, `flutter analyze`, kapsam; PR'da SonarQube Cloud (ücretsiz plan) | Öneri, [ADR-02](proje-bilgileri/adr/02-kalite-araci-sonarqube-cloud.md); yerel Community'de Dart yok (doğrulandı), Cloud denenmedi |
+| Konteyner | Podman + podman-compose **veya** Docker + Docker Compose | Kabul |
+| Kod kalitesi | Yerelde `dart analyze`, `flutter analyze`, kapsam; PR'da SonarQube Cloud (ücretsiz plan) | Kabul, [ADR-02](proje-bilgileri/adr/02-kalite-araci-sonarqube-cloud.md); yerel Community'de Dart yok (doğrulandı); Cloud kuruldu ve tarama yeşil (12 Ekim 2026) |
 | Dağıtım | VPS üzerinde compose, HTTPS | Planlandı |
 
 Paket sürümleri pub.dev'de kontrol edildikten sonra eklenecek. Değişiklik geçmişi: [teknoloji değişiklikleri](proje-bilgileri/kayitlar/teknoloji-degisiklikleri.md).
@@ -199,13 +201,15 @@ Tümü: [güvenlik ve gizlilik](proje-bilgileri/06-security-and-privacy.md). Dem
 | --- | --- |
 | Dart | 3.13.0 |
 | Flutter | 3.47.0 |
-| Podman ve podman-compose | 5.8.7 ve 1.6.0 |
+| Konteyner | Podman + podman-compose **veya** Docker + Docker Compose |
 | Git | 2.55.0 |
+
+Herkes kendi ortamını kullanır; konteyner için **Podman veya Docker** serbesttir. Ayrıntı ve yeni geliştirici şablonu: [geliştirme ortamı](proje-bilgileri/07-development-environment.md).
 
 **Planlanan adımlar**
 
 ```bash
-podman compose up -d        # PostgreSQL ve SonarQube
+podman compose up -d        # Docker kullanan: docker compose up -d
 cp .env.example .env        # değişkenleri doldur
 ```
 
@@ -236,8 +240,8 @@ Her kod commit'inden sonra statik analiz yapılır ve puanlar kayıt altına al�
 
 | Ölçüt | Durum |
 | --- | --- |
-| SonarQube | Çalışıyor (Community 26.9.0.129388, 30 Eylül'de doğrulandı); henüz kod olmadığı için tarama yapılmadı |
-| SonarQube Dart desteği | Yerel Community'de **yok**; Developer Edition ve SonarQube Cloud'da var, ücretsiz Cloud planı öneriliyor ([araştırma](proje-bilgileri/kayitlar/sonarqube-puanlari.md#dart-desteği-araştırması-2026-09-30)) |
+| SonarQube Cloud | Kuruldu; her push/PR'da tarama ve Quality Gate çalışıyor (12 Ekim 2026). Yerel Community Dart'ı taramıyor (doğrulandı) |
+| SonarQube Dart desteği | SonarQube Cloud'da var; ücretsiz plan kullanılıyor ([araştırma](proje-bilgileri/kayitlar/sonarqube-puanlari.md#dart-desteği-araştırması-2026-09-30)) |
 | Coverage | Henüz ölçülmedi |
 
 Puanlar ve bulgu günlüğü: [SonarQube puanları](proje-bilgileri/kayitlar/sonarqube-puanlari.md).

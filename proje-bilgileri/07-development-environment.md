@@ -1,16 +1,40 @@
 ---
 title: Geliştirme Ortamı
 durum: Güncel
-son-guncelleme: 2026-09-30
+son-guncelleme: 2026-10-12
 ---
 
 # Geliştirme Ortamı
 
 ← [İndeks](00-index.md)
 
-Değerler **30 Eylül 2026'da makineden komutlarla okundu** (sürüm komutları, `podman images`, `flutter doctor`). Araç değişince bu doküman ve [teknoloji değişiklikleri](kayitlar/teknoloji-degisiklikleri.md) güncellenir.
+Proje için **zorunlu tek bir makine veya araç yoktur.** Her geliştirici kendi işletim sistemini ve araçlarını kullanır; konteyner için **Podman veya Docker** serbesttir (komutlar büyük ölçüde aynıdır). Aşağıdaki **paylaşılan gereksinimler** herkes için geçerlidir; kişisel ortam ayrıntısını **her geliştirici kendi bölümüne kendisi yazar**. Yeni katılan, [Geliştirici ortamı şablonunu](#geliştirici-ortamı-şablonu) kopyalar.
 
-## Makine
+## Paylaşılan gereksinimler
+
+| Araç | Sürüm | Not |
+| --- | --- | --- |
+| Dart | 3.13.0 (stable) | |
+| Flutter | 3.47.0 (stable) | |
+| Git | 2.55.0 | |
+| Konteyner | Podman + podman-compose **veya** Docker + Docker Compose | Hangisi kuruluysa; komutlar benzer |
+
+## Geliştirici ortamları
+
+| Geliştirici | İşletim sistemi | Konteyner | Ortam ayrıntısı |
+| --- | --- | --- | --- |
+| Hüseyin Emre (@HuseyinEmreTech) | Fedora Linux 44 | Podman | [aşağıda](#örnek-hüseyin-emre-huseyinemretech) |
+| Ertuğrul Pekdemir (@ertrlpkdmr) | (doldurulacak) | (doldurulacak) | |
+| Çağdaş Kemal Ağca (@Cagdas3307) | (doldurulacak) | (doldurulacak) | |
+| Yusuf Ekenel (@yusufekenel) | (doldurulacak) | (doldurulacak) | |
+| Fatma Müberra Yener (@muberrayener) | (doldurulacak) | (doldurulacak) | |
+| Emir Kerem Çakıcı (@KeremC23) | (doldurulacak) | (doldurulacak) | |
+
+## Örnek: Hüseyin Emre (@HuseyinEmreTech)
+
+Değerler **30 Eylül 2026'da makineden komutlarla okundu** (sürüm komutları, `podman images`, `flutter doctor`). Bu bölüm bir geliştiricinin **örneğidir**; herkes kendi bölümünü yazar. Araç değişince ilgili kişi kendi bölümünü ve [teknoloji değişiklikleri](kayitlar/teknoloji-degisiklikleri.md) günceller.
+
+### Makine
 
 | Konu | Değer |
 | --- | --- |
@@ -20,13 +44,13 @@ Değerler **30 Eylül 2026'da makineden komutlarla okundu** (sürüm komutları,
 | Bellek | 22 GB |
 | Kabuk | bash |
 
-## Araç zinciri
+### Araç zinciri
 
 | Araç | Sürüm | Not |
 | --- | --- | --- |
 | Git | 2.55.0 | |
 | GitHub CLI (`gh`) | 2.97.0 | Repo durumu ve görünürlük kontrolü |
-| Podman | 5.8.7 | Docker yerine; komutlar büyük ölçüde aynı |
+| Podman | 5.8.7 | Bu ortamda Docker yerine; komutlar büyük ölçüde aynı. Docker kullanmak serbesttir |
 | podman-compose | 1.6.0 | `podman compose up -d` |
 | Dart | 3.13.0 (stable) | |
 | Flutter | 3.47.0 (stable) | `flutter doctor`: Flutter, Android toolchain (SDK 36.0.0), Chrome, Linux toolchain ve ağ kaynakları tamam; sorun yok |
@@ -37,32 +61,46 @@ Değerler **30 Eylül 2026'da makineden komutlarla okundu** (sürüm komutları,
 
 **Editörler:** VS Code 1.139.1 (Flatpak; `code` komutu PATH'te yok), Android Studio 2026.1.4.8 (Flatpak), Obsidian 1.13.7 (Flatpak).
 
-**Kurulu olmayanlar:** `dotnet` (projede kullanılmayacak), `docker` (Podman kullanılıyor).
+**Kurulu olmayanlar (bu ortamda):** `dotnet` (projede kullanılmayacak), `docker` (bu ortamda Podman kullanılıyor; diğer geliştiriciler Docker kullanabilir).
 
-## Yerelde hazır konteyner imajları
+### Yerelde hazır konteyner imajları
 
 | İmaj | Boyut | Projede |
 | --- | --- | --- |
 | `postgres:16` ve `postgres:16-alpine` | 458 MB, 297 MB | Uygulama veritabanı ve entegrasyon testi |
-| `sonarqube:community` | 1.44 GB | Kod kalitesi taraması |
+| `sonarqube:community` | 1.44 GB | Kod kalitesi taraması (yerel; Dart taramaz) |
 | `sonarsource/sonar-scanner-cli` | 1.01 GB | SonarQube tarayıcısı |
 
-SonarQube imajı ve tarayıcı yerelde mevcut. **30 Eylül'de doğrulandı:** `sonarqube:community` 26.9.0.129388 yaklaşık 30 saniyede açıldı ve arayüz yanıt verdi. **Ancak Community sürümünde Dart dili yok** (0 Dart kuralı); ayrıntı ve karar: [SonarQube puanları](kayitlar/sonarqube-puanlari.md#doğrulama-kaydı-2026-09-30). Bu makinede daha önce başka bir SonarQube konteynerı çalıştırılmıştı (şu an durmuş, `9000` portunda); ona dokunulmadı.
+SonarQube imajı ve tarayıcı yerelde mevcut. **30 Eylül'de doğrulandı:** `sonarqube:community` 26.9.0.129388 yaklaşık 30 saniyede açıldı ve arayüz yanıt verdi. **Ancak Community sürümünde Dart dili yok** (0 Dart kuralı); ayrıntı ve karar: [SonarQube puanları](kayitlar/sonarqube-puanlari.md#doğrulama-kaydı-2026-09-30). Dart taraması artık SonarQube Cloud'da yapılıyor ([ADR-02](adr/02-kalite-araci-sonarqube-cloud.md)). Bu makinede daha önce başka bir SonarQube konteynerı çalıştırılmıştı (şu an durmuş, `9000` portunda); ona dokunulmadı.
 
-## Portlar ve çakışma riski
+### Portlar ve çakışma riski
 
 | Servis | Planlanan port | Not |
 | --- | --- | --- |
 | PostgreSQL | 5432 | Makinede durmuş başka konteynerlar da 5432'yi kullanıyor; aynı anda ikisi çalışırsa çakışır. Proje compose dosyasında farklı bir host portu (ör. 5440) seçilecek |
-| SonarQube | 9005 | Ders deposundaki compose ile aynı; makinedeki eski konteyner 9000 kullanıyor |
+| SonarQube | 9005 | Yerel; ders deposundaki compose ile aynı. Dart taraması Cloud'da yapıldığı için isteğe bağlı |
 | Uygulama sunucusu | 8080 | Planlanan |
 
-Not: [ADR-02](adr/02-kalite-araci-sonarqube-cloud.md) kararına göre (öneri) **yerel SonarQube sunucusu kurulmayacak**; Dart taraması SonarQube Cloud'da yapılacak. Aşağıdaki compose'ta SonarQube yer almayabilir.
+Not: [ADR-02](adr/02-kalite-araci-sonarqube-cloud.md) kararına göre **yerel SonarQube sunucusu kurulmayacak**; Dart taraması SonarQube Cloud'da yapılıyor.
+
+## Geliştirici ortamı şablonu
+
+Yeni katılan, aşağıdaki bloğu kopyalayıp kendine göre doldurur; sonucu **yukarıdaki "Geliştirici ortamları" tablosuna** ekler (ve isterse kişisel planına yazar).
+
+```markdown
+### <Ad Soyad> (@github)
+
+- İşletim sistemi:
+- Konteyner: Podman / Docker (+ sürüm)
+- Dart / Flutter sürümü:
+- Editör:
+- Bilinen farklar / notlar:
+```
 
 ## Servisler (planlanan compose)
 
 ```bash
-podman compose up -d        # PostgreSQL ve SonarQube
+podman compose up -d        # Docker kullanan: docker compose up -d
 cp .env.example .env        # değişkenleri doldur
 ```
 
@@ -75,12 +113,12 @@ Aşağıdakiler ortamın sağlıklı olduğunu kanıtlar; değişiklikten sonra 
 ```bash
 flutter doctor              # tüm satırlar ✓ olmalı
 dart --version
-podman --version
-podman images               # postgres:16 ve sonarqube:community görünmeli
+podman --version            # Docker kullanan: docker --version
+podman images               # Docker kullanan: docker images
 ```
 
 ## Bilinen eksikler
 
-- Yerel SonarQube Community Dart'ı taramıyor; Dart taraması için SonarQube Cloud (ücretsiz plan) öneriliyor ([araştırma](kayitlar/sonarqube-puanlari.md#dart-desteği-araştırması-2026-09-30)). Yerelde kalite kanıtı `flutter analyze`, `dart analyze` ve kapsam raporu. Kalıcı yerel SonarQube (PostgreSQL destekli) compose'ta henüz tanımlanmadı.
+- Yerel SonarQube Community Dart'ı taramıyor; Dart taraması SonarQube Cloud'da yapılıyor ([ADR-02](adr/02-kalite-araci-sonarqube-cloud.md)). Yerelde kalite kanıtı `flutter analyze`, `dart analyze` ve kapsam raporu.
 - Paket sürümleri (pub.dev) henüz kontrol edilmedi; kod eklenince `pubspec.yaml` ile birlikte yazılır.
 - `flutter doctor` yalnızca `eglinfo` (Linux masaüstü sürücü bilgisi) uyarısı verdi; masaüstü hedefini etkilemez, çözüm gerekirse `mesa-utils` paketi.
