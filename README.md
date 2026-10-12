@@ -227,6 +227,8 @@ Sahte örnek veri (5 bina, 2 öğrenci, 2 görevli, 3 bildirim; parola `Demo.123
 podman compose exec -T db psql -U campus -d campus < db/seed/001_ornek.sql
 ```
 
+Docker kullanan, bu komutlarda `podman` yerine `docker` yazar.
+
 **Yapılandırma (planlanan)**
 
 | Değişken | Varsayılan | Açıklama |
