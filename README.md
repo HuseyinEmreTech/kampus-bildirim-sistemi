@@ -202,12 +202,14 @@ Tümü: [güvenlik ve gizlilik](proje-bilgileri/06-security-and-privacy.md). Dem
 | Podman ve podman-compose | 5.8.7 ve 1.6.0 |
 | Git | 2.55.0 |
 
-**Planlanan adımlar**
+**Veritabanı (PostgreSQL 16)**
 
 ```bash
-podman compose up -d        # PostgreSQL ve SonarQube
-cp .env.example .env        # değişkenleri doldur
+cp .env.example .env        # değişkenleri doldur, şifreyi değiştir
+podman compose up -d        # veya: docker compose up -d
 ```
+
+PostgreSQL `localhost:5440` adresinde açılır; `db/migrations/` içindeki SQL dosyaları ilk açılışta sırayla çalışır.
 
 **Yapılandırma (planlanan)**
 

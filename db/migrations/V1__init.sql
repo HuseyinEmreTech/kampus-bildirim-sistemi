@@ -10,6 +10,19 @@ CREATE TABLE users (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Giriş oturumları: refresh token yalnızca hash olarak saklanır (Issue #19).
+CREATE TABLE sessions (
+  session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(user_id),
+  refresh_token_hash VARCHAR(255) NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  expires_at TIMESTAMPTZ NOT NULL,
+  revoked_at TIMESTAMPTZ,
+  CHECK (expires_at > created_at)
+);
+
+CREATE INDEX idx_sessions_user ON sessions(user_id);
+
 CREATE TABLE buildings (
   building_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(100) NOT NULL UNIQUE CHECK (char_length(name) BETWEEN 2 AND 100),
