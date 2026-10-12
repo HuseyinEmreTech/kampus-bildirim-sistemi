@@ -215,6 +215,18 @@ podman compose up -d        # veya: docker compose up -d
 
 PostgreSQL `localhost:5440` adresinde açılır; `db/migrations/` içindeki SQL dosyaları ilk açılışta sırayla çalışır.
 
+Not: Migration'lar yalnızca veri klasörü **boşken** (ilk açılışta) otomatik çalışır. Veritabanını daha önce kurduysan yeni bir migration'ı elle uygula:
+
+```bash
+podman compose exec -T db psql -U campus -d campus < db/migrations/V2__status_history_ilk_durum.sql
+```
+
+Sahte örnek veri (5 bina, 2 öğrenci, 2 görevli, 3 bildirim; parola `Demo.1234`):
+
+```bash
+podman compose exec -T db psql -U campus -d campus < db/seed/001_ornek.sql
+```
+
 **Yapılandırma (planlanan)**
 
 | Değişken | Varsayılan | Açıklama |
