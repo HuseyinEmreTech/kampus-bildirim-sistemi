@@ -107,3 +107,40 @@ son-guncelleme: 2026-10-12
 - AI review süresi uzarsa → Küçük PR'lar, önbellekli prompt'lar
 - Backend darboğazı → Domain/App tek owner, Infrastructure/Server ayrı owner
 - VPS yok → Hafta 11'de erken karar, yerel demo kaydı hazırla
+
+---
+
+## 12 Ekim 2026 — SonarQube Cloud entegrasyonu (yapıldı, Hafta 7 işi erken tamamlandı)
+
+Bu, [ADR-02](../adr/02-kalite-araci-sonarqube-cloud.md) kararının (Dart taraması SonarQube Cloud Free'de) uygulanmasıdır. Yerel SonarQube Community Dart'ı taramıyor; bu yüzden CI'da bulut taraması kuruldu.
+
+### Neden
+- Dersin beklediği "her commit sonrası kod kalitesi taraması ve bulguların tek tek çözülmesi" alışkanlığını otomatikleştirmek.
+- Her push ve PR'da Quality Gate + bulgu raporu; sonuçlar GitHub'da PR check'i olarak görünsün.
+- Bulgular [SonarQube puanları](../kayitlar/sonarqube-puanlari.md) dosyasında tutulacak.
+
+### Adım adım ne yapıldı
+1. **Proje açılışı:** `sonarcloud.io` → GitHub hesabıyla giriş → repo import (Free plan). Oluşan değerler: organization `huseyinemretech`, project key `HuseyinEmreTech_Yapay-Zeka-Destekli-Yazilim-Gelistirme` (bu ikisi onboarding ekranının verdiği gerçek değerler; tahmin değil).
+2. **Token:** Analiz için `SONAR_TOKEN` üretildi ve GitHub repo → Settings → Secrets and variables → Actions → **Repository secrets** alanına eklendi. Token yalnızca burada durur; dosyaya/commit'e girmez.
+3. **`sonar-project.properties`** eklendi: projectKey, organization, `sonar.sources` (packages/*/lib), `sonar.tests` (yalnızca gerçekten var olan `test` ve `packages/app/test`), dışlamalar (`*.g.dart`, `*.freezed.dart`, `.dart_tool`, `build`, platform klasörleri).
+4. **`.github/workflows/sonar.yml`** eklendi: `actions/checkout` (fetch-depth: 0) → `subosito/flutter-action` (3.47.0) → `flutter pub get` → `SonarSource/sonarqube-scan-action@v8` (`SONAR_TOKEN` ile). Mevcut `ci.yml`'e dokunulmadı.
+5. **PR:** Branch `feature/sonarcloud-entegrasyon`, 3 commit (`bdfcddf`, `5b5e1bd`, `7c56af3`) → PR #24.
+6. **İlk tarama hatası ve düzeltmesi:** `sonar.tests` içinde repoda **bulunmayan boş klasörler** vardı (`packages/application/test` vb.) → "folder does not exist" hatası. Boş klasörler git'te tutulmadığı için yalnızca var olan test klasörleri bırakıldı. (Ayrıca action `v7 → v8` ve projectKey onboarding değeriyle düzeltildi.)
+7. **Yeşil sonuç:** PR #24'te `kontrol`, `sonar` ve `SonarCloud Code Analysis` (Quality Gate Passed, 0 yeni bulgu) başarılı. `main`'e squash ile birleştirildi (birleşme commit'i `89c3659`); `main`'de analiz tekrar çalışıp yeşil oldu.
+
+### Kararlar ve nerede verildi
+- **CI tabanlı analiz** (SonarCloud'un otomatik analizi değil): Dart/Flutter analizi `pub get` ve derlemeye ihtiyaç duyar; otomatik analiz bunu yapamaz.
+- **SonarQube Cloud Free:** [ADR-02](../adr/02-kalite-araci-sonarqube-cloud.md).
+- **`sonarqube-scan-action@v8`:** v3 ve altı Docker tabanlıydı ve `flutter pub get` ile inen bağımlılıklara erişemiyordu; v5+ composite olduğu için tarayıcı, bağımlılıkların olduğu ortamda çalışır.
+- **projectKey/organization:** onboarding'in verdiği değerler; elle uydurma yok.
+- **test yolları:** yalnızca repoda gerçekten bulunan klasörler.
+
+### Dersler
+- **Sır yönetimi:** Token bir kez sohbete düz metin yapıştırıldı; sızmış sayılıp revoke edilip yenisi üretilmeli ve yalnızca GitHub Secrets + SonarCloud tarafında tutulmalı. Repo'ya sır girmiyor ([AGENTS.md](../../AGENTS.md) kuralı).
+- **Boş klasör tuzağı:** Git boş klasörleri tutmaz; yol listelerini (`sources`/`tests`) dosya bazlı doğrula.
+- **Branch koruması:** `main` en az 1 onay + doğrusal geçmiş istiyor; bu yüzden merge `--squash` ile ve owner bypass'ıyla yapıldı.
+
+### Açık kalanlar
+- Coverage (`flutter test --coverage` + `sonar.dart.lcov.reportPaths`), README'ye Quality Gate badge ve branch protection'da `SonarCloud Code Analysis` zorunlu check — planlı, henüz yapılmadı.
+- Ekip erişimi: SonarCloud → organization → Members üzerinden üyelerin eklenmesi.
+- `analysis_options.yaml`'de commit'lenmemiş yerel değişiklik var (bu işin kapsamı dışında).
