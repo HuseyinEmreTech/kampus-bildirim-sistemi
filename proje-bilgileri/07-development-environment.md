@@ -91,7 +91,7 @@ Değerler **12 Ekim 2026'da makineden komutlarla okundu** (`flutter --version`, 
 - Konteyner: Docker 29.6.2
 - Dart / Flutter sürümü: Dart 3.13.5, Flutter 3.47.7 (stable). Paylaşılan gereksinimden (3.13.0 / 3.47.0) yalnızca yama sürümü farklı.
 - Editör: VS Code (Dart eklentisiyle; altyapı ve SQL işleri için), Android Studio da kurulu (Android SDK ve emülatör için)
-- Bilinen farklar / notlar: Kabuk PowerShell; README komutlarında `podman` yerine `docker` yazılır. Flutter 3.41.2 (Dart 3.11.0) projenin `sdk: ^3.13.0` şartını karşılamadığı için `flutter upgrade --force` ile güncellendi; `--force`, Windows git'in Flutter klasöründeki `.sh` dosyalarının satır sonlarını değiştirmesi yüzünden gerekti.
+- Bilinen farklar / notlar: Kabuk PowerShell; README komutlarında `podman` yerine `docker` yazılır. PowerShell `<` yönlendirmesini desteklemediği için `psql ... < dosya.sql` komutları `cmd /c "..."` içinde çalıştırılır (12 Ekim 2026'da bu makinede kurulum, migration ve seed bu yolla doğrulandı). Flutter 3.41.2 (Dart 3.11.0) projenin `sdk: ^3.13.0` şartını karşılamadığı için `flutter upgrade --force` ile güncellendi; `--force`, Windows git'in Flutter klasöründeki `.sh` dosyalarının satır sonlarını değiştirmesi yüzünden gerekti.
 
 ## Geliştirici ortamı şablonu
 
