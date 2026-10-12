@@ -8,7 +8,7 @@
 
 ## Ekip ve çalışma düzeni
 
-Proje ekiple, GitHub üzerinde branch ve Pull Request ile yürütülür. Ders cuma günleri; dönem 15 ders haftası, şu an 3. haftadayız. Ekibe yeni katılan: [Başlangıç rehberi](proje-bilgileri/ekip/00-baslangic-rehberi.md).
+Proje ekiple, GitHub üzerinde branch ve Pull Request ile yürütülür. Ders cuma günleri; dönem 15 ders haftası, şu an 5. haftadayız. Ekibe yeni katılan: [Başlangıç rehberi](proje-bilgileri/ekip/00-baslangic-rehberi.md).
 
 | Kişi | GitHub | Rol | Ana sorumluluk |
 | --- | --- | --- | --- |
@@ -50,8 +50,8 @@ Proje ekiple, GitHub üzerinde branch ve Pull Request ile yürütülür. Ders cu
 | Tür | Ders projesi (canlı demo ve sunum için; üretim sistemi değil) |
 | Ölçek | Tek kampüs, en fazla birkaç yüz kullanıcı |
 | İstemci | Flutter (Dart) |
-| Sunucu | Dart (Shelf), öneri |
-| Veritabanı | PostgreSQL 16, öneri |
+| Sunucu | Dart (Shelf) |
+| Veritabanı | PostgreSQL 16 |
 | Geliştirme yaklaşımı | Önce spec, sonra feature branch ile küçük iterasyonlar |
 | Ayrıntı | [Proje kapsamı ve amacı](proje-bilgileri/01-project-scope.md) |
 
@@ -130,10 +130,10 @@ Bağımlılıklar arayüzle verilir; bağlama `main.dart` içinde yapılır. Zen
 | Konu | Seçim | Durum |
 | --- | --- | --- |
 | İstemci | Flutter (Dart 3.13.0, Flutter 3.47.0) | Kabul |
-| Sunucu | Dart (Shelf) | Öneri, [ADR-01](proje-bilgileri/adr/01-dart-backend-postgresql.md) |
-| Veritabanı | PostgreSQL 16 | Öneri |
+| Sunucu | Dart (Shelf) | Kabul, [ADR-01](proje-bilgileri/adr/01-dart-backend-postgresql.md) |
+| Veritabanı | PostgreSQL 16 | Kabul |
 | Veritabanı erişimi | `postgres` paketi, parametreli sorgu | Öneri |
-| Şema yönetimi | Elle SQL dosyaları (`db/migrations/`) | Öneri |
+| Şema yönetimi | Elle SQL dosyaları (`db/migrations/`); V1 migration yazıldı | Kabul |
 | Test | Dart `test`, `mocktail`; entegrasyon testi gerçek PostgreSQL konteyneriyle | Öneri |
 | Konteyner | Podman + podman-compose **veya** Docker + Docker Compose | Kabul |
 | Kod kalitesi | Yerelde `dart analyze`, `flutter analyze`, kapsam; PR'da SonarQube Cloud (ücretsiz plan) | Kabul, [ADR-02](proje-bilgileri/adr/02-kalite-araci-sonarqube-cloud.md); yerel Community'de Dart yok (doğrulandı); Cloud kuruldu ve tarama yeşil (12 Ekim 2026) |
@@ -189,11 +189,11 @@ Hata biçimi: `{ "error": { "code", "message", "details" } }`. Durum kodları: 4
 | Parola | Güvenli hash (bcrypt veya argon2) |
 | SQL Injection | Yalnızca parametreli sorgu |
 
-Tümü: [güvenlik ve gizlilik](proje-bilgileri/06-security-and-privacy.md). Demo ve testte yalnızca sahte veri kullanılır.
+Tümü: [güvenlik ve gizlilik](proje-bilgileri/06-security-and-privacy.md). Demo ve testte yalnızca sahte veri kullanılır. Güvenlik açığı bildirimi ve politika: [SECURITY.md](SECURITY.md).
 
 ## 10. Kurulum ve çalıştırma
 
-> Kod henüz yok; bu bölüm kod eklenince gerçek komutlarla tamamlanacaktır. Aşağıdakiler **planlanan** biçimdir.
+> Veritabanı kurulumu (compose + migration) hazır; **sunucu ve istemci kodu** henüz yok. Uygulama kodu eklendikçe bu bölüm gerçek komutlarla tamamlanacaktır.
 
 **Gereksinimler**
 
@@ -244,7 +244,7 @@ Her kod commit'inden sonra statik analiz yapılır ve puanlar kayıt altına al�
 | --- | --- |
 | SonarQube Cloud | Kuruldu; her push/PR'da tarama ve Quality Gate çalışıyor (12 Ekim 2026). Yerel Community Dart'ı taramıyor (doğrulandı) |
 | SonarQube Dart desteği | SonarQube Cloud'da var; ücretsiz plan kullanılıyor ([araştırma](proje-bilgileri/kayitlar/sonarqube-puanlari.md#dart-desteği-araştırması-2026-09-30)) |
-| Coverage | Henüz ölçülmedi |
+| Coverage | Ölçülüyor (SonarCloud, lcov); lib koduna test eklendikçe artacak |
 
 Puanlar ve bulgu günlüğü: [SonarQube puanları](proje-bilgileri/kayitlar/sonarqube-puanlari.md).
 
@@ -286,10 +286,10 @@ Yapılan hatalar ve düzeltmeleri [hata kayıtlarında](proje-bilgileri/kayitlar
 | Hafta | Hedef | Durum |
 | --- | --- | --- |
 | 2 | Proje yaklaşımı, Git akışı, proje adayı | Tamamlandı |
-| 3 | Fikir onayı, dokümantasyon, kayıt sistemi, repo iskeleti | Devam ediyor |
-| 4-5 | Domain ve Application katmanı, testler | Planlandı |
-| 6-7 | PostgreSQL, API, entegrasyon testi | Planlandı |
-| 8+ | Flutter ekranları, SonarQube ve kalite, ADR'lar, canlıya alma, sunum | Planlandı |
+| 3 | Fikir onayı, dokümantasyon, kayıt sistemi, repo iskeleti, CI | Tamamlandı |
+| 4-5 | Domain ve Application katmanı, PostgreSQL şeması, SonarQube Cloud kurulumu | Devam ediyor |
+| 6-7 | API, entegrasyon testi, Flutter | Planlandı |
+| 8+ | Flutter ekranları, ADR'lar, canlıya alma, sunum | Planlandı |
 
 Gerçek ilerleme: [haftalık kayıtlar](proje-bilgileri/haftalik/00-haftalik-index.md). Takvim, dönem süresi ve takım büyüklüğü netleşince güncellenir.
 
@@ -303,7 +303,7 @@ Tüm dokümanlar `proje-bilgileri/` klasöründedir; nasıl inceleneceği ve kim
 | Kararlar | [ADR-01](proje-bilgileri/adr/01-dart-backend-postgresql.md), [ADR-02](proje-bilgileri/adr/02-kalite-araci-sonarqube-cloud.md), [ADR şablonu](proje-bilgileri/adr/00-adr-template.md) |
 | İzleme | [Haftalık](proje-bilgileri/haftalik/00-haftalik-index.md), [Başlangıç rehberi](proje-bilgileri/ekip/00-baslangic-rehberi.md), [Teknoloji değişiklikleri](proje-bilgileri/kayitlar/teknoloji-degisiklikleri.md), [Hata kayıtları](proje-bilgileri/kayitlar/hata-kayitlari.md), [SonarQube puanları](proje-bilgileri/kayitlar/sonarqube-puanlari.md), [Araç kayıtları](proje-bilgileri/kayitlar/skill-ve-arac-kullanimi.md) |
 
-Doküman kuralı: dokümanlar her Pull Request'te güncellenir; ADR'lar silinmez.
+Doküman kuralı: dokümanlar her Pull Request'te güncellenir; ADR'lar silinmez. Depo düzeyi dosyalar: [SECURITY.md](SECURITY.md) (güvenlik politikası), [LICENSE](LICENSE).
 
 ## 18. Lisans
 
