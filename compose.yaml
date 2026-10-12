@@ -1,0 +1,25 @@
+# Yerel geliştirme ve entegrasyon testi için PostgreSQL 16.
+# Çalıştır: podman compose up -d  (veya docker compose up -d)
+# Değişkenler .env dosyasından okunur: önce `cp .env.example .env`.
+services:
+  db:
+    image: docker.io/library/postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-campus}
+      POSTGRES_USER: ${POSTGRES_USER:-campus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env dosyasinda tanimli olmali}
+    ports:
+      # 5432 makinedeki başka konteynerlarla çakışabilir (07-development-environment.md).
+      - "${POSTGRES_PORT:-5440}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Migration'lar yalnızca veri klasörü boşken (ilk açılışta) sırayla çalışır.
+      - ./db/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

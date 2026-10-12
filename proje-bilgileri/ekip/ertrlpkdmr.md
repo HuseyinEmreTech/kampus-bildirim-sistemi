@@ -106,3 +106,5 @@ son-guncelleme: 2026-10-12
 - **Hüseyin Emre**: Domain repository interface'leri
 - **Çağdaş**: Server endpoint'leri repository'leri çağırıyor
 - **Yusuf/Fatma**: File upload/download URL'leri, API contract
+## Raporlar
+- [2026-10-12](raporlar/ertrlpkdmr/2026-10-12.md): Hafta 05 planı, compose ve V1 migration

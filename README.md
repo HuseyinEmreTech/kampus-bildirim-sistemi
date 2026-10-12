@@ -206,12 +206,14 @@ Tümü: [güvenlik ve gizlilik](proje-bilgileri/06-security-and-privacy.md). Dem
 
 Herkes kendi ortamını kullanır; konteyner için **Podman veya Docker** serbesttir. Ayrıntı ve yeni geliştirici şablonu: [geliştirme ortamı](proje-bilgileri/07-development-environment.md).
 
-**Planlanan adımlar**
+**Veritabanı (PostgreSQL 16)**
 
 ```bash
-podman compose up -d        # Docker kullanan: docker compose up -d
-cp .env.example .env        # değişkenleri doldur
+cp .env.example .env        # değişkenleri doldur, şifreyi değiştir
+podman compose up -d        # veya: docker compose up -d
 ```
+
+PostgreSQL `localhost:5440` adresinde açılır; `db/migrations/` içindeki SQL dosyaları ilk açılışta sırayla çalışır.
 
 **Yapılandırma (planlanan)**
 
