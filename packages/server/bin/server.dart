@@ -12,7 +12,6 @@ void main() async {
 
   final handler = const Pipeline()
       .addMiddleware(logRequests())
-      .addMiddleware(corsHeaders())
       .addHandler(router.call);
 
   await io.serve(handler, InternetAddress.anyIPv4, 8080);
