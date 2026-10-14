@@ -21,5 +21,5 @@ void main() async {
       .addHandler(router.call);
 
   final server = await io.serve(handler, InternetAddress.anyIPv4, 8080);
-  print('🚀 Sunucu çalışıyor: http://${server.address.host}:${server.port}');
+ // print('🚀 Sunucu çalışıyor: http://${server.address.host}:${server.port}');
 }
