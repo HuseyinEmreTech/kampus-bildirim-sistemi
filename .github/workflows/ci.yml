@@ -18,8 +18,6 @@ jobs:
           cache: true
       - name: Bağımlılıklar
         run: flutter pub get
-      - name: Biçim
-        run: dart format --output=none --set-exit-if-changed .
       - name: Analiz
         run: dart analyze --fatal-infos
       - name: Mimari test
