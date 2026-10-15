@@ -147,4 +147,46 @@ void main() {
       expect(await filesOnDisk(), isEmpty);
     });
   });
+  group('openRead and delete', () {
+    test('openRead_savedFile_returnsBytes', () async {
+      final bytes = _file(_jpegHeader, 10);
+      final saved = _expectSaved(await save(_oneChunk(bytes)));
+
+      final stream = await storage.openRead(saved.photo.url);
+
+      expect(await stream!.expand((c) => c).toList(), bytes);
+    });
+
+    test('openRead_malformedUrl_returnsNull', () async {
+      expect(await storage.openRead('/files/$_reportId/../../x.jpg'), isNull);
+      expect(await storage.openRead('/etc/passwd'), isNull);
+    });
+
+    test('delete_existingFile_removesFile', () async {
+      final saved = _expectSaved(await save(_oneChunk(_file(_jpegHeader, 10))));
+
+      expect(await storage.delete(saved.photo.url), isTrue);
+      expect(await storage.openRead(saved.photo.url), isNull);
+      expect(await filesOnDisk(), isEmpty);
+    });
+
+    test('delete_unknownFile_returnsFalse', () async {
+      expect(
+        await storage.delete('/files/$_reportId/${'0' * 32}.jpg'),
+        isFalse,
+      );
+    });
+
+    test('delete_pathTraversalUrl_returnsFalseAndKeepsFile', () async {
+      final outside = File('${root.path}/../campus_outside_test.jpg');
+      await outside.writeAsBytes(_file(_jpegHeader, 10));
+      addTearDown(outside.delete);
+
+      expect(
+        await storage.delete('/files/../campus_outside_test.jpg'),
+        isFalse,
+      );
+      expect(await outside.exists(), isTrue);
+    });
+  });
 }
