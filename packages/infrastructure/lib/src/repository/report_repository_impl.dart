@@ -1,6 +1,7 @@
 import 'package:postgres/postgres.dart' show TxSession;
 
 import '../database/database.dart';
+import '../database/paging.dart';
 import '../database/uuid_format.dart';
 
 /// `assign` sonucu. Application'daki `AppError` (#15) gelince ona çevrilecek.
@@ -48,6 +49,28 @@ typedef ReportDetail = ({
   DateTime? resolvedAt,
   ReportPhoto? resolutionPhoto,
   String? resolutionNote,
+});
+
+/// Liste süzgeci; boş alan "hepsi" demek. Öğrenci yalnızca kendi bildirimlerini
+/// görür (Rule 01): service öğrenci için [reporterId]'yi her zaman doldurur.
+typedef ReportFilter = ({
+  String? status,
+  String? category,
+  String? assigneeId,
+  String? reporterId,
+});
+
+/// Liste ekranındaki bir bildirim kartı.
+typedef ReportSummary = ({
+  String reportId,
+  String category,
+  String description,
+  String status,
+  String? place,
+  String? buildingName,
+  String photoUrl,
+  String? assigneeId,
+  DateTime createdAt,
 });
 
 /// Durum geçmişinin bir satırı. İlk satırda [fromStatus] boştur (bildirim açıldı).
@@ -106,6 +129,23 @@ JOIN users reporter ON reporter.user_id = r.reporter_id
 LEFT JOIN users assignee ON assignee.user_id = r.assignee_id
 LEFT JOIN buildings b ON b.building_id = r.building_id
 WHERE r.report_id = $1
+''';
+
+  // Boş süzgeç koşulu kendini devre dışı bırakır (`$1 IS NULL OR ...`); SQL sabit
+  // kalır, metin birleştirme gerekmez. Sayfalama `page`/`pageSize` (05-api-design):
+  // aynı zamanda açılanlar için kimlik ikinci sıralama ölçütü, böylece sayfalar
+  // arasında satır kaymaz.
+  static const _listSql = r'''
+SELECT r.report_id::text, r.category, r.description, r.status, r.place, b.name,
+  r.photo_url, r.assignee_id::text, r.created_at
+FROM reports r
+LEFT JOIN buildings b ON b.building_id = r.building_id
+WHERE ($1::text IS NULL OR r.status = $1::text)
+  AND ($2::text IS NULL OR r.category = $2::text)
+  AND ($3::uuid IS NULL OR r.assignee_id = $3::uuid)
+  AND ($4::uuid IS NULL OR r.reporter_id = $4::uuid)
+ORDER BY r.created_at DESC, r.report_id DESC
+LIMIT $5 OFFSET $6
 ''';
 
   // Eskiden yeniye; her işlem kendi NOW() değerini yazdığı için sıra doğru çıkar.
@@ -170,6 +210,54 @@ VALUES ($1, $2, 'ReportResolved', $3)
     return _toDetail(rows.single);
   }
 
+  /// [filter]'a uyan bildirimler, yeniden eskiye. [offset] kadarını atlar, en çok
+  /// [limit] tane döner. Sayfa geçersizse ya da süzgeçteki bir kimlik UUID değilse
+  /// boş liste döner: hiçbir bildirim eşleşmez, veritabanına gidilmez.
+  Future<List<ReportSummary>> list(
+    ReportFilter filter, {
+    required int limit,
+    required int offset,
+  }) async {
+    if (!isValidPage(limit, offset)) return const [];
+    if (!_isUuidOrNull(filter.assigneeId) ||
+        !_isUuidOrNull(filter.reporterId)) {
+      return const [];
+    }
+    final rows = await _db.execute(_listSql, [
+      filter.status,
+      filter.category,
+      filter.assigneeId,
+      filter.reporterId,
+      limit,
+      offset,
+    ]);
+    return [
+      for (final [
+            reportId,
+            category,
+            description,
+            status,
+            place,
+            buildingName,
+            photoUrl,
+            assigneeId,
+            createdAt,
+          ]
+          in rows)
+        (
+          reportId: reportId! as String,
+          category: category! as String,
+          description: description! as String,
+          status: status! as String,
+          place: place as String?,
+          buildingName: buildingName as String?,
+          photoUrl: photoUrl! as String,
+          assigneeId: assigneeId as String?,
+          createdAt: createdAt! as DateTime,
+        ),
+    ];
+  }
+
   /// Bildirimin durum geçmişi, eskiden yeniye. [reportId] UUID değilse ya da
   /// bildirim yoksa boş liste. Service önce [findById] ile yetkiyi denetler.
   Future<List<StatusChange>> findHistory(String reportId) async {
@@ -188,6 +276,8 @@ VALUES ($1, $2, 'ReportResolved', $3)
         ),
     ];
   }
+
+  bool _isUuidOrNull(String? id) => id == null || isUuid(id);
 
   ReportDetail _toDetail(List<Object?> row) {
     final [
