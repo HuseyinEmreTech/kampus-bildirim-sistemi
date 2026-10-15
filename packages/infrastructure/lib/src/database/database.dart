@@ -4,7 +4,9 @@ import 'package:postgres/postgres.dart';
 ///
 /// SQL yalnızca `$1`, `$2` parametreleriyle yazılır; değer SQL metnine eklenmez.
 class Database {
-  Database._(this._pool);
+  /// Hazır bir havuzla kurar. Uygulamada [Database.fromUrl] kullanılır; bu yapıcı
+  /// testlerde sahte havuz vermek içindir (veritabanı olmadan birim test).
+  Database(this._pool);
 
   final Pool<Object?> _pool;
 
@@ -13,7 +15,7 @@ class Database {
   ///
   /// - `sslmode=disable`: yerel PostgreSQL'de SSL yok; paket varsayılan olarak SSL ister.
   /// - `max_connection_count`: havuzdaki en fazla bağlantı; verilmezse paket 1 kullanır.
-  factory Database.fromUrl(String url) => Database._(Pool.withUrl(url));
+  factory Database.fromUrl(String url) => Database(Pool.withUrl(url));
 
   /// Tek sorgu çalıştırır. Sonuçtaki `affectedRows`, değişen satır sayısıdır.
   Future<Result> execute(String sql, [List<Object?> parameters = const []]) =>
