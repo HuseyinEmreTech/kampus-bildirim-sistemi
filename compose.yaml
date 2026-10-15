@@ -10,7 +10,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env dosyasinda tanimli olmali}
     ports:
       # 5432 makinedeki başka konteynerlarla çakışabilir (07-development-environment.md).
-      - "${POSTGRES_PORT:-5440}:5432"
+      # 127.0.0.1: veritabanına yalnızca bu bilgisayardan bağlanılır; aynı Wi-Fi'deki
+      # başka cihazlar erişemez.
+      - "127.0.0.1:${POSTGRES_PORT:-5440}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       # Migration'lar yalnızca veri klasörü boşken (ilk açılışta) sırayla çalışır.
