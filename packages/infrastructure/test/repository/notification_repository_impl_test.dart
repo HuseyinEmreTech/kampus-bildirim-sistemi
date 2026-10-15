@@ -126,6 +126,42 @@ void main() {
       );
     });
 
+    Future<List<String>> idsOf(
+      String userId, {
+      int limit = 20,
+      int offset = 0,
+    }) async {
+      final page = await repository.list(userId, limit: limit, offset: offset);
+      return [for (final item in page) item.notificationId];
+    }
+
+    // Rule 01: öğrenci yalnızca kendi "çözüldü" bildirimlerini görür.
+    test('list_returnsOnlyOwnNewestFirst', () async {
+      expect(await idsOf(_owner), [_second, _first]);
+      expect(await idsOf(_other), [_othersNotification]);
+    });
+
+    test('list_withLimitAndOffset_returnsPage', () async {
+      expect(await idsOf(_owner, limit: 1), [_second]);
+      expect(await idsOf(_owner, limit: 1, offset: 1), [_first]);
+    });
+
+    test('list_returnsFieldsAndReadTime', () async {
+      await repository.markRead(_first, _owner);
+
+      final [second, first] = await repository.list(
+        _owner,
+        limit: 20,
+        offset: 0,
+      );
+      expect(first.reportId, _firstReport);
+      expect(first.type, 'ReportResolved');
+      expect(first.message, 'Bildiriminiz çözüldü.');
+      expect(first.readAt, isA<DateTime>());
+      expect(second.readAt, isNull);
+      expect(second.createdAt.isAfter(first.createdAt), isTrue);
+    });
+
     test('unreadCount_countsOnlyUnreadOfUser', () async {
       expect(await repository.unreadCount(_owner), 2);
 
