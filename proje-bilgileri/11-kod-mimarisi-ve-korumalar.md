@@ -72,7 +72,7 @@ Her satır bir hata türünü kapatır. Hiçbiri "dikkatli olun" demez; hepsi ya
 | K5 | Önceden yazılmış kabul testleri | Kuralın yanlış anlaşılması | Her kullanıcı hikayesinin testlerini Hüseyin Emre görevden önce yazar ve `@Tags(['bekliyor'])` ile işaretler. CI bu etiketi atlar. Görevi alan kişi testi yeşile çevirir ve etiketi kaldırır |
 | K6 | CI | Bozuk kodun `main`'e girmesi | Her PR'da: biçim, `dart analyze --fatal-infos`, mimari test, tüm paketlerin testleri. Biri kırmızıysa birleştirme düğmesi kapalı. **"Biçim" adımı kaldırılamaz.** |
 | K7 | `main` koruması | Git kaosu | Doğrudan push yok, PR zorunlu, 1 onay, CODEOWNER onayı, yeni commit gelince onay düşer, açık yorum varken birleşmez, yalnızca squash, force-push ve silme kapalı; **zorunlu statü kontrolü `SonarCloud Code Analysis`** (2 Ekim 2026'da kuruldu) |
-| K8 | `CODEOWNERS` | Çekirdeğe habersiz değişiklik | `.github/`, `sonar-project.properties`, `packages/domain`, `packages/application`, `packages/contracts`, `test/`, `AGENTS.md`, `analysis_options.yaml` değişirse Hüseyin Emre'nin onayı zorunlu; `packages/app/lib/` değişirse @yusufekenel veya @muberrayener'in onayı zorunlu |
+| K8 | `CODEOWNERS` | Çekirdeğe habersiz değişiklik | `.github/`, `sonar-project.properties`, `packages/domain`, `packages/application`, `packages/contracts`, `test/`, `AGENTS.md`, `analysis_options.yaml` değişirse Hüseyin Emre'nin onayı zorunlu; `packages/app/lib/` değişirse @yusufekenel veya @muberrayener'in onayı zorunlu. Her alanda **@HuseyinEmreTech yedek sahiptir** |
 | K9 | Görev kartı (issue şablonu) | Kapsam dışına taşma | Her görevde: kabul ölçütü, dokunulacak dosyalar, **dokunulmayacak dosyalar**, bağlı testler |
 | K10 | PR şablonu | Anlaşılmadan alınan AI kodu | Her PR'da "ne yaptım, AI'a ne sordum, neyi değiştirdim, hangi satırı anlatamıyorum" bölümleri; inceleyen en az bir "bu satır neden böyle?" sorusu sorar, yazar cevaplar |
 | K11 | `AGENTS.md` | AI aracının mimariyi bozması | Ekipteki herkesin AI aracı aynı kural dosyasını okur: katman tablosu, yasaklar, test zorunluluğu, küçük parça kuralı |
@@ -111,6 +111,8 @@ Kim hangi yolun sahibi: `.github/CODEOWNERS`, [ekip ve yol haritası](10-ekip-ve
 - `lib/ortak/` — iki platformun paylaştığı kod (modeller, ortak widget'lar) → @yusufekenel @muberrayener
 
 `CODEOWNERS`'ta özel satırlar genel `/packages/app/lib/` satırından **sonra** yazılır; GitHub son eşleşen satırı kullandığı için mobil dosya yalnız Yusuf'u, web dosya yalnız Müberra'yı gerektirir. Genel satır geçiş döneminde henüz taşınmamış dosyaları kapsar.
+
+**Yedek sahip (2026-10-15).** `require_code_owner_reviews` yazarın kendi PR'ını onaylamasını kabul etmez. Tek sahipli bir alanda (ör. `packages/server/` → Çağdaş, `packages/infrastructure/` → Ertuğrul) yazar kendi PR'ı için onay bulamaz ve PR bypass'a kalır. Bunu bitirmek için her alana **@HuseyinEmreTech ikinci (yedek) sahip** olarak eklendi: tek sahipli yolda yazar yerine lead onay verir, PR normal akışla ilerler. Paylaşımlı yollarda (domain, application, contracts, `.github/`, `sonar-project.properties`) zaten tek sahip Hüseyin Emre'dir.
 
 ## 4. Domain'in hataya kapalı biçimi
 
