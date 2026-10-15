@@ -1,8 +1,16 @@
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:math';
+import 'dart:typed_data';
+
+import 'package:image/image.dart' as img;
 
 /// Rule 07: fotoğraf en fazla 5 MB.
 const maxPhotoSizeBytes = 5 * 1024 * 1024;
+
+/// Açılacak en büyük fotoğraf: 25 megapiksel. Küçük bir dosya çok büyük en/boy
+/// bildirebilir; açılınca belleği doldurmasın diye önce yalnızca başlığa bakılır.
+const maxPhotoPixels = 25 * 1000 * 1000;
 
 /// Fotoğrafın neden kabul edilmediği. `AppError` (#15) gelince ona çevrilecek.
 enum PhotoError { invalidFormat, sizeExceeded, invalidReportId }
@@ -29,12 +37,18 @@ final class PhotoRejected extends SavePhotoResult {
 /// Fotoğrafları sunucu diskinde `<kök>/<reportId>/<rastgele-ad>.<uzantı>` olarak saklar.
 /// `FileStorage` arayüzü (#15, application) gelince onu uygular.
 ///
-/// Henüz yapılmayan: EXIF temizleme (Rule 07), `image` paketi onayını bekliyor.
+/// Rule 07: fotoğraf yeniden kodlanarak kaydedilir; EXIF (konum, cihaz) ve
+/// içine gizlenmiş başka veri diske yazılmaz, yalnızca pikseller kalır.
 class LocalFileStorage {
-  LocalFileStorage(this._root, {this.maxSizeBytes = maxPhotoSizeBytes});
+  LocalFileStorage(
+    this._root, {
+    this.maxSizeBytes = maxPhotoSizeBytes,
+    this.maxPixels = maxPhotoPixels,
+  });
 
   final Directory _root;
   final int maxSizeBytes;
+  final int maxPixels;
 
   static const _urlPrefix = '/files';
   static const _headerLength = 8;
@@ -42,6 +56,7 @@ class LocalFileStorage {
   static const _jpegSignature = [0xFF, 0xD8, 0xFF];
   static const _pngSignature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
   static const _extensions = {'image/jpeg': 'jpg', 'image/png': 'png'};
+  static const _jpegQuality = 85;
 
   static final _uuid = RegExp(
     r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
@@ -96,9 +111,26 @@ class LocalFileStorage {
       }
       await sink.close();
       sink = null;
-      await partFile.rename(_pathFor(url));
-      partFile = null;
-      return PhotoSaved((url: url, contentType: contentType, sizeBytes: size));
+
+      final original = await partFile.readAsBytes();
+      final limit = maxPixels;
+      // Çözme ve sıkıştırma işlemciyi saniyeler boyunca meşgul eder; sunucu
+      // diğer isteklere cevap verebilsin diye ayrı bir isolate'te yapılır.
+      final cleaned = await Isolate.run(
+        () => _reencode(original, contentType, limit),
+      );
+      if (cleaned case PhotoRejected()) return cleaned;
+      final bytesOut = (cleaned as _Cleaned).bytes;
+      // Yeniden kodlanan dosya girdiden büyük çıkabilir; sınır diskteki dosya için de geçerli.
+      if (bytesOut.length > maxSizeBytes) {
+        return const PhotoRejected(PhotoError.sizeExceeded);
+      }
+      await File(_pathFor(url)).writeAsBytes(bytesOut, flush: true);
+      return PhotoSaved((
+        url: url,
+        contentType: contentType,
+        sizeBytes: bytesOut.length,
+      ));
     } finally {
       // Yarıda kalan dosya, kapatma da hata verse silinir.
       try {
@@ -108,6 +140,38 @@ class LocalFileStorage {
           await partFile.delete();
         }
       }
+    }
+  }
+
+  // Önce yalnızca başlıktaki en/boy okunur; sınırı aşan fotoğraf açılmaz.
+  // JPEG çözücü EXIF'teki yön bilgisini piksellere kendisi işler; sonra bütün
+  // üst veri atılır ve yalnızca pikseller yeniden kodlanır.
+  static Object _reencode(Uint8List data, String contentType, int maxPixels) {
+    final decoder = contentType == 'image/png'
+        ? img.PngDecoder()
+        : img.JpegDecoder();
+    try {
+      final info = decoder.startDecode(data);
+      if (info == null) return const PhotoRejected(PhotoError.invalidFormat);
+      if (info.width * info.height > maxPixels) {
+        return const PhotoRejected(PhotoError.sizeExceeded);
+      }
+      // Yalnızca ilk kare: hareketli PNG'nin diğer kareleri belleği şişirmesin.
+      final decoded = decoder.decodeFrame(0);
+      if (decoded == null) return const PhotoRejected(PhotoError.invalidFormat);
+
+      final clean = decoded
+        ..exif = img.ExifData()
+        ..textData = null
+        ..iccProfile = null;
+      return _Cleaned(
+        contentType == 'image/png'
+            ? img.encodePng(clean)
+            : img.encodeJpg(clean, quality: _jpegQuality),
+      );
+    } on img.ImageException {
+      // Paket bozuk dosyadaki her hatayı ImageException olarak bildirir.
+      return const PhotoRejected(PhotoError.invalidFormat);
     }
   }
 
@@ -136,4 +200,10 @@ class LocalFileStorage {
 
   String _pathFor(String url) =>
       '${_root.path}${url.substring(_urlPrefix.length)}';
+}
+
+final class _Cleaned {
+  const _Cleaned(this.bytes);
+
+  final Uint8List bytes;
 }
