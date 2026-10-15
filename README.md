@@ -227,6 +227,14 @@ Sahte örnek veri (5 bina, 2 öğrenci, 2 görevli, 3 bildirim; parola `Demo.123
 podman compose exec -T db psql -U campus -d campus < db/seed/001_ornek.sql
 ```
 
+Docker kullanan, bu komutlarda `podman` yerine `docker` yazar.
+
+Windows PowerShell `<` işaretini desteklemez (`RedirectionNotSupported` hatası verir). Komutu `cmd /c` içinde çalıştır:
+
+```powershell
+cmd /c "docker compose exec -T db psql -U campus -d campus < db\seed\001_ornek.sql"
+```
+
 **Yapılandırma (planlanan)**
 
 | Değişken | Varsayılan | Açıklama |

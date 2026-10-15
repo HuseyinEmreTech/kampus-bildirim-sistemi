@@ -24,7 +24,7 @@ Proje için **zorunlu tek bir makine veya araç yoktur.** Her geliştirici kendi
 | Geliştirici | İşletim sistemi | Konteyner | Ortam ayrıntısı |
 | --- | --- | --- | --- |
 | Hüseyin Emre (@HuseyinEmreTech) | Fedora Linux 44 | Podman | [aşağıda](#örnek-hüseyin-emre-huseyinemretech) |
-| Ertuğrul Pekdemir (@ertrlpkdmr) | (doldurulacak) | (doldurulacak) | |
+| Ertuğrul Pekdemir (@ertrlpkdmr) | Windows 11 Pro | Docker | [aşağıda](#ertuğrul-pekdemir-ertrlpkdmr) |
 | Çağdaş Kemal Ağca (@Cagdas3307) | (doldurulacak) | (doldurulacak) | |
 | Yusuf Ekenel (@yusufekenel) | (doldurulacak) | (doldurulacak) | |
 | Fatma Müberra Yener (@muberrayener) | (doldurulacak) | (doldurulacak) | |
@@ -83,6 +83,16 @@ SonarQube imajı ve tarayıcı yerelde mevcut. **30 Eylül'de doğrulandı:** `s
 
 Not: [ADR-02](adr/02-kalite-araci-sonarqube-cloud.md) kararına göre **yerel SonarQube sunucusu kurulmayacak**; Dart taraması SonarQube Cloud'da yapılıyor.
 
+## Ertuğrul Pekdemir (@ertrlpkdmr)
+
+Değerler **12 Ekim 2026'da makineden komutlarla okundu** (`flutter --version`, `dart --version`, `docker --version`, PowerShell `Get-CimInstance`).
+
+- İşletim sistemi: Microsoft Windows 11 Pro
+- Konteyner: Docker 29.6.2
+- Dart / Flutter sürümü: Dart 3.13.5, Flutter 3.47.7 (stable). Paylaşılan gereksinimden (3.13.0 / 3.47.0) yalnızca yama sürümü farklı.
+- Editör: VS Code (Dart eklentisiyle; altyapı ve SQL işleri için), Android Studio da kurulu (Android SDK ve emülatör için)
+- Bilinen farklar / notlar: Kabuk PowerShell; README komutlarında `podman` yerine `docker` yazılır. PowerShell `<` yönlendirmesini desteklemediği için `psql ... < dosya.sql` komutları `cmd /c "..."` içinde çalıştırılır (12 Ekim 2026'da bu makinede kurulum, migration ve seed bu yolla doğrulandı). Flutter 3.41.2 (Dart 3.11.0) projenin `sdk: ^3.13.0` şartını karşılamadığı için `flutter upgrade --force` ile güncellendi; `--force`, Windows git'in Flutter klasöründeki `.sh` dosyalarının satır sonlarını değiştirmesi yüzünden gerekti.
+
 ## Geliştirici ortamı şablonu
 
 Yeni katılan, aşağıdaki bloğu kopyalayıp kendine göre doldurur; sonucu **yukarıdaki "Geliştirici ortamları" tablosuna** ekler (ve isterse kişisel planına yazar).
@@ -97,14 +107,17 @@ Yeni katılan, aşağıdaki bloğu kopyalayıp kendine göre doldurur; sonucu **
 - Bilinen farklar / notlar:
 ```
 
-## Servisler (planlanan compose)
+## Servisler (compose)
 
 ```bash
+cp .env.example .env        # önce bu: değişkenleri doldur, şifreyi değiştir
 podman compose up -d        # Docker kullanan: docker compose up -d
-cp .env.example .env        # değişkenleri doldur
 ```
 
-Compose dosyası ve yapılandırma tablosu kod reposu açılınca eklenecek.
+- Sıra önemli: `compose.yaml` şifreyi yalnızca `.env`'den alır; `.env` yoksa `up` "şifre eksik" hatasıyla durur.
+- PostgreSQL 16 `localhost:5440` adresinde açılır (5432 başka konteynerlarla çakışmasın diye). `db/migrations/` içindeki dosyalar ilk açılışta sırayla çalışır.
+- Örnek veri ve sonradan eklenen migration'ı elle uygulama komutları: [README §10](../README.md#10-kurulum-ve-çalıştırma).
+- Docker kullanan, komutlarda `podman` yerine `docker` yazar.
 
 ## Ortamı doğrulama
 
