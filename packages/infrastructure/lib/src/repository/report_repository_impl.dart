@@ -9,8 +9,22 @@ enum AssignOutcome { assigned, alreadyAssigned, invalidTransition, notFound }
 /// `resolve` sonucu. Application'daki `AppError` (#15) gelince ona çevrilecek.
 enum ResolveOutcome { resolved, notAssignee, invalidTransition, notFound }
 
-/// Sonuç fotoğrafı (Rule 04). Domain'deki `Photo` (#15) gelince onunla değişecek.
-typedef ResolutionPhoto = ({String url, String contentType, int sizeBytes});
+/// Bildirim ve sonuç fotoğrafı. Domain'deki `Photo` (#15) gelince onunla değişecek.
+typedef ReportPhoto = ({String url, String contentType, int sizeBytes});
+
+/// Öğrencinin açtığı yeni bildirim. Domain'deki `Report` (#15) gelince onunla değişecek.
+/// Kuralları (Rule 01, Rule 06) service kontrol eder; burada yalnızca kayıt var.
+typedef NewReport = ({
+  String reporterId,
+  String category,
+  String description,
+  ReportPhoto photo,
+  double latitude,
+  double longitude,
+  String? place,
+  String locationSource,
+  String? buildingId,
+});
 
 /// Bildirimlerin PostgreSQL tarafı. `ReportRepository` arayüzü (#15) gelince onu uygular.
 class ReportRepositoryImpl {
@@ -36,6 +50,14 @@ WHERE report_id = $1 AND assignee_id = $2 AND status = 'Ustlenildi'
 RETURNING reporter_id::text
 ''';
 
+  static const _createSql = r'''
+INSERT INTO reports (reporter_id, category, description, photo_url,
+  photo_content_type, photo_size_bytes, latitude, longitude, place,
+  location_source, building_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+RETURNING report_id::text
+''';
+
   static const _insertHistorySql = r'''
 INSERT INTO status_history (report_id, from_status, to_status, changed_by, note)
 VALUES ($1, $2, $3, $4, $5)
@@ -52,6 +74,31 @@ VALUES ($1, $2, 'ReportResolved', $3)
 
   static const _statusAndAssigneeSql =
       r'SELECT status, assignee_id::text FROM reports WHERE report_id = $1';
+
+  /// Bildirimi `Yeni` olarak kaydeder ve kimliğini döner. İlk durum geçmişi satırı
+  /// (boş → `Yeni`) aynı işlemde yazılır. Bina kimliğinin var olduğunu service
+  /// önceden `BuildingRepositoryImpl.findById` ile denetler.
+  Future<String> create(NewReport report) => _db.transaction((tx) async {
+    final rows = await tx.execute(
+      _createSql,
+      parameters: [
+        report.reporterId,
+        report.category,
+        report.description,
+        report.photo.url,
+        report.photo.contentType,
+        report.photo.sizeBytes,
+        report.latitude,
+        report.longitude,
+        report.place,
+        report.locationSource,
+        report.buildingId,
+      ],
+    );
+    final reportId = rows.single.single! as String;
+    await _insertHistory(tx, reportId, null, 'Yeni', report.reporterId);
+    return reportId;
+  });
 
   /// [assigneeId] görevlisini bildirime atar; yalnızca `Yeni` ve görevlisiz bildirimde olur.
   /// Durum değişimi ve durum geçmişi aynı işlemde yazılır: biri olmazsa ikisi de olmaz.
@@ -86,7 +133,7 @@ VALUES ($1, $2, 'ReportResolved', $3)
   Future<ResolveOutcome> resolve(
     String reportId,
     String assigneeId,
-    ResolutionPhoto photo, {
+    ReportPhoto photo, {
     String? note,
   }) async {
     if (!isUuid(reportId)) return ResolveOutcome.notFound;
@@ -139,7 +186,7 @@ VALUES ($1, $2, 'ReportResolved', $3)
   Future<void> _insertHistory(
     TxSession tx,
     String reportId,
-    String from,
+    String? from,
     String to,
     String changedBy, {
     String? note,
