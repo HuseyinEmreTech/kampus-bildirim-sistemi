@@ -18,8 +18,13 @@ analysis_options.yaml    @HuseyinEmreTech
 /packages/server/         @Cagdas3307
 
 # Flutter App - Yusuf (mobil), Fatma (web)
-/packages/app/lib/        @yusufekenel @muberrayener
-/packages/app/web/        @muberrayener
+# Sahiplik platform bazlıdır. GitHub son eşleşen satırı kullanır: genel satır
+# taşınmamış dosyaları kapsar, alttaki özel satırlar onu geçersiz kılar.
+/packages/app/lib/            @yusufekenel @muberrayener
+/packages/app/lib/mobil/      @yusufekenel
+/packages/app/lib/web/        @muberrayener
+/packages/app/lib/ortak/      @yusufekenel @muberrayener
+/packages/app/web/            @muberrayener
 
 # Veritabanı ve yerel geliştirme ortamı - Ertuğrul
 /db/                      @ertrlpkdmr
