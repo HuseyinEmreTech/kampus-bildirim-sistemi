@@ -21,6 +21,8 @@ Bu dosya, ekipteki herkesin yapay zeka aracına (Claude Code, Codex, Gemini, Cop
 | `campus_server` | `packages/server` | hepsi | iş kuralı yazmak (kural servistedir) |
 | `campus_app` | `packages/app` | `campus_contracts`, onaylı Flutter paketleri | `campus_domain`, `campus_application`, iş kuralı |
 
+`campus_app` klasör düzeni (sahiplik için): `lib/mobil/` yalnız mobil, `lib/web/` yalnız web, `lib/ortak/` iki platformun paylaştığı kod. Yeni özellik kodu bu üç klasörden birine yazılır; platform ayrımı yapmayan `lib/features/` gibi bir yol kullanılmaz. Ayrıntı: `proje-bilgileri/11-kod-mimarisi-ve-korumalar.md` (bölüm 3.2).
+
 ## Kod kuralları
 
 - Domain nesneleri: özel yapıcı, `create` fabrika metodu, `final` alanlar, setter yok. Durum yalnızca metotla değişir (`assign`, `resolve`).

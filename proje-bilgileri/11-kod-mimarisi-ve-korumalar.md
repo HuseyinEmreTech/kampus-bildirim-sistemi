@@ -1,7 +1,7 @@
 ---
 title: Kod Mimarisi ve Korumalar
 durum: Onaylandı
-son-guncelleme: 2026-10-02
+son-guncelleme: 2026-10-15
 ---
 
 # Kod Mimarisi ve Korumalar
@@ -70,12 +70,47 @@ Her satır bir hata türünü kapatır. Hiçbiri "dikkatli olun" demez; hepsi ya
 | K3 | Hataya kapalı domain | İş kuralı bozulması | Yapıcılar özel; nesne yalnızca `Report.create(...)` ile oluşur; alanlar `final`, setter yok; durum yalnızca `assign`, `resolve` metotlarıyla değişir ve geçersiz geçişte hata döner |
 | K4 | `sealed` hata tipleri ve `switch` | Unutulan hata eşlemesi | Uygulama hataları `sealed class AppError` altındadır; sunucudaki eşleme `switch` ifadesidir. Yeni hata eklenip HTTP karşılığı yazılmazsa derleme hatası olur |
 | K5 | Önceden yazılmış kabul testleri | Kuralın yanlış anlaşılması | Her kullanıcı hikayesinin testlerini Hüseyin Emre görevden önce yazar ve `@Tags(['bekliyor'])` ile işaretler. CI bu etiketi atlar. Görevi alan kişi testi yeşile çevirir ve etiketi kaldırır |
-| K6 | CI | Bozuk kodun `main`'e girmesi | Her PR'da: biçim, `dart analyze --fatal-infos`, mimari test, tüm paketlerin testleri. Biri kırmızıysa birleştirme düğmesi kapalı |
-| K7 | `main` koruması | Git kaosu | Doğrudan push yok, PR zorunlu, 1 onay, yeni commit gelince onay düşer, açık yorum varken birleşmez, yalnızca squash, force-push ve silme kapalı (2 Ekim 2026'da kuruldu) |
-| K8 | `CODEOWNERS` | Çekirdeğe habersiz değişiklik | `packages/domain`, `packages/application`, `packages/contracts`, `test/`, `.github/`, `AGENTS.md`, `analysis_options.yaml` değişirse Hüseyin Emre'nin onayı zorunlu |
+| K6 | CI | Bozuk kodun `main`'e girmesi | Her PR'da: biçim, `dart analyze --fatal-infos`, mimari test, tüm paketlerin testleri. Biri kırmızıysa birleştirme düğmesi kapalı. **"Biçim" adımı kaldırılamaz.** |
+| K7 | `main` koruması | Git kaosu | Doğrudan push yok, PR zorunlu, 1 onay, CODEOWNER onayı, yeni commit gelince onay düşer, açık yorum varken birleşmez, yalnızca squash, force-push ve silme kapalı; **zorunlu statü kontrolü `SonarCloud Code Analysis`** (2 Ekim 2026'da kuruldu) |
+| K8 | `CODEOWNERS` | Çekirdeğe habersiz değişiklik | `.github/`, `sonar-project.properties`, `packages/domain`, `packages/application`, `packages/contracts`, `test/`, `AGENTS.md`, `analysis_options.yaml` değişirse Hüseyin Emre'nin onayı zorunlu; `packages/app/lib/` değişirse @yusufekenel veya @muberrayener'in onayı zorunlu |
 | K9 | Görev kartı (issue şablonu) | Kapsam dışına taşma | Her görevde: kabul ölçütü, dokunulacak dosyalar, **dokunulmayacak dosyalar**, bağlı testler |
 | K10 | PR şablonu | Anlaşılmadan alınan AI kodu | Her PR'da "ne yaptım, AI'a ne sordum, neyi değiştirdim, hangi satırı anlatamıyorum" bölümleri; inceleyen en az bir "bu satır neden böyle?" sorusu sorar, yazar cevaplar |
 | K11 | `AGENTS.md` | AI aracının mimariyi bozması | Ekipteki herkesin AI aracı aynı kural dosyasını okur: katman tablosu, yasaklar, test zorunluluğu, küçük parça kuralı |
+
+### 3.1 Paylaşılan CI ve Sonar dosyaları
+
+Bu dosyalar tüm ekibin ortak altyapısıdır. Bir görevin kapsamında değilse **dokunulmaz**; kapsamındaysa [`CODEOWNERS`](11-kod-mimarisi-ve-korumalar.md#3-koruma-katmanları) gereği Hüseyin Emre'nin onayı gerekir. İhlali `main` korumasını kilitleyebilir.
+
+- **`.github/workflows/sonar.yml` silinemez veya boşaltılamaz.** `main`'in zorunlu statü kontrolü olan `SonarCloud Code Analysis`'i üreten tek yerdir. Silinirse bu kontrol hiç üretilmez ve **PR, onay verilse bile birleşemez (BLOCKED kalır)**.
+- **`sonar-project.properties` takımın SonarCloud projesine bağlıdır** (`HuseyinEmreTech_Yapay-Zeka-Destekli-Yazilim-Gelistirme`). Kişisel proje anahtarı (`sonar.projectKey`, `sonar.organization`) yazılmaz; `sonar.sources` tüm paketleri kapsar ve `sonar.dart.lcov.reportPaths` korunur.
+- **`.github/workflows/ci.yml`'deki "Biçim" adımı** (`dart format --output=none --set-exit-if-changed .`) kaldırılamaz. Biçim kuralını atlamak için adımı silmek yerine kodu biçimlendirin.
+- **`packages/server/pubspec.yaml`**: paket adı `campus_server` ve bölüm 2'deki bağımlılıkları korunur; ad veya bağımlılıklar değiştirilmez.
+- **Workspace'te tek `pubspec.lock`** vardır (kök dizin). Paket klasörüne ayrı `pubspec.lock` eklenmez.
+- Sonar kapısı **"yeni kod kapsamı ≥ %80"** ister. Yalnızca `@Tags(['db'])` ile işaretli testlerle kaplanan kod, CI'da bu testler çalışmadığı için kapsam dışı kalır; kapsamı CI'da koşan birim testleriyle sağlayın.
+
+### 3.2 `CODEOWNERS` nasıl çalışır
+
+`.github/CODEOWNERS` bir **yolu bir kişiye bağlar**: o yola dokunan PR'ı o kişi onaylamadan `main`'e giremez. `main` korumasındaki `require_code_owner_reviews` bu yüzden genel bir onay değil, **o yolun sahibinin** onayını arar. GitHub, PR açılınca ilgili sahibi otomatik reviewer olarak ekler; kimse elle eklemez.
+
+Satır biçimi: `<yol> <kullanıcı...>`.
+
+- `/packages/domain/ @HuseyinEmreTech` — domain'e dokunmak Hüseyin Emre onayı ister.
+- `/packages/app/lib/ @yusufekenel @muberrayener` — uygulama kodu; sahipleri mobil (Yusuf) ve web (Müberra).
+- Aynı satırda birden fazla sahip varsa, içlerinden **birinin** onayı yeterlidir.
+
+Kim hangi yolun sahibi: `.github/CODEOWNERS`, [ekip ve yol haritası](10-ekip-ve-yol-haritasi.md) ve `AGENTS.md` paket sahipliği.
+
+**Uygulama (`campus_app`) sahipliği neden paylaşımlı.** Mobil ve web aynı Flutter kod tabanını kullanır; platforma özel Dart kodu aynı `packages/app/lib/` altındadır, `packages/app/web/` yalnızca web kabuğudur (index, ikon, manifest). Bu yüzden `lib/`'e dokunan her PR, `yusufekenel` veya `muberrayener`'den bir onay ister. Yazar kendi PR'ını onaylayamadığı için, PR'ı açan sahip değilse **diğer** sahip onaylar: örneğin Yusuf'un mobil PR'ını (`packages/app/lib/`'e dokunduğu için) web sahibi Müberra onaylar. Bu **kurulumun gereğidir, hata değil**; "kendi kısmının dışına çıkma" değil, ortak kod tabanının tek sahiplik satırında toplanmasının sonucudur.
+
+**Alan dışına taşmamak.** Görev kartındaki (K9) "dokunulmayacak dosyalar" listesine uyulur. Başka birinin sahiplendiği klasöre dokunmak ek onay gerektirir; kapsam dışına taşan PR (ör. sunucu/CI dosyaları) request-changes ile geri çevrilir.
+
+**Karar (2026-10-15).** Ortak `lib/` yüzünden mobil bir PR'ın web sahibini zorunlu onaylayıcı olarak çağırmasını önlemek için `packages/app/lib/` platform bazında ayrılır:
+
+- `lib/mobil/` — yalnız mobil (Android) kodu → @yusufekenel
+- `lib/web/` — yalnız web kodu → @muberrayener
+- `lib/ortak/` — iki platformun paylaştığı kod (modeller, ortak widget'lar) → @yusufekenel @muberrayener
+
+`CODEOWNERS`'ta özel satırlar genel `/packages/app/lib/` satırından **sonra** yazılır; GitHub son eşleşen satırı kullandığı için mobil dosya yalnız Yusuf'u, web dosya yalnız Müberra'yı gerektirir. Genel satır geçiş döneminde henüz taşınmamış dosyaları kapsar.
 
 ## 4. Domain'in hataya kapalı biçimi
 
