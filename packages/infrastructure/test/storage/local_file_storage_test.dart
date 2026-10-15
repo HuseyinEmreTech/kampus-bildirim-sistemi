@@ -170,6 +170,17 @@ void main() {
       expect(await filesOnDisk(), isEmpty);
     });
 
+    test('delete_sameFileTwiceAtOnce_onlyOneDeletes', () async {
+      final saved = _expectSaved(await save(_oneChunk(_file(_jpegHeader, 10))));
+
+      final results = await Future.wait([
+        storage.delete(saved.photo.url),
+        storage.delete(saved.photo.url),
+      ]);
+
+      expect(results, unorderedEquals([true, false]));
+    });
+
     test('delete_unknownFile_returnsFalse', () async {
       expect(
         await storage.delete('/files/$_reportId/${'0' * 32}.jpg'),

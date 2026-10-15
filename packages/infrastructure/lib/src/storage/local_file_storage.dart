@@ -127,9 +127,15 @@ class LocalFileStorage {
   /// Kaydedilmiş fotoğrafı siler; silindiyse `true`.
   Future<bool> delete(String url) async {
     final file = _fileFor(url);
-    if (file == null || !await file.exists()) return false;
-    await file.delete();
-    return true;
+    if (file == null) return false;
+    // Önce "var mı" diye bakmak yerine doğrudan silinir: aynı anda iki silme
+    // gelirse ikincisi hata fırlatmak yerine `false` alır.
+    try {
+      await file.delete();
+      return true;
+    } on PathNotFoundException {
+      return false;
+    }
   }
 
   String? _detectType(List<int> header) {
