@@ -10,6 +10,24 @@ jobs:
   sonar:
     name: sonar
     runs-on: ubuntu-latest
+    # db etiketli testler gerçek PostgreSQL ister; bu iş için geçici bir veritabanı.
+    # Parola yalnızca bu geçici konteyner içindir, sır değildir.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: campus
+          POSTGRES_PASSWORD: ci-test
+          POSTGRES_DB: campus
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U campus"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://campus:ci-test@localhost:5432/campus?sslmode=disable&max_connection_count=10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,6 +39,13 @@ jobs:
           cache: true
       - name: Bağımlılıklar
         run: flutter pub get
+      - name: Veritabanı şeması (migration'lar sırayla)
+        env:
+          PGPASSWORD: ci-test
+        run: |
+          for f in $(ls db/migrations/V*.sql | sort -V); do
+            psql -h localhost -U campus -d campus -v ON_ERROR_STOP=1 -f "$f"
+          done
       - name: Testler ve kapsam
         run: |
           mkdir -p coverage
