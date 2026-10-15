@@ -172,5 +172,12 @@ void main() {
 
       expect(outcome, AssignOutcome.notFound);
     });
+
+    test('assign_whenIdNotUuid_returnsNotFound', () async {
+      // Adresteki kimlik bozuksa sunucu hatası değil "bulunamadı" dönmeli.
+      final outcome = await repository.assign('abc', _staffA);
+
+      expect(outcome, AssignOutcome.notFound);
+    });
   }, skip: url == null ? 'DATABASE_URL tanımlı değil' : false);
 }

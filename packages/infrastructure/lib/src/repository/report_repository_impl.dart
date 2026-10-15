@@ -1,6 +1,7 @@
 import 'package:postgres/postgres.dart' show TxSession;
 
 import '../database/database.dart';
+import '../database/uuid_format.dart';
 
 /// `assign` sonucu. Application'daki `AppError` (#15) gelince ona çevrilecek.
 enum AssignOutcome { assigned, alreadyAssigned, invalidTransition, notFound }
@@ -29,6 +30,7 @@ VALUES ($1, $2, $3, $4)
   /// [assigneeId] görevlisini bildirime atar; yalnızca `Yeni` ve görevlisiz bildirimde olur.
   /// Durum değişimi ve durum geçmişi aynı işlemde yazılır: biri olmazsa ikisi de olmaz.
   Future<AssignOutcome> assign(String reportId, String assigneeId) async {
+    if (!isUuid(reportId)) return AssignOutcome.notFound;
     final assigned = await _db.transaction((tx) async {
       final result = await tx.execute(
         _assignSql,
