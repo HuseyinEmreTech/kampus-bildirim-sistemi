@@ -113,6 +113,8 @@ void main() {
 
     test('rotate_sameTokenAtOnce_onlyOneWins', () async {
       // Aynı yenileme belirteci iki kez aynı anda gelirse yalnızca biri yeni oturum alır.
+      // Havuzda tek bağlantı varsa istekler sıraya girer ve yarış hiç oluşmaz.
+      expect(url, contains('max_connection_count'), reason: 'havuz en az 2');
       for (var round = 0; round < 20; round++) {
         await _deleteFixtures(db);
         await db.execute(_insertUser, [_user]);
