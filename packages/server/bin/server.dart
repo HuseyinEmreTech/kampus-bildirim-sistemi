@@ -38,5 +38,6 @@ void main() async {
       .addHandler(router.call);
 
   final server = await io.serve(handler, InternetAddress.anyIPv4, 8080);
+  // ignore: avoid_print
   print('Server listening on port ${server.port}');
 }
