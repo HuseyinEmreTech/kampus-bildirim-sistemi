@@ -37,12 +37,21 @@ VALUES ($1, $2, $3, 'Ariza', 'Çözülmüş test bildirimi', '/files/test.jpg',
   '/files/sonuc.jpg', 'image/jpeg', 1000)
 ''';
 
+const _historyOf = r'''
+SELECT from_status, to_status, changed_by::text FROM status_history
+WHERE report_id = $1
+''';
+
 const _resetToNew = r'''
 UPDATE reports SET status = 'Yeni', assignee_id = NULL, taken_at = NULL
 WHERE report_id = $1
 ''';
 
 Future<void> _deleteFixtures(Database db) async {
+  await db.execute(r'DELETE FROM status_history WHERE report_id IN ($1, $2)', [
+    _newReport,
+    _resolvedReport,
+  ]);
   await db.execute(r'DELETE FROM reports WHERE report_id IN ($1, $2)', [
     _newReport,
     _resolvedReport,
@@ -105,6 +114,8 @@ void main() {
         [_newReport],
       );
       expect(row.single, ['Ustlenildi', _staffA, true]);
+      final history = await db.execute(_historyOf, [_newReport]);
+      expect(history.single, ['Yeni', 'Ustlenildi', _staffA]);
     });
 
     test('assign_whenAlreadyAssigned_returnsAlreadyAssigned', () async {
@@ -118,11 +129,17 @@ void main() {
         [_newReport],
       );
       expect(row.single.single, _staffA);
+      expect(await db.execute(_historyOf, [_newReport]), hasLength(1));
     });
 
     test('assign_whenTwoStaffAtOnce_onlyOneWins', () async {
+      // Havuzda tek bağlantı varsa istekler sıraya girer ve yarış hiç oluşmaz.
+      expect(url, contains('max_connection_count'), reason: 'havuz en az 2');
       // Rule 02: aynı anda iki istek; tekrar tekrar denenir ki yarış gerçekten oluşsun.
       for (var round = 0; round < 20; round++) {
+        await db.execute(r'DELETE FROM status_history WHERE report_id = $1', [
+          _newReport,
+        ]);
         await db.execute(_resetToNew, [_newReport]);
 
         final outcomes = await Future.wait([
@@ -138,6 +155,8 @@ void main() {
           ]),
           reason: 'tur $round',
         );
+        final history = await db.execute(_historyOf, [_newReport]);
+        expect(history, hasLength(1), reason: 'tur $round');
       }
     });
 
@@ -145,6 +164,7 @@ void main() {
       final outcome = await repository.assign(_resolvedReport, _staffB);
 
       expect(outcome, AssignOutcome.invalidTransition);
+      expect(await db.execute(_historyOf, [_resolvedReport]), isEmpty);
     });
 
     test('assign_whenReportMissing_returnsNotFound', () async {

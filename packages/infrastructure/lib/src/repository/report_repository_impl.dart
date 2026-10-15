@@ -1,3 +1,5 @@
+import 'package:postgres/postgres.dart' show TxSession;
+
 import '../database/database.dart';
 
 /// `assign` sonucu. Application'daki `AppError` (#15) gelince ona çevrilecek.
@@ -17,12 +19,26 @@ SET assignee_id = $2, taken_at = NOW(), status = 'Ustlenildi'
 WHERE report_id = $1 AND assignee_id IS NULL AND status = 'Yeni'
 ''';
 
+  static const _insertHistorySql = r'''
+INSERT INTO status_history (report_id, from_status, to_status, changed_by)
+VALUES ($1, $2, $3, $4)
+''';
+
   static const _statusSql = r'SELECT status FROM reports WHERE report_id = $1';
 
   /// [assigneeId] görevlisini bildirime atar; yalnızca `Yeni` ve görevlisiz bildirimde olur.
+  /// Durum değişimi ve durum geçmişi aynı işlemde yazılır: biri olmazsa ikisi de olmaz.
   Future<AssignOutcome> assign(String reportId, String assigneeId) async {
-    final result = await _db.execute(_assignSql, [reportId, assigneeId]);
-    if (result.affectedRows == 1) return AssignOutcome.assigned;
+    final assigned = await _db.transaction((tx) async {
+      final result = await tx.execute(
+        _assignSql,
+        parameters: [reportId, assigneeId],
+      );
+      if (result.affectedRows != 1) return false;
+      await _insertHistory(tx, reportId, 'Yeni', 'Ustlenildi', assigneeId);
+      return true;
+    });
+    if (assigned) return AssignOutcome.assigned;
     return _whyNotAssigned(reportId);
   }
 
@@ -35,4 +51,15 @@ WHERE report_id = $1 AND assignee_id IS NULL AND status = 'Yeni'
     if (status == 'Cozuldu') return AssignOutcome.invalidTransition;
     return AssignOutcome.alreadyAssigned;
   }
+
+  Future<void> _insertHistory(
+    TxSession tx,
+    String reportId,
+    String from,
+    String to,
+    String changedBy,
+  ) => tx.execute(
+    _insertHistorySql,
+    parameters: [reportId, from, to, changedBy],
+  );
 }
