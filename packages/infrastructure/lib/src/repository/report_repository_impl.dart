@@ -89,6 +89,7 @@ VALUES ($1, $2, 'ReportResolved', $3)
     ResolutionPhoto photo, {
     String? note,
   }) async {
+    if (!isUuid(reportId)) return ResolveOutcome.notFound;
     final resolved = await _db.transaction((tx) async {
       final rows = await tx.execute(
         _resolveSql,

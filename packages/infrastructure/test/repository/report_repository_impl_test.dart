@@ -286,6 +286,12 @@ FROM reports WHERE report_id = $1
       expect(outcome, ResolveOutcome.notFound);
     });
 
+    test('resolve_whenIdNotUuid_returnsNotFound', () async {
+      final outcome = await repository.resolve('abc', _staffA, photo);
+
+      expect(outcome, ResolveOutcome.notFound);
+    });
+
     test('resolve_whenNotificationFails_rollsBackEverything', () async {
       // Aynı bildirim için ikinci "çözüldü" kaydı UNIQUE kuralına takılır.
       await db.execute(
