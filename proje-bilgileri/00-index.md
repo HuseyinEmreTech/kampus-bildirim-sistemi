@@ -37,6 +37,7 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 | - | [Uygulama planı: repo iskeleti](planlar/2026-10-02-repo-iskeleti.md) | Hafta 4'ün ilk işi, adım adım | Onay bekliyor |
 | - | [ADR-01: Dart backend ve PostgreSQL](adr/01-dart-backend-postgresql.md) | Geri dönülmesi zor karar | Önerildi |
 | - | [ADR-02: Kod kalitesi aracı](adr/02-kalite-araci-sonarqube-cloud.md) | SonarQube Cloud ve yerel analiz kararı, karşılaştırma matrisi | Önerildi |
+| - | [ADR-03: Katmanlı mimari ve tek dilli ürün](adr/03-katmanli-mimari-ve-tek-dil.md) | Ürün tek dil; esneklik dağıtıma girmeyen araçlarda; çok dilli ürün reddi | Önerildi |
 | - | [ADR şablonu](adr/00-adr-template.md) | ADR yazma kuralı | Şablon |
 
 ## İzleme kayıtları
