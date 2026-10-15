@@ -1,7 +1,7 @@
 ---
 title: Yusuf Ekenel - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-10-12
+son-guncelleme: 2026-10-15
 ---
 
 # Yusuf Ekenel (@yusufekenel) - Kişisel Plan
@@ -111,3 +111,6 @@ son-guncelleme: 2026-10-12
 - **Hüseyin Emre**: Contracts (DTO), API spec, kabul testleri
 - **Çağdaş/Ertuğrul**: API endpoint'leri hazır olmalı
 - **Fatma**: Web UI ortak widget'lar, responsive breakpoint'ler
+
+## Raporlar
+- [2026-10-15](raporlar/yusufekenel/2026-10-15.md): Kurulum ve öğrenci bildirim listesi ekranı (#21)
