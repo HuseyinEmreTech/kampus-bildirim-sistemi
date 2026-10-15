@@ -1,7 +1,7 @@
 ---
 title: Domain Tasarımı
 durum: Taslak
-son-guncelleme: 2026-10-02
+son-guncelleme: 2026-10-15
 ---
 
 # Domain Tasarımı
@@ -26,7 +26,7 @@ stateDiagram-v2
 | --- | --- | --- | --- | --- |
 | userId | Guid | Benzersiz kimlik | 5c98741b-... | Tekrar etmez |
 | fullName | Text | Ad soyad | Ayşe Yılmaz | 3-100 karakter |
-| email | Text | Giriş e-postası | ayse@ornek.edu | Geçerli biçim, benzersiz |
+| email | Text | Giriş e-postası | ayse@ornek.edu | Geçerli biçim, büyük/küçük harf fark etmeden benzersiz |
 | role | Role | Rol | Student | `Student` veya `Staff` |
 
 ## Report (Aggregate root)
