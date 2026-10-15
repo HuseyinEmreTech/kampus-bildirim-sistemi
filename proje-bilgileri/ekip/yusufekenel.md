@@ -114,3 +114,4 @@ son-guncelleme: 2026-10-15
 
 ## Raporlar
 - [2026-10-15](raporlar/yusufekenel/2026-10-15.md): Kurulum ve öğrenci bildirim listesi ekranı (#21)
+- [2026-10-16](raporlar/yusufekenel/2026-10-16.md): Giriş ekranı ve oturum durumu, gh kurulumu
