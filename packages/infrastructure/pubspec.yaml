@@ -7,5 +7,6 @@ environment:
 dependencies:
   campus_domain: any
   campus_application: any
+  postgres: ^3.5.20
 dev_dependencies:
   test: ^1.31.1
