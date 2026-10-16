@@ -5,7 +5,7 @@ Bu dosya, ekipteki herkesin yapay zeka aracına (Claude Code, Codex, Gemini, Cop
 ## Proje bağlamı
 
 - Kampüs sorun bildirim sistemi; **ders projesi**, canlı demo ve sunum için. Üretim sistemi değil.
-- Ölçek: tek kampüs, en fazla birkaç yüz kullanıcı. 4 kişilik ekip, 15 haftalık dönem.
+- Ölçek: tek kampüs, en fazla birkaç yüz kullanıcı. 6 kişilik ekip (hoca dağıttı), 15 haftalık dönem.
 - Flutter (Android) istemci, Dart (Shelf) sunucu, PostgreSQL 16.
 - **En basit çalışan çözüm.** Mikroservis, kuyruk, önbellek, ORM, kod üretimi, durum yönetimi paketi, DI paketi yok.
 - Ayrıntı: `proje-bilgileri/01-project-scope.md`, `proje-bilgileri/03-domain-design.md` (kurallar Rule 00-07), `proje-bilgileri/05-api-design.md`, `proje-bilgileri/11-kod-mimarisi-ve-korumalar.md`.

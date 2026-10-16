@@ -21,7 +21,7 @@ Bu doküman projenin **neden** var olduğunu, **kimin için** yapıldığını, 
 | İstemci | Flutter (Dart) |
 | Sunucu | Dart (Shelf) ve PostgreSQL, öneri: [ADR-01](adr/01-dart-backend-postgresql.md) |
 | Geliştirme yaklaşımı | Feature branch ile küçük iterasyonlar, spec önce ([süreç](08-development-process.md)) |
-| Durum | Onaylandı, dört kişilik ekip kuruldu |
+| Durum | Onaylandı, altı kişilik ekip kuruldu (hoca dağıttı) |
 
 ## 2. Problem
 
@@ -121,7 +121,7 @@ Bu bölüm yapay zeka araçlarına her oturumda verilir; gereksiz karmaşıklı�
 - **Amaç:** ders projesi; canlı demo ve sunum için.
 - **Ölçek:** tek kampüs, en fazla birkaç yüz kullanıcı, aynı anda birkaç kullanıcı.
 - **Kullanım yeri:** üretim sistemi değil.
-- **Takım ve süre:** 4 kişi ([ekip](10-ekip-ve-yol-haritasi.md#1-ekip)); 15 ders haftası, geliştirme 4-12. haftalar.
+- **Takım ve süre:** 6 kişi ([ekip](10-ekip-ve-yol-haritasi.md#1-ekip)); 15 ders haftası, geliştirme 4-12. haftalar.
 - **Mimari sınır:** tek dağıtılabilir sunucu, katmanlı mimari, tek veritabanı. Mikroservis, mesaj kuyruğu ve önbellek yoktur.
 
 Bilinçli sadeleştirmeler:
@@ -154,7 +154,7 @@ Bilinçli sadeleştirmeler:
 
 | Ders kriteri | Projede karşılığı |
 | --- | --- |
-| Takım (1-4 kişi) | Bkz. [kapsam](#7-ölçek-ve-kısıtlar-proje-bağlamı) |
+| Takım (ders kuralı 1-4; hoca bu takımı 6 kişi olarak dağıttı) | Bkz. [kapsam](#7-ölçek-ve-kısıtlar-proje-bağlamı) |
 | En az bir yapay zeka dil modeli aracı | Claude Code, [kayıtlar](kayitlar/skill-ve-arac-kullanimi.md) |
 | Clean Code, SOLID, mimari uyum, okunabilirlik, test edilebilirlik | [Mimari](02-architecture-overview.md), [süreç](08-development-process.md), [SonarQube puanları](kayitlar/sonarqube-puanlari.md) |
 | Dokümantasyon (mimari, AI araçları, zorluklar ve çözümler) | Bu vault, [README](../README.md), [hata kayıtları](kayitlar/hata-kayitlari.md) |
