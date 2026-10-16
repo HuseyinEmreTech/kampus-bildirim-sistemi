@@ -1,0 +1,40 @@
+# Canlı ortam (VPS ya da demo bilgisayarı): veritabanı ve sunucu birlikte.
+# Çalıştır: docker compose -f compose.prod.yaml up -d --build
+# Değişkenler .env dosyasından okunur (.env.example). Şifrede @ : / ? # karakterleri
+# kullanma; DATABASE_URL içinde adresin parçası sanılırlar.
+services:
+  db:
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-campus}
+      POSTGRES_USER: ${POSTGRES_USER:-campus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env dosyasinda tanimli olmali}
+    # Port açılmaz: veritabanına dışarıdan değil, yalnızca sunucu konteyneri iç ağdan ulaşır.
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Migration'lar yalnızca veri klasörü boşken (ilk açılışta) sırayla çalışır.
+      - ./db/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  server:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-campus}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-campus}?sslmode=disable&max_connection_count=10
+    volumes:
+      # Yüklenen fotoğraflar; konteyner silinse de kalır.
+      - files:/data/files
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+
+volumes:
+  pgdata:
+  files:

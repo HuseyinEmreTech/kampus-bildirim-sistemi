@@ -1,0 +1,11 @@
+# İmaj derlenirken Docker'a gönderilmeyen dosyalar: sırlar ve gereksiz büyük klasörler.
+.env
+.env.*
+*.dump
+.git
+**/.dart_tool
+**/build
+uploads
+photos
+pgdata
+gizli

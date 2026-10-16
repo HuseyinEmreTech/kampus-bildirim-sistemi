@@ -244,6 +244,18 @@ dart run bin/server.dart
 # http://localhost:8080/health
 ```
 
+**Canlı ortam (sunucu + veritabanı konteynerde)**
+
+VPS'te ya da demo bilgisayarında sunucu da konteynerde çalışır. `Dockerfile` sunucuyu tek dosyalık programa derler (imaj yaklaşık 17 MB, içinde kabuk ve kaynak kod yok, root olmayan kullanıcıyla çalışır). `compose.prod.yaml` veritabanını dışarıya açmaz; ona yalnızca sunucu ulaşır.
+
+```bash
+cp .env.example .env     # güçlü bir şifre yaz; şifrede @ : / ? # kullanma
+docker compose -f compose.prod.yaml up -d --build
+# http://localhost:8080/health
+```
+
+Fotoğraflar `files` adlı kalıcı diskte (`/data/files`) durur. HTTPS (Caddy) dağıtım kararından sonra eklenecek.
+
 **Mobil / Web istemci**
 
 ```bash
