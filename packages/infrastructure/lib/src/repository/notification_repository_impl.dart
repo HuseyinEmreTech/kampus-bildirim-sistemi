@@ -1,4 +1,5 @@
 import '../database/database.dart';
+import '../database/paging.dart';
 import '../database/uuid_format.dart';
 
 /// `markRead` sonucu. Application'daki `AppError` (#15) gelince ona çevrilecek.
@@ -52,12 +53,14 @@ SELECT count(*) FROM notifications WHERE user_id = $1 AND read_at IS NULL
   }
 
   /// [userId] öğrencisinin bildirimleri (Rule 01), yeniden eskiye. [offset] kadarını
-  /// atlar, en çok [limit] tane döner; sayfa boyutu sınırını service denetler.
+  /// atlar, en çok [limit] tane döner. Sayfa geçersizse boş liste döner,
+  /// veritabanına gidilmez.
   Future<List<NotificationItem>> list(
     String userId, {
     required int limit,
     required int offset,
   }) async {
+    if (!isValidPage(limit, offset)) return const [];
     final rows = await _db.execute(_listSql, [userId, limit, offset]);
     return [
       for (final [id, reportId, type, message, createdAt, readAt] in rows)

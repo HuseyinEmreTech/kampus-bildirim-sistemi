@@ -146,6 +146,14 @@ void main() {
       expect(await idsOf(_owner, limit: 1, offset: 1), [_first]);
     });
 
+    // Negatif sayı veritabanı hatasına (500), çok büyük sayı ağır sorguya dönmez.
+    test('list_withInvalidPage_returnsEmpty', () async {
+      expect(await idsOf(_owner, limit: 0), isEmpty);
+      expect(await idsOf(_owner, limit: maxPageSize + 1), isEmpty);
+      expect(await idsOf(_owner, offset: -1), isEmpty);
+      expect(await idsOf(_owner, limit: maxPageSize), hasLength(2));
+    });
+
     test('list_returnsFieldsAndReadTime', () async {
       await repository.markRead(_first, _owner);
 
