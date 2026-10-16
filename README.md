@@ -236,6 +236,29 @@ Windows PowerShell `<` işaretini desteklemez (`RedirectionNotSupported` hatası
 cmd /c "docker compose exec -T db psql -U campus -d campus < db\seed\001_ornek.sql"
 ```
 
+**Veritabanı yedeği** (ör. demodan önce)
+
+Yedek, veritabanının o anki halini tek dosyaya yazar; bir şey bozulursa o ana dönülür. Dosya konteynerin içinde oluşturulup dışarı kopyalanır; komutlarda `<` olmadığı için PowerShell'de `cmd /c` gerekmez.
+
+```bash
+# Yedek al: repo klasörünün bir üstüne campus-yedek.dump yazar
+docker compose exec -T db pg_dump -U campus -d campus -Fc -f /tmp/campus-yedek.dump
+docker compose cp db:/tmp/campus-yedek.dump ../campus-yedek.dump
+docker compose exec -T db rm /tmp/campus-yedek.dump
+
+# Geri yükle: yedekten sonra yapılan bütün değişiklikler silinir (önce sunucuyu durdur)
+docker compose cp ../campus-yedek.dump db:/tmp/campus-yedek.dump
+docker compose exec -T db pg_restore -U campus -d campus --clean --if-exists --single-transaction /tmp/campus-yedek.dump
+docker compose exec -T db rm /tmp/campus-yedek.dump
+```
+
+- `-Fc`: PostgreSQL'in sıkıştırılmış yedek biçimi; `pg_restore` ile geri yüklenir.
+- `--clean --if-exists`: geri yüklemeden önce tabloları silip yedekteki haliyle yeniden kurar.
+- `--single-transaction`: geri yükleme yarıda hata verirse hiçbir şey değişmez.
+- Yedekte kullanıcılar ve parola özetleri vardır: paylaşma, repoya koyma (`*.dump` zaten `.gitignore`'da).
+- Yedek yalnızca veritabanıdır; yüklenen fotoğraflar diskte ayrı bir klasördedir, onlar ayrıca kopyalanır.
+- Docker Compose ile denendi; Podman ile doğrulanmadı (`compose cp` desteklenmezse `podman cp` kullanılır).
+
 **Sunucu**
 
 ```bash
