@@ -28,7 +28,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER:-campus}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-campus}?sslmode=disable&max_connection_count=10
+      DATABASE_URL: postgres://${POSTGRES_USER:-campus}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-campus}?sslmode=disable&max_connection_count=10&connect_timeout=5&query_timeout=10
     volumes:
       # Yüklenen fotoğraflar; konteyner silinse de kalır.
       - files:/data/files
