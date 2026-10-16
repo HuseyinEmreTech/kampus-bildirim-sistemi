@@ -13,7 +13,10 @@ COPY packages/infrastructure packages/infrastructure
 COPY packages/server packages/server
 
 # packages/app bir Flutter paketi; bu imajda Flutter yok ve sunucu ona bağlı değil.
-RUN sed -i '/^  - packages\/app$/d' pubspec.yaml && dart pub get
+# Önce Windows satır sonları (CRLF) LF'ye çevrilir; yoksa satır eşleşmez.
+RUN sed -i 's/\r$//' pubspec.yaml \
+  && sed -i '/^  - packages\/app$/d' pubspec.yaml \
+  && dart pub get
 RUN mkdir -p /cikti/files \
   && dart compile exe packages/server/bin/server.dart -o /cikti/server
 
