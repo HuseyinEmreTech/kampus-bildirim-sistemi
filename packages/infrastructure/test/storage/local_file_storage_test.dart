@@ -136,15 +136,15 @@ void main() {
       expect(maxPhotoSizeBytes, 5 * 1024 * 1024);
     });
 
-    test('save_reportIdNotUuid_throwsArgumentError', () {
-      expect(
-        () => storage.save(
-          '../../etc',
-          _oneChunk(_file(_jpegHeader, 10)),
-          'image/jpeg',
-        ),
-        throwsArgumentError,
+    test('save_reportIdNotUuid_returnsInvalidReportId', () async {
+      final result = await storage.save(
+        '../../etc',
+        _oneChunk(_file(_jpegHeader, 10)),
+        'image/jpeg',
       );
+
+      expect(result, _rejected(PhotoError.invalidReportId));
+      expect(await filesOnDisk(), isEmpty);
     });
   });
 }

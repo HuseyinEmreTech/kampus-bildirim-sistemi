@@ -193,7 +193,7 @@ Tümü: [güvenlik ve gizlilik](proje-bilgileri/06-security-and-privacy.md). Dem
 
 ## 10. Kurulum ve çalıştırma
 
-> Veritabanı kurulumu (compose + migration) hazır; **sunucu ve istemci kodu** henüz yok. Uygulama kodu eklendikçe bu bölüm gerçek komutlarla tamamlanacaktır.
+Veritabanı kurulumu (compose + migration) hazır. Sunucu iskeleti (`/health`) çalışıyor; istemci tarafında geçici bir kök uygulama var, mobil ve web ekranları `lib/mobil/` ve `lib/web/` altında geliştiriliyor.
 
 **Gereksinimler**
 
@@ -235,6 +235,23 @@ Windows PowerShell `<` işaretini desteklemez (`RedirectionNotSupported` hatası
 ```powershell
 cmd /c "docker compose exec -T db psql -U campus -d campus < db\seed\001_ornek.sql"
 ```
+
+**Sunucu**
+
+```bash
+cd packages/server
+dart run bin/server.dart
+# http://localhost:8080/health
+```
+
+**Mobil / Web istemci**
+
+```bash
+cd packages/app
+flutter run --target lib/main.dart   # geçici kök uygulama
+```
+
+Mobil ekranlar `lib/mobil/`, web ekranlar `lib/web/` altında geliştiriliyor. Platforma özgü gerçek giriş noktası Hafta 6'da eklenecek.
 
 **Yapılandırma (planlanan)**
 
