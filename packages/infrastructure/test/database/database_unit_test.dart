@@ -21,6 +21,8 @@ class _FakePool implements Pool<Object?> {
   Object? executedParameters;
   var transactionStarted = false;
   var wasClosed = false;
+  Exception? failure;
+  Duration delay = Duration.zero;
 
   @override
   Future<Result> execute(
@@ -32,6 +34,8 @@ class _FakePool implements Pool<Object?> {
   }) async {
     executedQuery = query;
     executedParameters = parameters;
+    await Future<void>.delayed(delay);
+    if (failure case final error?) throw error;
     return _emptyResult;
   }
 
@@ -87,6 +91,36 @@ void main() {
       db.transaction<void>((tx) async => throw StateError('hata')),
       throwsStateError,
     );
+  });
+
+  test('isReachable_whenQuerySucceeds_returnsTrue', () async {
+    expect(await db.isReachable(), isTrue);
+    expect(pool.executedQuery, 'SELECT 1');
+  });
+
+  test('isReachable_whenQueryFails_returnsFalse', () async {
+    pool.failure = Exception('bağlantı kurulamadı');
+
+    expect(await db.isReachable(), isFalse);
+  });
+
+  test('isReachable_whenQueryHangs_returnsFalseAfterTimeout', () async {
+    pool.delay = const Duration(seconds: 1);
+
+    expect(
+      await db.isReachable(timeout: const Duration(milliseconds: 50)),
+      isFalse,
+    );
+  });
+
+  // Sağlık kontrolü sunucu ayaktayken veritabanı kapalı olduğunda da çalışmalı.
+  test('isReachable_whenServerDown_returnsFalse', () async {
+    final unreachable = Database.fromUrl(
+      'postgres://kimse:yok@127.0.0.1:1/yok?sslmode=disable',
+    );
+    addTearDown(unreachable.close);
+
+    expect(await unreachable.isReachable(), isFalse);
   });
 
   test('close_closesPool', () async {

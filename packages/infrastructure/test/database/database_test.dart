@@ -29,6 +29,10 @@ void main() {
       expect(result.single.single, 1);
     });
 
+    test('isReachable_whenDatabaseUp_returnsTrue', () async {
+      expect(await db.isReachable(), isTrue);
+    });
+
     test('execute_withParameters_bindsDollarPlaceholders', () async {
       final result = await db.execute(r'SELECT $1::int + $2::int', [2, 3]);
 

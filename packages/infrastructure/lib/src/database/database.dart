@@ -1,5 +1,8 @@
 import 'package:postgres/postgres.dart';
 
+/// Sağlık kontrolünde veritabanının cevap vermesi için beklenen en uzun süre.
+const healthCheckTimeout = Duration(seconds: 2);
+
 /// PostgreSQL bağlantı havuzu. Repository'ler bütün sorgularını buradan çalıştırır.
 ///
 /// SQL yalnızca `$1`, `$2` parametreleriyle yazılır; değer SQL metnine eklenmez.
@@ -24,6 +27,18 @@ class Database {
   /// [action] içindeki sorgular tek işlemdir: hata olursa hepsi geri alınır.
   Future<T> transaction<T>(Future<T> Function(TxSession tx) action) =>
       _pool.runTx(action);
+
+  /// Veritabanı şu an cevap veriyor mu? Sunucunun `/health` ucu içindir.
+  /// Bağlantı kurulamazsa ya da [timeout] içinde cevap gelmezse hata fırlatmaz,
+  /// `false` döner.
+  Future<bool> isReachable({Duration timeout = healthCheckTimeout}) async {
+    try {
+      await _pool.execute('SELECT 1').timeout(timeout);
+      return true;
+    } on Exception {
+      return false;
+    }
+  }
 
   /// Havuzdaki bütün bağlantıları kapatır.
   Future<void> close() => _pool.close();
