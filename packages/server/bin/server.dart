@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:campus_server/src/logging/logger.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
@@ -47,5 +48,5 @@ void main() async {
       .addHandler(router.call);
 
   final server = await io.serve(handler, InternetAddress.anyIPv4, 8080);
-  stdout.writeln('Server listening on port ${server.port}');
+  serverLog('Server listening on port ${server.port}');
 }
