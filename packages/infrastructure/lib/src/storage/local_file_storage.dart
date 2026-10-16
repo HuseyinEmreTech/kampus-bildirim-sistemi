@@ -55,7 +55,9 @@ class LocalFileStorage {
   static const _nameBytes = 16;
   static const _jpegSignature = [0xFF, 0xD8, 0xFF];
   static const _pngSignature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
-  static const _extensions = {'image/jpeg': 'jpg', 'image/png': 'png'};
+  static const _png = 'image/png';
+  static const _jpeg = 'image/jpeg';
+  static const _extensions = {_jpeg: 'jpg', _png: 'png'};
   static const _jpegQuality = 85;
 
   static final _uuid = RegExp(
@@ -111,26 +113,8 @@ class LocalFileStorage {
       }
       await sink.close();
       sink = null;
-
-      final original = await partFile.readAsBytes();
-      final limit = maxPixels;
-      // Çözme ve sıkıştırma işlemciyi saniyeler boyunca meşgul eder; sunucu
-      // diğer isteklere cevap verebilsin diye ayrı bir isolate'te yapılır.
-      final cleaned = await Isolate.run(
-        () => _reencode(original, contentType, limit),
-      );
-      if (cleaned case PhotoRejected()) return cleaned;
-      final bytesOut = (cleaned as _Cleaned).bytes;
-      // Yeniden kodlanan dosya girdiden büyük çıkabilir; sınır diskteki dosya için de geçerli.
-      if (bytesOut.length > maxSizeBytes) {
-        return const PhotoRejected(PhotoError.sizeExceeded);
-      }
-      await File(_pathFor(url)).writeAsBytes(bytesOut, flush: true);
-      return PhotoSaved((
-        url: url,
-        contentType: contentType,
-        sizeBytes: bytesOut.length,
-      ));
+      // `await` burada gerekli: geçici dosya, temizleme bitmeden silinmesin.
+      return await _cleanAndStore(partFile, url, contentType);
     } finally {
       // Yarıda kalan dosya, kapatma da hata verse silinir.
       try {
@@ -143,13 +127,38 @@ class LocalFileStorage {
     }
   }
 
+  /// Geçici dosyadaki fotoğrafı EXIF'ten temizleyip asıl adıyla yazar.
+  Future<SavePhotoResult> _cleanAndStore(
+    File partFile,
+    String url,
+    String contentType,
+  ) async {
+    final original = await partFile.readAsBytes();
+    final limit = maxPixels;
+    // Çözme ve sıkıştırma işlemciyi saniyeler boyunca meşgul eder; sunucu
+    // diğer isteklere cevap verebilsin diye ayrı bir isolate'te yapılır.
+    final cleaned = await Isolate.run(
+      () => _reencode(original, contentType, limit),
+    );
+    if (cleaned case PhotoRejected()) return cleaned;
+    final bytesOut = (cleaned as _Cleaned).bytes;
+    // Yeniden kodlanan dosya girdiden büyük çıkabilir; sınır diskteki dosya için de geçerli.
+    if (bytesOut.length > maxSizeBytes) {
+      return const PhotoRejected(PhotoError.sizeExceeded);
+    }
+    await File(_pathFor(url)).writeAsBytes(bytesOut, flush: true);
+    return PhotoSaved((
+      url: url,
+      contentType: contentType,
+      sizeBytes: bytesOut.length,
+    ));
+  }
+
   // Önce yalnızca başlıktaki en/boy okunur; sınırı aşan fotoğraf açılmaz.
   // JPEG çözücü EXIF'teki yön bilgisini piksellere kendisi işler; sonra bütün
   // üst veri atılır ve yalnızca pikseller yeniden kodlanır.
   static Object _reencode(Uint8List data, String contentType, int maxPixels) {
-    final decoder = contentType == 'image/png'
-        ? img.PngDecoder()
-        : img.JpegDecoder();
+    final decoder = contentType == _png ? img.PngDecoder() : img.JpegDecoder();
     try {
       final info = decoder.startDecode(data);
       if (info == null) return const PhotoRejected(PhotoError.invalidFormat);
@@ -165,7 +174,7 @@ class LocalFileStorage {
         ..textData = null
         ..iccProfile = null;
       return _Cleaned(
-        contentType == 'image/png'
+        contentType == _png
             ? img.encodePng(clean)
             : img.encodeJpg(clean, quality: _jpegQuality),
       );
@@ -176,8 +185,8 @@ class LocalFileStorage {
   }
 
   String? _detectType(List<int> header) {
-    if (_startsWith(header, _pngSignature)) return 'image/png';
-    if (_startsWith(header, _jpegSignature)) return 'image/jpeg';
+    if (_startsWith(header, _pngSignature)) return _png;
+    if (_startsWith(header, _jpegSignature)) return _jpeg;
     return null;
   }
 
