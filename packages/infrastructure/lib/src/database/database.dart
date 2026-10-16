@@ -18,7 +18,8 @@ class Database {
   ///
   /// - `sslmode=disable`: yerel PostgreSQL'de SSL yok; paket varsayılan olarak SSL ister.
   /// - `max_connection_count`: havuzdaki en fazla bağlantı; verilmezse paket 1 kullanır.
-  /// - `connect_timeout`: bağlanmak için en fazla saniye; verilmezse 15.
+  /// - `connect_timeout`: havuzda boş bağlantı beklemek ve bağlanmak için toplam
+  ///   en fazla saniye; verilmezse 15. Havuz o süre dolu kalırsa istek hata alır.
   /// - `query_timeout`: bir sorgu için en fazla saniye; verilmezse 5 dakika. Süre
   ///   dolunca paket sorguyu sunucuda da iptal eder ve bağlantı havuza döner.
   factory Database.fromUrl(String url) => Database(Pool.withUrl(url));
