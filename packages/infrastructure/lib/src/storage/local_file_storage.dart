@@ -158,7 +158,11 @@ class LocalFileStorage {
   // JPEG çözücü EXIF'teki yön bilgisini piksellere kendisi işler; sonra bütün
   // üst veri atılır ve yalnızca pikseller yeniden kodlanır.
   static Object _reencode(Uint8List data, String contentType, int maxPixels) {
-    final decoder = contentType == _png ? img.PngDecoder() : img.JpegDecoder();
+    // JPEG'de başlıktan okunan en/boy gerçek kareden farklı olabilir; sınır
+    // çözücüye de verilir ki kareyi açmadan önce kendisi de kontrol etsin.
+    final decoder = contentType == _png
+        ? img.PngDecoder()
+        : img.JpegDecoder(maxPixels: maxPixels);
     try {
       final info = decoder.startDecode(data);
       if (info == null) return const PhotoRejected(PhotoError.invalidFormat);

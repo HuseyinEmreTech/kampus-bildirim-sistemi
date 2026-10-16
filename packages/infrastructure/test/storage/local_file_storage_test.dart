@@ -35,6 +35,22 @@ Uint8List _jpegWithExif({int orientation = 1}) {
 
 Uint8List _png() => img.encodePng(_picture());
 
+// Başlığı 1x1 diyen ama 4x2 çözülen JPEG: paket SOI'den sonraki RST0'ı en/boy
+// okurken uzunluklu blok sayıp gerçek kareyi atlar, COM'daki sahte kareyi görür.
+// Sınır 7 pikselse büyük kare gibi reddedilmeli.
+Uint8List _jpegWithLyingHeader() {
+  final real = img.encodeJpg(_picture());
+  final body = real.sublist(2, real.length - 2); // SOI ve EOI hariç
+  final prefix = [0xFF, 0xD8, 0xFF, 0xD0, ...body];
+  final padding = (body[0] << 8 | body[1]) - prefix.length; // atlanan kısım
+  // dart format off
+  const fake = [0xFF, 0xC0, 0, 11, 8, 0, 1, 0, 1, 1, 1, 0x11, 0, // 1x1 kare
+      0xFF, 0xDA, 0, 8, 1, 1, 0, 0, 0x3F, 0]; // tarama başlığı
+  final length = 2 + padding + fake.length;
+  return Uint8List.fromList([...prefix, 0xFF, 0xFE, length >> 8, length & 0xFF,
+      ...List.filled(padding, 0), ...fake, 0xFF, 0xD9]); // dart format on
+}
+
 bool _containsText(List<int> bytes, String text) =>
     String.fromCharCodes(bytes).contains(text);
 
@@ -210,6 +226,15 @@ void main() {
       final result = await save(_oneChunk(_png()), 'image/png');
 
       expect(result, _rejected(PhotoError.sizeExceeded));
+      expect(await filesOnDisk(), isEmpty);
+    });
+
+    test('save_jpegHeaderHidesRealSize_rejected', () async {
+      storage = LocalFileStorage(root, maxSizeBytes: 1 << 20, maxPixels: 7);
+
+      final result = await save(_oneChunk(_jpegWithLyingHeader()));
+
+      expect(result, _rejected(PhotoError.invalidFormat));
       expect(await filesOnDisk(), isEmpty);
     });
 
