@@ -1,0 +1,2 @@
+# Kabuk betikleri konteynerde (Linux) çalışır; Windows satır sonu (CRLF) onları bozar.
+*.sh text eol=lf
