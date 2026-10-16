@@ -33,7 +33,9 @@ class Database {
   /// `false` döner.
   Future<bool> isReachable({Duration timeout = healthCheckTimeout}) async {
     try {
-      await _pool.execute('SELECT 1').timeout(timeout);
+      // Süre sorguya da verilir: aşılırsa paket sorguyu sunucuda iptal eder ve
+      // bağlantı havuza döner. Dıştaki sınır havuzda boş yer beklemeyi de keser.
+      await _pool.execute('SELECT 1', timeout: timeout).timeout(timeout);
       return true;
     } on Exception {
       return false;
