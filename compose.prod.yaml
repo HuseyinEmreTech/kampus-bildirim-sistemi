@@ -2,6 +2,9 @@
 # Çalıştır: docker compose -f compose.prod.yaml up -d --build
 # Değişkenler .env dosyasından okunur (.env.example). Şifrede @ : / ? # karakterleri
 # kullanma; DATABASE_URL içinde adresin parçası sanılırlar.
+# Ayrı proje adı: aynı bilgisayardaki geliştirme veritabanıyla (compose.yaml)
+# konteyner ve disk paylaşılmaz.
+name: campus-canli
 services:
   db:
     image: docker.io/library/postgres:16-alpine
