@@ -1,13 +1,15 @@
-name: server
-description: Campus Server API
-publish_to: 'none'
-version: 1.0.0
+name: campus_server
+publish_to: none
 resolution: workspace
-
 environment:
-  sdk: '^3.13.0'
+  sdk: ^3.13.0
 
 dependencies:
+  campus_domain: any
+  campus_application: any
+  campus_infrastructure: any
+  campus_contracts: any
   shelf: ^1.4.1
   shelf_router: ^1.1.4
-  shelf_cors_headers: ^0.1.5
+dev_dependencies:
+  test: ^1.31.1

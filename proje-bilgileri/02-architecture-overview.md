@@ -48,6 +48,12 @@ flowchart LR
 
 Zengin domain nesnesi: `private` alanlar, doğrulama `Create` fabrika metodunda; geçersiz nesne oluşamaz.
 
+## Dil, kapsam ve bilinçli sadeleştirmeler
+
+- **Ölçek:** ders projesi, tek kampüs, birkaç yüz kullanıcı, canlı demo. Bu ölçekte mikroservis, kuyruk ve önbellek **gereksiz karmaşıklık borcudur** (hocanın ders notları, Gün 06). Mimari sınır: **tek dağıtılabilir backend, katmanlı mimari, tek veritabanı** ([kapsam](01-project-scope.md)).
+- **Dil:** ders "dil ve framework bağlayıcı değil, hâkim olduğunla git" diyor; ancak ürün **tek dilli** (Dart/Flutter) kalır. Farklı dilde katkı, ürünün içine değil **dağıtıma girmeyen araçlara** (test/QA, seed, benchmark, doküman araçları) yönlendirilir. Böylece herkes güçlü olduğu dilde katkı verirken sistem dağıtık karmaşıklığa sürüklenmez.
+- Gerekçe ve karar: [ADR-03](adr/03-katmanli-mimari-ve-tek-dil.md).
+
 ## Uyulacak ilkeler
 
 - SOLID ilkeleri, Clean Code prensipleri

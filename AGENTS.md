@@ -5,7 +5,7 @@ Bu dosya, ekipteki herkesin yapay zeka aracına (Claude Code, Codex, Gemini, Cop
 ## Proje bağlamı
 
 - Kampüs sorun bildirim sistemi; **ders projesi**, canlı demo ve sunum için. Üretim sistemi değil.
-- Ölçek: tek kampüs, en fazla birkaç yüz kullanıcı. 4 kişilik ekip, 15 haftalık dönem.
+- Ölçek: tek kampüs, en fazla birkaç yüz kullanıcı. 6 kişilik ekip (hoca dağıttı), 15 haftalık dönem.
 - Flutter (Android) istemci, Dart (Shelf) sunucu, PostgreSQL 16.
 - **En basit çalışan çözüm.** Mikroservis, kuyruk, önbellek, ORM, kod üretimi, durum yönetimi paketi, DI paketi yok.
 - Ayrıntı: `proje-bilgileri/01-project-scope.md`, `proje-bilgileri/03-domain-design.md` (kurallar Rule 00-07), `proje-bilgileri/05-api-design.md`, `proje-bilgileri/11-kod-mimarisi-ve-korumalar.md`.
@@ -20,6 +20,8 @@ Bu dosya, ekipteki herkesin yapay zeka aracına (Claude Code, Codex, Gemini, Cop
 | `campus_infrastructure` | `packages/infrastructure` | `campus_domain`, `campus_application`, onaylı dış paketler | HTTP katmanı |
 | `campus_server` | `packages/server` | hepsi | iş kuralı yazmak (kural servistedir) |
 | `campus_app` | `packages/app` | `campus_contracts`, onaylı Flutter paketleri | `campus_domain`, `campus_application`, iş kuralı |
+
+`campus_app` klasör düzeni (sahiplik için): `lib/mobil/` yalnız mobil, `lib/web/` yalnız web, `lib/ortak/` iki platformun paylaştığı kod. Yeni özellik kodu bu üç klasörden birine yazılır; platform ayrımı yapmayan `lib/features/` gibi bir yol kullanılmaz. Ayrıntı: `proje-bilgileri/11-kod-mimarisi-ve-korumalar.md` (bölüm 3.2).
 
 ## Kod kuralları
 

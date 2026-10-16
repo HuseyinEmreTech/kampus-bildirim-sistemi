@@ -1,0 +1,3 @@
+tags:
+  # Gerçek PostgreSQL ister (DATABASE_URL). CI şimdilik -x db ile atlar.
+  db:
