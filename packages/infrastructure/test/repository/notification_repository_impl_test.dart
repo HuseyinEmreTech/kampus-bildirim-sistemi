@@ -165,6 +165,9 @@ void main() {
       expect(first.reportId, _firstReport);
       expect(first.type, 'ReportResolved');
       expect(first.message, 'Bildiriminiz çözüldü.');
+      // Kutudaki satır hangi bildirime ait, ayrı sorgu atmadan görünsün (N+1 yok).
+      expect(first.reportCategory, 'Ariza');
+      expect(first.reportDescription, 'Bildirim testi');
       expect(first.readAt, isA<DateTime>());
       expect(second.readAt, isNull);
       expect(second.createdAt.isAfter(first.createdAt), isTrue);

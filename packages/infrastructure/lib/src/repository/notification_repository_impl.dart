@@ -6,9 +6,13 @@ import '../database/uuid_format.dart';
 enum MarkReadOutcome { marked, notFound }
 
 /// Öğrencinin bildirim kutusundaki bir satır. [readAt] boşsa okunmamış.
+/// [reportCategory] ve [reportDescription] satırın hangi bildirime ait olduğunu
+/// gösterir; her satır için ayrıca bildirim sorgulamak gerekmez (N+1 yok).
 typedef NotificationItem = ({
   String notificationId,
   String reportId,
+  String reportCategory,
+  String reportDescription,
   String type,
   String message,
   DateTime createdAt,
@@ -31,11 +35,12 @@ WHERE notification_id = $1 AND user_id = $2
 
   // Yeniden eskiye; aynı anda oluşanlar kimliğe göre sıralanır, sayfalar kaymaz.
   static const _listSql = r'''
-SELECT notification_id::text, report_id::text, type, message, created_at,
-  read_at
-FROM notifications
-WHERE user_id = $1
-ORDER BY created_at DESC, notification_id DESC
+SELECT n.notification_id::text, n.report_id::text, r.category, r.description,
+  n.type, n.message, n.created_at, n.read_at
+FROM notifications n
+JOIN reports r ON r.report_id = n.report_id
+WHERE n.user_id = $1
+ORDER BY n.created_at DESC, n.notification_id DESC
 LIMIT $2 OFFSET $3
 ''';
 
@@ -63,10 +68,22 @@ SELECT count(*) FROM notifications WHERE user_id = $1 AND read_at IS NULL
     if (!isValidPage(limit, offset)) return const [];
     final rows = await _db.execute(_listSql, [userId, limit, offset]);
     return [
-      for (final [id, reportId, type, message, createdAt, readAt] in rows)
+      for (final [
+            id,
+            reportId,
+            reportCategory,
+            reportDescription,
+            type,
+            message,
+            createdAt,
+            readAt,
+          ]
+          in rows)
         (
           notificationId: id! as String,
           reportId: reportId! as String,
+          reportCategory: reportCategory! as String,
+          reportDescription: reportDescription! as String,
           type: type! as String,
           message: message! as String,
           createdAt: createdAt! as DateTime,
