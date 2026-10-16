@@ -23,7 +23,8 @@ services:
       - ./db/migrations:/migrations:ro
       - ./db/prod:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      # -h: ilk kurulumda geçici sunucu yalnızca soket dinler; TCP açılınca hazırdır.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 3s
       retries: 10
