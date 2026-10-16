@@ -5,7 +5,7 @@ import 'dart:math';
 const maxPhotoSizeBytes = 5 * 1024 * 1024;
 
 /// Fotoğrafın neden kabul edilmediği. `AppError` (#15) gelince ona çevrilecek.
-enum PhotoError { invalidFormat, sizeExceeded }
+enum PhotoError { invalidFormat, sizeExceeded, invalidReportId }
 
 /// Kaydedilen fotoğraf. Domain'deki `Photo` (#15) gelince onunla değişecek.
 typedef StoredPhoto = ({String url, String contentType, int sizeBytes});
@@ -58,7 +58,7 @@ class LocalFileStorage {
     String contentType,
   ) async {
     if (!_uuid.hasMatch(reportId)) {
-      throw ArgumentError.value(reportId, 'reportId', 'UUID değil');
+      return const PhotoRejected(PhotoError.invalidReportId);
     }
 
     final header = <int>[];
