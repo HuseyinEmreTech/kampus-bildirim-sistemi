@@ -1,7 +1,7 @@
-import 'package:campus_app/features/reports/data/report_list_item.dart';
-import 'package:campus_app/features/reports/data/reports_source.dart';
-import 'package:campus_app/features/reports/presentation/student/reports_list_screen.dart';
-import 'package:campus_app/features/reports/presentation/student/widgets/report_card.dart';
+import 'package:campus_app/mobil/features/reports/data/report_list_item.dart';
+import 'package:campus_app/mobil/features/reports/data/reports_source.dart';
+import 'package:campus_app/mobil/features/reports/presentation/student/reports_list_screen.dart';
+import 'package:campus_app/mobil/features/reports/presentation/student/widgets/report_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
