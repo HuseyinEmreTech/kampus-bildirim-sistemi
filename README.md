@@ -257,6 +257,7 @@ docker compose exec -T db rm /tmp/campus-yedek.dump
 - `--single-transaction`: geri yükleme yarıda hata verirse hiçbir şey değişmez.
 - Yedekte kullanıcılar ve parola özetleri vardır: paylaşma, repoya koyma (`*.dump` zaten `.gitignore`'da).
 - Yedek yalnızca veritabanıdır; yüklenen fotoğraflar diskte ayrı bir klasördedir, onlar ayrıca kopyalanır.
+- Bu komutlar geliştirme veritabanı (`compose.yaml`) içindir. Canlı ortamdaki (`compose.prod.yaml`) veritabanı için her `docker compose` komutuna `-f compose.prod.yaml` eklenir; eklenmezse yedek yanlış veritabanından alınır.
 - Docker Compose ile denendi; Podman ile doğrulanmadı (`compose cp` desteklenmezse `podman cp` kullanılır).
 
 **Sunucu**
