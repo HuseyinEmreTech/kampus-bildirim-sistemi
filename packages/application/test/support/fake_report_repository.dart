@@ -1,16 +1,6 @@
 import 'package:campus_application/campus_application.dart';
 import 'package:campus_domain/campus_domain.dart';
 
-AppError _mapDomainError(DomainError error) => switch (error) {
-  InvalidRole() => const ForbiddenError(),
-  InvalidTransition() => const InvalidTransitionError(),
-  MissingResolutionPhoto() => const MissingResolutionPhotoError(),
-  InvalidPhoto(:final reason) => ValidationError('photo', reason),
-  InvalidLocation(:final reason) => ValidationError('location', reason),
-  InvalidDescription(:final reason) => ValidationError('description', reason),
-  InvalidId(:final reason) => ValidationError('id', reason),
-};
-
 final class FakeHistoryEntry {
   FakeHistoryEntry({
     required this.fromStatus,
@@ -99,7 +89,7 @@ final class FakeReportRepository implements ReportRepository {
         now,
       );
       return const Success<Unit, AppError>(Unit.value);
-    }, (error) => Failure<Unit, AppError>(_mapDomainError(error)));
+    }, (error) => Failure<Unit, AppError>(mapDomainError(error)));
   }
 
   @override
@@ -143,7 +133,7 @@ final class FakeReportRepository implements ReportRepository {
         ),
       );
       return const Success<Unit, AppError>(Unit.value);
-    }, (error) => Failure<Unit, AppError>(_mapDomainError(error)));
+    }, (error) => Failure<Unit, AppError>(mapDomainError(error)));
   }
 
   @override

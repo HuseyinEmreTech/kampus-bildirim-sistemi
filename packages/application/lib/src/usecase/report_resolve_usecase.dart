@@ -1,8 +1,8 @@
 import 'package:campus_domain/campus_domain.dart';
 
 import '../core/app_error.dart';
-import '../core/command_parser.dart';
 import '../core/error_mapper.dart';
+import '../core/report_mutation.dart';
 import '../dto/resolve_report_command.dart';
 import '../repository/report_repository.dart';
 
@@ -12,44 +12,23 @@ final class ReportResolveUseCase {
   final ReportRepository _repository;
 
   Future<Result<Unit, AppError>> execute(ResolveReportCommand command) async {
-    final baseResult = CommandParser.parseBase(
+    final mutationResult = await loadStaffMutation(
+      repository: _repository,
       role: command.role,
       reportId: command.reportId,
       assigneeId: command.assigneeId,
+      requiredStatus: ReportStatus.ustlenildi,
+      statusError: const InvalidTransitionError(),
     );
-    final BaseCommand base;
-    switch (baseResult) {
+    final ReportMutation mutation;
+    switch (mutationResult) {
       case Success(value: final value):
-        base = value;
-      case Failure(error: final error):
-        return Failure(error);
-    }
-    final role = base.role;
-    final reportId = base.reportId;
-    final assigneeId = base.assigneeId;
-
-    if (role != Role.staff) {
-      return const Failure(ForbiddenError());
-    }
-
-    final findResult = await _repository.findById(reportId);
-    final Report? report;
-    switch (findResult) {
-      case Success(value: final value):
-        report = value;
+        mutation = value;
       case Failure(error: final error):
         return Failure(error);
     }
 
-    if (report == null) {
-      return const Failure(NotFoundError());
-    }
-
-    if (report.status != ReportStatus.ustlenildi) {
-      return const Failure(InvalidTransitionError());
-    }
-
-    if (report.assigneeId?.value != assigneeId.value) {
+    if (mutation.report.assigneeId?.value != mutation.assigneeId.value) {
       return const Failure(ForbiddenError());
     }
 
@@ -73,6 +52,11 @@ final class ReportResolveUseCase {
         return Failure(mapDomainError(error));
     }
 
-    return _repository.resolve(reportId, assigneeId, photo, note: command.note);
+    return _repository.resolve(
+      mutation.reportId,
+      mutation.assigneeId,
+      photo,
+      note: command.note,
+    );
   }
 }
