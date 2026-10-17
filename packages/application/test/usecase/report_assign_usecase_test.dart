@@ -67,4 +67,33 @@ void main() {
     expect(result, isA<Failure<Unit, AppError>>());
     expect((result as Failure<Unit, AppError>).error, isA<ConflictError>());
   });
+
+  test('execute_reportNotFound_returnsNotFound', () async {
+    final result = await useCase.execute(
+      AssignReportCommand(
+        reportId: '5c98741b-64c8-49de-9e68-3d7a2f44802b',
+        assigneeId: staffId,
+        role: 'Staff',
+      ),
+    );
+
+    expect(result, isA<Failure<Unit, AppError>>());
+    expect((result as Failure<Unit, AppError>).error, isA<NotFoundError>());
+  });
+
+  test('execute_invalidRoleString_returnsValidationError', () async {
+    final report = newReport();
+    repository.seed(report);
+
+    final result = await useCase.execute(
+      AssignReportCommand(
+        reportId: report.id.value,
+        assigneeId: staffId,
+        role: 'Admin',
+      ),
+    );
+
+    expect(result, isA<Failure<Unit, AppError>>());
+    expect((result as Failure<Unit, AppError>).error, isA<ForbiddenError>());
+  });
 }

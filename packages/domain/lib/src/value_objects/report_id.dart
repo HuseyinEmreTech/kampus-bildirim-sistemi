@@ -12,13 +12,13 @@ final class ReportId {
   static ReportId generate() => ReportId._(generateUuidV4());
 
   static Result<ReportId, DomainError> create(String value) {
-    final trimmed = value.trim();
-    if (trimmed.isEmpty) {
-      return const Failure(InvalidId('reportId boş olamaz'));
-    }
-    if (!uuidV4RegExp.hasMatch(trimmed)) {
-      return const Failure(InvalidId('reportId geçerli bir UUID olmalı'));
-    }
-    return Success(ReportId._(trimmed));
+    return switch (validateUuid(
+      value,
+      emptyMessage: 'reportId boş olamaz',
+      invalidMessage: 'reportId geçerli bir UUID olmalı',
+    )) {
+      Success(value: final id) => Success(ReportId._(id)),
+      Failure(error: final error) => Failure(error),
+    };
   }
 }

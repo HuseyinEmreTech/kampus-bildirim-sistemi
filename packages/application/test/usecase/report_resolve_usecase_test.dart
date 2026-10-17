@@ -74,4 +74,22 @@ void main() {
       isA<InvalidTransitionError>(),
     );
   });
+
+  test('execute_otherAssignee_returnsForbidden', () async {
+    final report = await assignedReport(repository, assigneeId: staffId);
+
+    final result = await useCase.execute(
+      ResolveReportCommand(
+        reportId: report.id.value,
+        assigneeId: otherStaffId,
+        role: 'Staff',
+        resolutionPhotoUrl: '/files/sonuc.jpg',
+        resolutionPhotoContentType: 'image/jpeg',
+        resolutionPhotoSizeBytes: 500000,
+      ),
+    );
+
+    expect(result, isA<Failure<Unit, AppError>>());
+    expect((result as Failure<Unit, AppError>).error, isA<ForbiddenError>());
+  });
 }

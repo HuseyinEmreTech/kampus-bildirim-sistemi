@@ -14,10 +14,10 @@ enum NotificationType { reportResolved }
 Result<Category, DomainError> parseCategory(String value) {
   final lowered = value.trim().toLowerCase();
   return switch (lowered) {
-    'ariza' => Success(Category.ariza),
-    'temizlik' => Success(Category.temizlik),
-    'guvenlik' => Success(Category.guvenlik),
-    'diger' => Success(Category.diger),
+    'ariza' => const Success(Category.ariza),
+    'temizlik' => const Success(Category.temizlik),
+    'guvenlik' => const Success(Category.guvenlik),
+    'diger' => const Success(Category.diger),
     _ => const Failure(InvalidDescription('kategori geçersiz')),
   };
 }
@@ -25,8 +25,8 @@ Result<Category, DomainError> parseCategory(String value) {
 Result<Role, DomainError> parseRole(String value) {
   final lowered = value.trim().toLowerCase();
   return switch (lowered) {
-    'student' => Success(Role.student),
-    'staff' => Success(Role.staff),
+    'student' => const Success(Role.student),
+    'staff' => const Success(Role.staff),
     _ => const Failure(InvalidRole()),
   };
 }
@@ -34,9 +34,9 @@ Result<Role, DomainError> parseRole(String value) {
 Result<ReportStatus, DomainError> parseReportStatus(String value) {
   final lowered = value.trim().toLowerCase();
   return switch (lowered) {
-    'yeni' => Success(ReportStatus.yeni),
-    'ustlenildi' => Success(ReportStatus.ustlenildi),
-    'cozuldu' => Success(ReportStatus.cozuldu),
+    'yeni' => const Success(ReportStatus.yeni),
+    'ustlenildi' => const Success(ReportStatus.ustlenildi),
+    'cozuldu' => const Success(ReportStatus.cozuldu),
     _ => const Failure(InvalidTransition()),
   };
 }

@@ -1,7 +1,6 @@
 import 'package:campus_domain/campus_domain.dart';
 
 import '../core/app_error.dart';
-import '../core/error_mapper.dart';
 import '../dto/list_reports_query.dart';
 import '../dto/paginated.dart';
 import '../dto/report_summary.dart';
@@ -19,97 +18,51 @@ final class ListReportsUseCase {
   Future<Result<Paginated<ReportSummary>, AppError>> execute(
     ListReportsQuery query,
   ) async {
-    final roleResult = parseRole(query.role);
-    final currentUserIdResult = UserId.create(query.currentUserId);
-
-    final Role role;
-    switch (roleResult) {
-      case Success(value: final value):
-        role = value;
-      case Failure(error: final error):
-        return Failure(mapDomainError(error));
+    final role = _parseRole(query.role);
+    if (role == null) {
+      return _validation('role', 'rol geçersiz');
     }
 
-    final UserId currentUserId;
-    switch (currentUserIdResult) {
-      case Success(value: final value):
-        currentUserId = value;
-      case Failure(error: final error):
-        return Failure(mapDomainError(error));
+    final currentUserId = _parseUserId(query.currentUserId);
+    if (currentUserId == null) {
+      return _validation('currentUserId', 'userId geçersiz');
     }
 
     if (query.page < 1) {
-      return const Failure(
-        ValidationError('page', 'page 1 veya daha büyük olmalı'),
-      );
+      return _validation('page', 'page 1 veya daha büyük olmalı');
     }
     if (query.pageSize < minPageSize || query.pageSize > maxPageSize) {
-      return const Failure(
-        ValidationError('pageSize', 'pageSize 1-100 arasında olmalı'),
-      );
+      return _validation('pageSize', 'pageSize 1-100 arasında olmalı');
     }
 
-    final ReportStatus? status;
-    if (query.status == null) {
-      status = null;
-    } else {
-      final result = parseReportStatus(query.status!);
-      switch (result) {
-        case Success(value: final value):
-          status = value;
-        case Failure(error: final error):
-          return Failure(mapDomainError(error));
-      }
+    final statusRaw = _parseOptionalStatus(query.status);
+    if (statusRaw == _invalid) {
+      return _invalidTransition();
     }
+    final status = statusRaw as ReportStatus?;
 
-    final Category? category;
-    if (query.category == null) {
-      category = null;
-    } else {
-      final result = parseCategory(query.category!);
-      switch (result) {
-        case Success(value: final value):
-          category = value;
-        case Failure(error: final error):
-          return Failure(mapDomainError(error));
-      }
+    final categoryRaw = _parseOptionalCategory(query.category);
+    if (categoryRaw == _invalid) {
+      return _validation('category', 'kategori geçersiz');
     }
+    final category = categoryRaw as Category?;
 
-    final UserId? assigneeId;
-    if (query.assigneeId == null) {
-      assigneeId = null;
-    } else {
-      final result = UserId.create(query.assigneeId!);
-      switch (result) {
-        case Success(value: final value):
-          assigneeId = value;
-        case Failure(error: final error):
-          return Failure(mapDomainError(error));
-      }
+    final assigneeIdRaw = _parseOptionalUserId(query.assigneeId);
+    if (assigneeIdRaw == _invalid) {
+      return _validation('assigneeId', 'assigneeId geçersiz');
     }
+    final assigneeId = assigneeIdRaw as UserId?;
 
-    final UserId? reporterId;
-    if (query.reporterId == null) {
-      reporterId = null;
-    } else {
-      final result = UserId.create(query.reporterId!);
-      switch (result) {
-        case Success(value: final value):
-          reporterId = value;
-        case Failure(error: final error):
-          return Failure(mapDomainError(error));
-      }
+    final reporterIdRaw = _parseOptionalUserId(query.reporterId);
+    if (reporterIdRaw == _invalid) {
+      return _validation('reporterId', 'reporterId geçersiz');
     }
+    final reporterId = reporterIdRaw as UserId?;
 
-    final UserId? effectiveReporterId;
-    final UserId? effectiveAssigneeId;
-    if (role == Role.student) {
-      effectiveReporterId = currentUserId;
-      effectiveAssigneeId = null;
-    } else {
-      effectiveReporterId = reporterId;
-      effectiveAssigneeId = assigneeId;
-    }
+    final effectiveReporterId = role == Role.student
+        ? currentUserId
+        : reporterId;
+    final effectiveAssigneeId = role == Role.student ? null : assigneeId;
 
     final filter = ReportListFilter(
       status: status,
@@ -126,4 +79,58 @@ final class ListReportsUseCase {
       offset: offset,
     );
   }
+
+  static const Object _invalid = Object();
+
+  Role? _parseRole(String value) {
+    return switch (parseRole(value)) {
+      Success(value: final role) => role,
+      Failure() => null,
+    };
+  }
+
+  UserId? _parseUserId(String value) {
+    return switch (UserId.create(value)) {
+      Success(value: final id) => id,
+      Failure() => null,
+    };
+  }
+
+  Object? _parseOptionalStatus(String? value) {
+    if (value == null) {
+      return null;
+    }
+    return switch (parseReportStatus(value)) {
+      Success(value: final status) => status,
+      Failure() => _invalid,
+    };
+  }
+
+  Object? _parseOptionalCategory(String? value) {
+    if (value == null) {
+      return null;
+    }
+    return switch (parseCategory(value)) {
+      Success(value: final category) => category,
+      Failure() => _invalid,
+    };
+  }
+
+  Object? _parseOptionalUserId(String? value) {
+    if (value == null) {
+      return null;
+    }
+    return switch (UserId.create(value)) {
+      Success(value: final id) => id,
+      Failure() => _invalid,
+    };
+  }
+
+  static Result<Paginated<ReportSummary>, AppError> _validation(
+    String field,
+    String message,
+  ) => Failure(ValidationError(field, message));
+
+  static Result<Paginated<ReportSummary>, AppError> _invalidTransition() =>
+      const Failure(InvalidTransitionError());
 }

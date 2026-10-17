@@ -8,13 +8,13 @@ final class UserId {
   final String value;
 
   static Result<UserId, DomainError> create(String value) {
-    final trimmed = value.trim();
-    if (trimmed.isEmpty) {
-      return const Failure(InvalidId('userId boş olamaz'));
-    }
-    if (!uuidV4RegExp.hasMatch(trimmed)) {
-      return const Failure(InvalidId('userId geçerli bir UUID olmalı'));
-    }
-    return Success(UserId._(trimmed));
+    return switch (validateUuid(
+      value,
+      emptyMessage: 'userId boş olamaz',
+      invalidMessage: 'userId geçerli bir UUID olmalı',
+    )) {
+      Success(value: final id) => Success(UserId._(id)),
+      Failure(error: final error) => Failure(error),
+    };
   }
 }

@@ -49,6 +49,70 @@ void main() {
       );
       expect(result, isA<Failure<Report, DomainError>>());
     });
+
+    test('invalidReporterId_returnsInvalidId', () {
+      final result = Report.create(
+        reporterId: 'not-valid',
+        category: 'Ariza',
+        description: 'B blok lambası yanmıyor',
+        photoUrl: '/files/lamba.jpg',
+        photoContentType: 'image/jpeg',
+        photoSizeBytes: 812345,
+        latitude: 36.5871,
+        longitude: 36.1742,
+        locationSource: 'Gps',
+        createdAt: now,
+      );
+      expect(result, isA<Failure<Report, DomainError>>());
+    });
+
+    test('invalidPhoto_returnsInvalidPhoto', () {
+      final result = Report.create(
+        reporterId: reporterId,
+        category: 'Ariza',
+        description: 'B blok lambası yanmıyor',
+        photoUrl: '',
+        photoContentType: 'image/jpeg',
+        photoSizeBytes: 812345,
+        latitude: 36.5871,
+        longitude: 36.1742,
+        locationSource: 'Gps',
+        createdAt: now,
+      );
+      expect(result, isA<Failure<Report, DomainError>>());
+    });
+
+    test('invalidLocation_returnsInvalidLocation', () {
+      final result = Report.create(
+        reporterId: reporterId,
+        category: 'Ariza',
+        description: 'B blok lambası yanmıyor',
+        photoUrl: '/files/lamba.jpg',
+        photoContentType: 'image/jpeg',
+        photoSizeBytes: 812345,
+        latitude: 91,
+        longitude: 36.1742,
+        locationSource: 'Gps',
+        createdAt: now,
+      );
+      expect(result, isA<Failure<Report, DomainError>>());
+    });
+
+    test('invalidCategory_returnsInvalidDescription', () {
+      final result = Report.create(
+        reporterId: reporterId,
+        category: 'Yok',
+        description: 'B blok lambası yanmıyor',
+        photoUrl: '/files/lamba.jpg',
+        photoContentType: 'image/jpeg',
+        photoSizeBytes: 812345,
+        latitude: 36.5871,
+        longitude: 36.1742,
+        locationSource: 'Gps',
+        createdAt: now,
+      );
+      expect(result, isA<Failure<Report, DomainError>>());
+    });
   });
 
   group('assign', () {
@@ -144,6 +208,17 @@ void main() {
         role: Role.student,
         resolutionPhoto: resolutionPhoto(),
         resolvedAt: now,
+      );
+      expect(result, isA<Failure<Report, DomainError>>());
+    });
+
+    test('longNote_returnsInvalidDescription', () {
+      final result = assignedReport().resolve(
+        assigneeId: staffId,
+        role: Role.staff,
+        resolutionPhoto: resolutionPhoto(),
+        resolvedAt: now,
+        note: 'a' * 501,
       );
       expect(result, isA<Failure<Report, DomainError>>());
     });

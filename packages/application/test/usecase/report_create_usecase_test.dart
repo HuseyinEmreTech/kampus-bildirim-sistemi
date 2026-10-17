@@ -63,4 +63,26 @@ void main() {
     final error = (result as Failure<ReportId, AppError>).error;
     expect(error, isA<ValidationError>());
   });
+
+  test('execute_invalidPhoto_returnsValidationError', () async {
+    final command = CreateReportCommand(
+      reporterId: '5c98741b-64c8-49de-9e68-3d7a2f44802b',
+      category: 'Ariza',
+      description: 'B blok lambası yanmıyor',
+      photoUrl: '/files/lamba.jpg',
+      photoContentType: 'image/gif',
+      photoSizeBytes: 812345,
+      latitude: 36.5871,
+      longitude: 36.1742,
+      locationSource: 'Gps',
+    );
+
+    final result = await useCase.execute(command);
+
+    expect(result, isA<Failure<ReportId, AppError>>());
+    expect(
+      (result as Failure<ReportId, AppError>).error,
+      isA<ValidationError>(),
+    );
+  });
 }

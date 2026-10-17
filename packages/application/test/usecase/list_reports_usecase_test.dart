@@ -45,4 +45,16 @@ void main() {
     final page = (result as Success<Paginated<ReportSummary>, AppError>).value;
     expect(page.items, hasLength(2));
   });
+
+  test('execute_invalidPage_returnsValidationError', () async {
+    final result = await useCase.execute(
+      ListReportsQuery(currentUserId: studentId, role: 'Student', page: 0),
+    );
+
+    expect(result, isA<Failure<Paginated<ReportSummary>, AppError>>());
+    expect(
+      (result as Failure<Paginated<ReportSummary>, AppError>).error,
+      isA<ValidationError>(),
+    );
+  });
 }
