@@ -47,6 +47,12 @@ class LocalFileStorage {
     r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
   );
 
+  // Yalnızca bu sınıfın ürettiği biçim kabul edilir; `..` gibi yollar eşleşemez.
+  static final _storedUrl = RegExp(
+    r'^/files/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+    r'/[0-9a-f]{32}\.(?:jpg|png)$',
+  );
+
   static final _random = Random.secure();
 
   /// [bytes] akışını okuyup kaydeder. Tür, istemcinin söylediği [contentType]'a değil
@@ -111,6 +117,27 @@ class LocalFileStorage {
     }
   }
 
+  /// Kaydedilmiş fotoğrafı okumak için açar; adres geçersizse ya da dosya yoksa `null`.
+  Future<Stream<List<int>>?> openRead(String url) async {
+    final file = _fileFor(url);
+    if (file == null || !await file.exists()) return null;
+    return file.openRead();
+  }
+
+  /// Kaydedilmiş fotoğrafı siler; silindiyse `true`.
+  Future<bool> delete(String url) async {
+    final file = _fileFor(url);
+    if (file == null) return false;
+    // Önce "var mı" diye bakmak yerine doğrudan silinir: aynı anda iki silme
+    // gelirse ikincisi hata fırlatmak yerine `false` alır.
+    try {
+      await file.delete();
+      return true;
+    } on PathNotFoundException {
+      return false;
+    }
+  }
+
   String? _detectType(List<int> header) {
     if (_startsWith(header, _pngSignature)) return 'image/png';
     if (_startsWith(header, _jpegSignature)) return 'image/jpeg';
@@ -132,6 +159,11 @@ class LocalFileStorage {
       (_) => _random.nextInt(256).toRadixString(16).padLeft(2, '0'),
     ).join();
     return '$_urlPrefix/$reportId/$name.${_extensions[contentType]}';
+  }
+
+  File? _fileFor(String url) {
+    if (!_storedUrl.hasMatch(url)) return null;
+    return File(_pathFor(url));
   }
 
   String _pathFor(String url) =>
