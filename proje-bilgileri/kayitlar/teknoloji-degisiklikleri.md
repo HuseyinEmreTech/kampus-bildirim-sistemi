@@ -1,7 +1,7 @@
 ---
 title: Teknoloji Değişiklikleri
 durum: Güncel
-son-guncelleme: 2026-10-02
+son-guncelleme: 2026-10-15
 ---
 
 # Teknoloji Değişiklikleri
@@ -45,6 +45,7 @@ Projede teknoloji yığınına eklenen, değiştirilen veya elenen her şey bura
 | 2026-10-02 | Repo düzeni | Tek klasör varsayımı | Dart pub workspace, katman başına paket; Flutter 3.47.0 ile yerelde denendi | Katman ihlalini derleme ve mimari testle engellemek ([korumalar](../11-kod-mimarisi-ve-korumalar.md)) |
 | 2026-10-02 | Konum | Yalnızca GPS | GPS; izin yoksa bina listesi | Kullanıcı izin vermezse de bildirim açılabilsin |
 | 2026-10-02 | Kayıt sistemi | Commit başına kayıt dosyası ve betik | PR açıklaması kayıt; kişi başına günlük rapor (`ekip/raporlar/`) | 4 kişide ortak indeks dosyası merge çakışması üretir |
+| 2026-10-15 | EXIF temizleme (Rule 07) | Seçilmedi | `image` 4.12.0 ile yeniden kodlama (yalnızca pikseller kalır); 25 megapiksel üstü açılmaz | Elle EXIF bölümü kırpmaya göre gizlenmiş içeriği de temizler. Yerel denemede 12 MP, 5,5 MB JPEG yaklaşık 1,7 sn ve 120 MB bellek; sunucuda ölçülmedi |
 
 ## Elenenler
 
