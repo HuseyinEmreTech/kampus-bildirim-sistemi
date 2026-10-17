@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../data/report_creator.dart';
 import '../../data/report_list_item.dart';
 import '../../data/reports_source.dart';
+import 'report_create_screen.dart';
 import 'widgets/report_card.dart';
 
 /// Öğrencinin kendi bildirimlerini listeleyen ekran.
@@ -11,9 +13,16 @@ import 'widgets/report_card.dart';
 /// Şimdilik yalnızca ilk sayfa yüklenir; aşağı kaydırınca devamını yükleme
 /// ayrı PR'da eklenecek.
 class ReportsListScreen extends StatefulWidget {
-  const ReportsListScreen({super.key, required this.source});
+  const ReportsListScreen({
+    super.key,
+    required this.source,
+    required this.creator,
+  });
 
   final ReportsSource source;
+
+  /// "Bildirim oluştur" ekranına verilen kaynak.
+  final ReportCreator creator;
 
   @override
   State<ReportsListScreen> createState() => _ReportsListScreenState();
@@ -51,6 +60,17 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     });
   }
 
+  /// Oluşturma ekranını açar; bildirim oluşturulduysa listeyi baştan yükler.
+  Future<void> _openCreateScreen() async {
+    final created = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => ReportCreateScreen(creator: widget.creator),
+      ),
+    );
+    if (created != true) return;
+    await _loadFirstPage();
+  }
+
   void _retry() {
     setState(() => _isLoading = true);
     unawaited(_loadFirstPage());
@@ -61,6 +81,11 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Bildirimlerim')),
       body: _buildBody(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openCreateScreen,
+        tooltip: 'Bildirim oluştur',
+        child: const Icon(Icons.add),
+      ),
     );
   }
 

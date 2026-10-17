@@ -1,5 +1,8 @@
+import 'package:campus_app/mobil/features/reports/data/new_report.dart';
+import 'package:campus_app/mobil/features/reports/data/report_creator.dart';
 import 'package:campus_app/mobil/features/reports/data/report_list_item.dart';
 import 'package:campus_app/mobil/features/reports/data/reports_source.dart';
+import 'package:campus_app/mobil/features/reports/presentation/student/report_create_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/reports_list_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/widgets/report_card.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +23,13 @@ class FakeReportsSource implements ReportsSource {
   }
 }
 
+/// Her gönderimi kabul eden sahte kaynak.
+class AcceptingReportCreator implements ReportCreator {
+  @override
+  Future<ReportCreateResult> create(NewReport report) async =>
+      const ReportCreated();
+}
+
 ReportListItem report({String place = 'A Blok'}) => ReportListItem(
   category: ReportCategory.ariza,
   status: ReportStatus.yeni,
@@ -28,7 +38,14 @@ ReportListItem report({String place = 'A Blok'}) => ReportListItem(
 );
 
 Future<void> pumpScreen(WidgetTester tester, ReportsSource source) async {
-  await tester.pumpWidget(MaterialApp(home: ReportsListScreen(source: source)));
+  await tester.pumpWidget(
+    MaterialApp(
+      home: ReportsListScreen(
+        source: source,
+        creator: AcceptingReportCreator(),
+      ),
+    ),
+  );
   await tester.pumpAndSettle();
 }
 
@@ -82,5 +99,32 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(ReportCard), findsOneWidget);
+  });
+
+  testWidgets('opensCreateScreen_onAddTap', (tester) async {
+    await pumpScreen(tester, FakeReportsSource([const ReportsPageLoaded([])]));
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ReportCreateScreen), findsOneWidget);
+  });
+
+  testWidgets('reloadsList_afterReportCreated', (tester) async {
+    final source = FakeReportsSource([
+      const ReportsPageLoaded([]),
+      ReportsPageLoaded([report(place: 'Kütüphane')]),
+    ]);
+    await pumpScreen(tester, source);
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Temizlik'));
+    await tester.enterText(find.byType(TextFormField), 'Kütüphanede ışık yok');
+    await tester.tap(find.text('Gönder'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ReportCreateScreen), findsNothing);
+    expect(find.textContaining('Kütüphane'), findsOneWidget);
   });
 }
