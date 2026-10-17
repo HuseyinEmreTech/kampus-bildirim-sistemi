@@ -10,7 +10,8 @@ import '../report_labels.dart';
 /// Fotoğrafların ekrandaki yüksekliği.
 const _photoHeight = 200.0;
 
-/// Bildirim detayı: kategori, durum, yer, tarih, açıklama ve fotoğraf (USR 02).
+/// Bildirim detayı: bilgiler, fotoğraf ve durum geçmişi (USR 02); çözüldüyse
+/// görevlinin sonuç fotoğrafı ve notu (USR 03).
 class ReportDetailScreen extends StatefulWidget {
   const ReportDetailScreen({
     super.key,
@@ -72,6 +73,7 @@ class _DetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final resolution = detail.resolution;
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -88,6 +90,24 @@ class _DetailView extends StatelessWidget {
         Text(formatDate(detail.createdAt)),
         const SizedBox(height: 8),
         Text(detail.description),
+        if (resolution != null) ...[
+          const SizedBox(height: 16),
+          Text('Sonuç', style: textTheme.titleMedium),
+          _Photo(url: resolution.photoUrl),
+          if (resolution.note case final note?) Text(note),
+        ],
+        const SizedBox(height: 16),
+        Text('Durum geçmişi', style: textTheme.titleMedium),
+        for (final change in detail.history)
+          ListTile(
+            dense: true,
+            leading: const Icon(Icons.circle, size: 12),
+            title: Text(statusLabel(change.to)),
+            // Not varsa tarihin yanına: "16.10.2026 · Yerine gidiliyor".
+            subtitle: Text(
+              [formatDate(change.changedAt), ?change.note].join(' · '),
+            ),
+          ),
       ],
     );
   }

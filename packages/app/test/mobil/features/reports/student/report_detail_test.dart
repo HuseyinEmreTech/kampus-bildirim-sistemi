@@ -19,14 +19,30 @@ class FakeReportDetailSource implements ReportDetailSource {
   }
 }
 
-ReportDetail detail() => ReportDetail(
+final created = DateTime(2026, 10, 15, 9, 15);
+
+ReportDetail detail({bool resolved = false}) => ReportDetail(
   id: 'r1',
   category: ReportCategory.ariza,
-  status: ReportStatus.ustlenildi,
+  status: resolved ? ReportStatus.cozuldu : ReportStatus.ustlenildi,
   description: 'B blok 2. kat koridor lambası yanmıyor',
   place: 'B Blok 2. kat',
-  createdAt: DateTime(2026, 10, 15, 9, 15),
+  createdAt: created,
   photoUrl: 'https://ornek.test/files/lamba.jpg',
+  history: [
+    StatusChange(to: ReportStatus.yeni, changedAt: created),
+    StatusChange(
+      to: ReportStatus.ustlenildi,
+      changedAt: DateTime(2026, 10, 16),
+      note: 'Yerine gidiliyor',
+    ),
+  ],
+  resolution: resolved
+      ? const Resolution(
+          photoUrl: 'https://ornek.test/files/sonuc.jpg',
+          note: 'Lamba değiştirildi.',
+        )
+      : null,
 );
 
 Future<void> pumpScreen(WidgetTester tester, ReportDetailSource source) async {
@@ -48,8 +64,35 @@ void main() {
     expect(find.text('B blok 2. kat koridor lambası yanmıyor'), findsOneWidget);
     expect(find.text('B Blok 2. kat'), findsOneWidget);
     expect(find.text('Arıza'), findsOneWidget);
-    expect(find.text('Üstlenildi'), findsOneWidget);
-    expect(find.text('15.10.2026'), findsOneWidget);
+    expect(find.widgetWithText(Chip, 'Üstlenildi'), findsOneWidget);
+    expect(find.text('15.10.2026'), findsWidgets); // üstte ve geçmişte
+    expect(find.text('Sonuç'), findsNothing);
+  });
+
+  testWidgets('showsHistory_inOrder', (tester) async {
+    await pumpScreen(
+      tester,
+      FakeReportDetailSource([ReportDetailLoaded(detail())]),
+    );
+    await tester.scrollUntilVisible(
+      find.textContaining('Yerine gidiliyor'),
+      200,
+    );
+
+    expect(find.text('Durum geçmişi'), findsOneWidget);
+    expect(find.text('Yeni'), findsOneWidget);
+    expect(find.text('16.10.2026 · Yerine gidiliyor'), findsOneWidget);
+  });
+
+  testWidgets('showsResolution_whenResolved', (tester) async {
+    await pumpScreen(
+      tester,
+      FakeReportDetailSource([ReportDetailLoaded(detail(resolved: true))]),
+    );
+    await tester.scrollUntilVisible(find.text('Lamba değiştirildi.'), 200);
+
+    expect(find.text('Sonuç'), findsOneWidget);
+    expect(find.text('Lamba değiştirildi.'), findsOneWidget);
   });
 
   testWidgets('showsNotFound_whenMissing', (tester) async {
