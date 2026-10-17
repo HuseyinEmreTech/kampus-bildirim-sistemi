@@ -1,0 +1,52 @@
+# Canlı ortam (VPS ya da demo bilgisayarı): veritabanı ve sunucu birlikte.
+# Çalıştır: docker compose -f compose.prod.yaml up -d --build
+# Değişkenler .env dosyasından okunur (.env.example). Şifrede @ : / ? # karakterleri
+# kullanma; DATABASE_URL içinde adresin parçası sanılırlar.
+# Ayrı proje adı: aynı bilgisayardaki geliştirme veritabanıyla (compose.yaml)
+# konteyner ve disk paylaşılmaz.
+name: campus-canli
+services:
+  db:
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-campus}
+      POSTGRES_USER: ${POSTGRES_USER:-campus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env dosyasinda tanimli olmali}
+      APP_DB_USER: ${APP_DB_USER:-campus_app}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?APP_DB_PASSWORD .env dosyasinda tanimli olmali}
+    # Port açılmaz: veritabanına dışarıdan değil, yalnızca sunucu konteyneri iç ağdan ulaşır.
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # İlk açılışta (veri klasörü boşken) db/prod/ilk-kurulum.sh migration'ları
+      # uygular ve sunucunun kısıtlı kullanıcısını açar.
+      - ./db/migrations:/migrations:ro
+      - ./db/prod:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # -h: ilk kurulumda geçici sunucu yalnızca soket dinler; TCP açılınca hazırdır.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  server:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Sunucu yönetici hesabıyla değil, yalnızca veri okuyup yazabilen hesapla bağlanır.
+      DATABASE_URL: postgres://${APP_DB_USER:-campus_app}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB:-campus}?sslmode=disable&max_connection_count=10&connect_timeout=5&query_timeout=10
+      # Oturum belirteçlerinin sırları (#19); sunucu bunlar olmadan açılmaz.
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET .env dosyasinda tanimli olmali}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET .env dosyasinda tanimli olmali}
+    volumes:
+      # Yüklenen fotoğraflar; konteyner silinse de kalır.
+      - files:/data/files
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+
+volumes:
+  pgdata:
+  files:
