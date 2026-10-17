@@ -24,6 +24,7 @@ Standartlar: [Mimari genel bakış](02-architecture-overview.md). Modeller: [Dom
 | `/api/reports/{id}/resolution` | PUT | Üstlenen görevli | Çözüldü işaretle |
 | `/api/me/notifications` | GET | Öğrenci | "Çözüldü" bildirimleri; sayfalı, okunmamış sayısıyla |
 | `/api/me/notifications/{id}/read` | PUT | Öğrenci | Okundu işaretle |
+| `/api/users/me` | GET | Giriş yapmış herkes | Kendi profil bilgisi (`userId`, `fullName`, `email`, `role`); parola özeti yok |
 | `/api/buildings` | GET | Giriş yapmış herkes | Bina listesi (konum izni yokken seçim için) |
 | `/health` | GET | Herkes | Sağlık kontrolü |
 
