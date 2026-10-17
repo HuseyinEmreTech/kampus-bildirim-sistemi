@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:campus_infrastructure/campus_infrastructure.dart';
@@ -145,6 +146,72 @@ void main() {
 
       expect(result, _rejected(PhotoError.invalidReportId));
       expect(await filesOnDisk(), isEmpty);
+    });
+  });
+  group('openRead and delete', () {
+    // Gerçek, çözülebilen 1x1 PNG (67 bayt). Sahte başlıklı dosyayı EXIF
+    // temizliği (#53) reddeder; bu dosya iki PR'ın sırasından bağımsız geçer.
+    final png = base64Decode(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR42mNoAAAAggCB2kUIOwAAAABJRU5ErkJggg==',
+    );
+    Future<PhotoSaved> savePng() async =>
+        _expectSaved(await save(_oneChunk(png), 'image/png'));
+
+    setUp(() => storage = LocalFileStorage(root));
+
+    test('openRead_savedFile_returnsBytesOnDisk', () async {
+      final saved = await savePng();
+      final [onDisk] = await filesOnDisk();
+
+      final stream = await storage.openRead(saved.photo.url);
+
+      expect(
+        await stream!.expand((c) => c).toList(),
+        File(onDisk).readAsBytesSync(),
+      );
+    });
+
+    test('openRead_malformedUrl_returnsNull', () async {
+      expect(await storage.openRead('/files/$_reportId/../../x.jpg'), isNull);
+      expect(await storage.openRead('/etc/passwd'), isNull);
+    });
+
+    test('delete_existingFile_removesFile', () async {
+      final saved = await savePng();
+
+      expect(await storage.delete(saved.photo.url), isTrue);
+      expect(await storage.openRead(saved.photo.url), isNull);
+      expect(await filesOnDisk(), isEmpty);
+    });
+
+    test('delete_sameFileTwiceAtOnce_onlyOneDeletes', () async {
+      final saved = await savePng();
+
+      final results = await Future.wait([
+        storage.delete(saved.photo.url),
+        storage.delete(saved.photo.url),
+      ]);
+
+      expect(results, unorderedEquals([true, false]));
+    });
+
+    test('delete_unknownFile_returnsFalse', () async {
+      expect(
+        await storage.delete('/files/$_reportId/${'0' * 32}.jpg'),
+        isFalse,
+      );
+    });
+
+    test('delete_pathTraversalUrl_returnsFalseAndKeepsFile', () async {
+      final outside = File('${root.path}/../campus_outside_test.jpg');
+      await outside.writeAsBytes(_file(_jpegHeader, 10));
+      addTearDown(outside.delete);
+
+      expect(
+        await storage.delete('/files/../campus_outside_test.jpg'),
+        isFalse,
+      );
+      expect(await outside.exists(), isTrue);
     });
   });
 }
