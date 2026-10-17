@@ -6,10 +6,11 @@ import '../../data/report_assigner.dart';
 import '../../data/report_list_item.dart';
 import '../../data/reports_source.dart';
 import '../../data/staff_reports_source.dart';
+import '../report_labels.dart';
 import '../widgets/report_list_body.dart';
 
-/// Görevlinin bildirim listesi: "Gelen" ve "Benimkiler" sekmeleri (USR 04);
-/// "Gelen"deki bildirimler buradan üstlenilir (USR 05).
+/// Görevlinin bildirim listesi: "Gelen" ve "Benimkiler" sekmeleri ve kategori
+/// filtresi (USR 04); "Gelen"deki bildirimler buradan üstlenilir (USR 05).
 class StaffReportsScreen extends StatefulWidget {
   const StaffReportsScreen({
     super.key,
@@ -27,6 +28,9 @@ class StaffReportsScreen extends StatefulWidget {
 class _StaffReportsScreenState extends State<StaffReportsScreen> {
   final _items = <ReportListItem>[];
   StaffReportsView _view = StaffReportsView.incoming;
+
+  /// Seçili kategori; `null` ise tüm kategoriler.
+  ReportCategory? _category;
   bool _isLoading = true;
   bool _loadFailed = false;
 
@@ -39,12 +43,13 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
     unawaited(_load());
   }
 
-  /// Seçili sekmenin ilk sayfasını yükler.
+  /// Seçili sekme ve kategorinin ilk sayfasını yükler.
   Future<void> _load() async {
     final view = _view;
-    final result = await widget.source.fetchFirstPage(view);
-    // Cevap gelene kadar ekran kapanmış ya da sekme değişmiş olabilir.
-    if (!mounted || view != _view) return;
+    final category = _category;
+    final result = await widget.source.fetchFirstPage(view, category: category);
+    // Cevap gelene kadar ekran kapanmış ya da seçim değişmiş olabilir.
+    if (!mounted || view != _view || category != _category) return;
     setState(() {
       _isLoading = false;
       switch (result) {
@@ -84,6 +89,11 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
     );
   }
 
+  void _selectCategory(ReportCategory? category) {
+    _category = category;
+    _showLoadingAndReload();
+  }
+
   void _showLoadingAndReload({StaffReportsView? view}) {
     setState(() {
       _view = view ?? _view;
@@ -117,6 +127,18 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
               onSelectionChanged: (selection) =>
                   _showLoadingAndReload(view: selection.first),
             ),
+          ),
+          DropdownButton<ReportCategory?>(
+            value: _category,
+            onChanged: _selectCategory,
+            items: [
+              const DropdownMenuItem(child: Text('Tüm kategoriler')),
+              for (final category in ReportCategory.values)
+                DropdownMenuItem(
+                  value: category,
+                  child: Text(categoryLabel(category)),
+                ),
+            ],
           ),
           Expanded(
             child: ReportListBody(

@@ -11,11 +11,16 @@ class FakeStaffReportsSource implements StaffReportsSource {
   FakeStaffReportsSource(this.results);
 
   final Map<StaffReportsView, List<ReportsPageResult>> results;
-  final requested = <StaffReportsView>[];
+
+  /// İstenen sekme ve kategori (`null`: tüm kategoriler).
+  final requested = <(StaffReportsView, ReportCategory?)>[];
 
   @override
-  Future<ReportsPageResult> fetchFirstPage(StaffReportsView view) async {
-    requested.add(view);
+  Future<ReportsPageResult> fetchFirstPage(
+    StaffReportsView view, {
+    ReportCategory? category,
+  }) async {
+    requested.add((view, category));
     return results[view]!.removeAt(0);
   }
 }
@@ -66,6 +71,13 @@ FakeStaffReportsSource incomingThenEmpty() => FakeStaffReportsSource({
   ],
 });
 
+Future<void> selectCategory(WidgetTester tester, String label) async {
+  await tester.tap(find.byType(DropdownButton<ReportCategory?>));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(label).last);
+  await tester.pumpAndSettle();
+}
+
 Future<void> tapAssign(WidgetTester tester) async {
   await tester.tap(find.text('Üstlen'));
   await tester.pumpAndSettle();
@@ -81,7 +93,7 @@ void main() {
 
     await pumpScreen(tester, source);
 
-    expect(source.requested, [StaffReportsView.incoming]);
+    expect(source.requested, [(StaffReportsView.incoming, null)]);
     expect(find.textContaining('A Blok'), findsOneWidget);
   });
 
@@ -99,7 +111,7 @@ void main() {
     await tester.tap(find.text('Benimkiler'));
     await tester.pumpAndSettle();
 
-    expect(source.requested.last, StaffReportsView.mine);
+    expect(source.requested.last, (StaffReportsView.mine, null));
     expect(find.textContaining('Kütüphane'), findsOneWidget);
     expect(find.textContaining('A Blok'), findsNothing);
     expect(find.text('Üstlen'), findsNothing);
@@ -164,5 +176,43 @@ void main() {
 
     expect(find.text('Üstlenilemedi, tekrar deneyin'), findsOneWidget);
     expect(find.textContaining('A Blok'), findsOneWidget);
+  });
+
+  testWidgets('filtersByCategory_whenCategorySelected', (tester) async {
+    final source = FakeStaffReportsSource({
+      StaffReportsView.incoming: [
+        ReportsPageLoaded([report('A Blok')]),
+        ReportsPageLoaded([report('Yemekhane')]),
+      ],
+    });
+    await pumpScreen(tester, source);
+
+    await selectCategory(tester, 'Temizlik');
+
+    expect(source.requested.last, (
+      StaffReportsView.incoming,
+      ReportCategory.temizlik,
+    ));
+    expect(find.textContaining('Yemekhane'), findsOneWidget);
+  });
+
+  testWidgets('keepsCategory_whenTabChanges', (tester) async {
+    final source = FakeStaffReportsSource({
+      StaffReportsView.incoming: [
+        const ReportsPageLoaded([]),
+        const ReportsPageLoaded([]),
+      ],
+      StaffReportsView.mine: [const ReportsPageLoaded([])],
+    });
+    await pumpScreen(tester, source);
+    await selectCategory(tester, 'Güvenlik');
+
+    await tester.tap(find.text('Benimkiler'));
+    await tester.pumpAndSettle();
+
+    expect(source.requested.last, (
+      StaffReportsView.mine,
+      ReportCategory.guvenlik,
+    ));
   });
 }
