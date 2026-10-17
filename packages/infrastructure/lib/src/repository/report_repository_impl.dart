@@ -26,6 +26,30 @@ typedef NewReport = ({
   String? buildingId,
 });
 
+/// Bildirim detayı: bildirenin, görevlinin ve binanın adlarıyla birlikte.
+typedef ReportDetail = ({
+  String reportId,
+  String reporterId,
+  String reporterName,
+  String? assigneeId,
+  String? assigneeName,
+  String category,
+  String description,
+  ReportPhoto photo,
+  double latitude,
+  double longitude,
+  String? place,
+  String locationSource,
+  String? buildingId,
+  String? buildingName,
+  String status,
+  DateTime createdAt,
+  DateTime? takenAt,
+  DateTime? resolvedAt,
+  ReportPhoto? resolutionPhoto,
+  String? resolutionNote,
+});
+
 /// Bildirimlerin PostgreSQL tarafı. `ReportRepository` arayüzü (#15) gelince onu uygular.
 class ReportRepositoryImpl {
   ReportRepositoryImpl(this._db);
@@ -56,6 +80,22 @@ INSERT INTO reports (reporter_id, category, description, photo_url,
   location_source, building_id)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 RETURNING report_id::text
+''';
+
+  // Bildireni ve binayı her zaman, görevliyi varsa getirir (LEFT JOIN).
+  static const _detailSql = r'''
+SELECT r.report_id::text, r.reporter_id::text, reporter.full_name,
+  r.assignee_id::text, assignee.full_name, r.category, r.description,
+  r.photo_url, r.photo_content_type, r.photo_size_bytes, r.latitude,
+  r.longitude, r.place, r.location_source, r.building_id::text, b.name,
+  r.status, r.created_at, r.taken_at, r.resolved_at, r.resolution_photo_url,
+  r.resolution_photo_content_type, r.resolution_photo_size_bytes,
+  r.resolution_note
+FROM reports r
+JOIN users reporter ON reporter.user_id = r.reporter_id
+LEFT JOIN users assignee ON assignee.user_id = r.assignee_id
+LEFT JOIN buildings b ON b.building_id = r.building_id
+WHERE r.report_id = $1
 ''';
 
   static const _insertHistorySql = r'''
@@ -99,6 +139,78 @@ VALUES ($1, $2, 'ReportResolved', $3)
     await _insertHistory(tx, reportId, null, 'Yeni', report.reporterId);
     return reportId;
   });
+
+  /// [reportId] UUID değilse ya da bildirim yoksa `null`. Yetki burada denetlenmez:
+  /// öğrenci yalnızca kendi bildirimini görür (Rule 01), service [ReportDetail.reporterId]
+  /// alanına bakar.
+  Future<ReportDetail?> findById(String reportId) async {
+    if (!isUuid(reportId)) return null;
+    final rows = await _db.execute(_detailSql, [reportId]);
+    if (rows.isEmpty) return null;
+    return _toDetail(rows.single);
+  }
+
+  ReportDetail _toDetail(List<Object?> row) {
+    final [
+      reportId,
+      reporterId,
+      reporterName,
+      assigneeId,
+      assigneeName,
+      category,
+      description,
+      photoUrl,
+      photoType,
+      photoSize,
+      latitude,
+      longitude,
+      place,
+      locationSource,
+      buildingId,
+      buildingName,
+      status,
+      createdAt,
+      takenAt,
+      resolvedAt,
+      resolutionUrl,
+      resolutionType,
+      resolutionSize,
+      resolutionNote,
+    ] = row;
+    return (
+      reportId: reportId! as String,
+      reporterId: reporterId! as String,
+      reporterName: reporterName! as String,
+      assigneeId: assigneeId as String?,
+      assigneeName: assigneeName as String?,
+      category: category! as String,
+      description: description! as String,
+      photo: (
+        url: photoUrl! as String,
+        contentType: photoType! as String,
+        sizeBytes: photoSize! as int,
+      ),
+      latitude: latitude! as double,
+      longitude: longitude! as double,
+      place: place as String?,
+      locationSource: locationSource! as String,
+      buildingId: buildingId as String?,
+      buildingName: buildingName as String?,
+      status: status! as String,
+      createdAt: createdAt! as DateTime,
+      takenAt: takenAt as DateTime?,
+      resolvedAt: resolvedAt as DateTime?,
+      // Veritabanı kuralı: sonuç fotoğrafının alanları ya hep dolu ya hep boş.
+      resolutionPhoto: resolutionUrl == null
+          ? null
+          : (
+              url: resolutionUrl as String,
+              contentType: resolutionType! as String,
+              sizeBytes: resolutionSize! as int,
+            ),
+      resolutionNote: resolutionNote as String?,
+    );
+  }
 
   /// [assigneeId] görevlisini bildirime atar; yalnızca `Yeni` ve görevlisiz bildirimde olur.
   /// Durum değişimi ve durum geçmişi aynı işlemde yazılır: biri olmazsa ikisi de olmaz.

@@ -11,6 +11,7 @@ import 'package:test/test.dart';
 const _student = 'a0000000-0000-4000-8000-0000000000d3';
 const _staff = 'a0000000-0000-4000-8000-0000000000d2';
 const _building = 'b0000000-0000-4000-8000-0000000000d1';
+const _missing = 'c0000000-0000-4000-8000-0000000000dd';
 
 const _gpsReport = (
   reporterId: _student,
@@ -76,7 +77,7 @@ Future<void> _deleteFixtures(Database db) async {
 void main() {
   final url = Platform.environment['DATABASE_URL'];
 
-  group('ReportRepositoryImpl.create', () {
+  group('ReportRepositoryImpl.create and findById', () {
     late Database db;
     late ReportRepositoryImpl repository;
 
@@ -139,6 +140,44 @@ void main() {
       expect(history, [
         [null, 'Yeni', _student],
       ]);
+    });
+
+    test('findById_returnsNamesOfReporterAndBuilding', () async {
+      final reportId = await repository.create(_buildingReport);
+
+      final detail = (await repository.findById(reportId))!;
+      expect(detail.reporterName, 'Oluşturma Öğrenci');
+      expect(detail.buildingId, _building);
+      expect(detail.buildingName, 'Oluşturma Testi Binası');
+      expect(detail.assigneeId, isNull);
+      expect(detail.resolutionPhoto, isNull);
+    });
+
+    test('findById_afterResolve_returnsAssigneeAndResolution', () async {
+      final reportId = await repository.create(_gpsReport);
+      await repository.assign(reportId, _staff);
+      const result = (
+        url: '/files/sonuc.jpg',
+        contentType: 'image/jpeg',
+        sizeBytes: 500,
+      );
+      await repository.resolve(reportId, _staff, result, note: 'Değişti');
+
+      final detail = (await repository.findById(reportId))!;
+      expect(detail.status, 'Cozuldu');
+      expect(detail.assigneeName, 'Oluşturma Görevli');
+      expect(detail.takenAt, isNotNull);
+      expect(detail.resolvedAt, isNotNull);
+      expect(detail.resolutionPhoto, result);
+      expect(detail.resolutionNote, 'Değişti');
+    });
+
+    test('findById_whenMissing_returnsNull', () async {
+      expect(await repository.findById(_missing), isNull);
+    });
+
+    test('findById_whenIdNotUuid_returnsNull', () async {
+      expect(await repository.findById('abc'), isNull);
     });
   }, skip: url == null ? 'DATABASE_URL tanımlı değil' : false);
 }
