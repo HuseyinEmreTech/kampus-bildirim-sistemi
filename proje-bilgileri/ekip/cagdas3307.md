@@ -1,7 +1,7 @@
 ---
 title: Çağdaş Kemal Ağca - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-10-12
+son-guncelleme: 2026-10-17
 ---
 
 # Çağdaş Kemal Ağca (@Cagdas3307) - Kişisel Plan
@@ -12,23 +12,25 @@ son-guncelleme: 2026-10-12
 ## Haftalık Hedefler
 
 ### Hafta 3 (28 Eyl - 4 Eki): Sunucu İskeleti
-- [ ] `campus_server` paketi: `pubspec.yaml` (shelf, shelf_router, jwt, bcrypt, campus_contracts, campus_application)
-- [ ] Shelf router kurulumu: `Router`, `Pipeline`, middleware zinciri
-- [ ] Health check: `GET /health` → 200 OK
-- [ ] CORS middleware (Flutter Web için)
-- [ ] Request logging middleware (structured JSON)
-- [ ] PR: Sunucu ayağa kalkıyor, `/health` yanıtı veriyor
+- [x] `campus_server` paketi: `pubspec.yaml` (shelf, shelf_router, jwt, bcrypt, campus_contracts, campus_application) — jwt ve bcrypt #19 ile
+- [x] Shelf router kurulumu: `Router`, `Pipeline`, middleware zinciri
+- [x] Health check: `GET /health` → 200 OK
+- [x] CORS middleware (Flutter Web için)
+- [x] Request logging middleware (structured JSON) — `feature/hafta03-json-log`, PR sırada
+- [x] PR: Sunucu ayağa kalkıyor, `/health` yanıtı veriyor (#33)
 
 ### Hafta 4 (5 - 11 Eki): Kimlik Doğrulama
-- [ ] `POST /auth/login`: Email/şifre → JWT access + refresh token
-- [ ] `POST /auth/refresh`: Refresh token → yeni access token
-- [ ] Şifre hash: `bcrypt` (cost 12)
-- [ ] JWT: HS256, access 15dk, refresh 7 gün, secret config'den
-- [ ] Auth middleware: `Authorization: Bearer` → `request.context['user'] = User`
-- [ ] Role guard: `@requireRole('Staff')` middleware
-- [ ] PR: Auth endpoints + middleware testleri
+- [x] `POST /auth/login`: Email/şifre → JWT access + refresh token (#19)
+- [x] `POST /auth/refresh`: Refresh token → yeni access token (rotation ile)
+- [x] Şifre hash: `bcrypt` (cost 12)
+- [x] JWT: HS256, access 15dk, refresh 7 gün, secret config'den
+- [x] Auth middleware: `Authorization: Bearer` → `request.context['user'] = UserContext`
+- [x] Role guard: `requireRole('Staff')` middleware
+- [x] PR: Auth endpoints + middleware testleri — 4 PR'a bölündü, ilki #67 (review bekliyor)
 
 ### Hafta 5 (12 - 18 Eki): Bildirim Endpoint'leri - Öğrenci
+> Durum (17 Eki): #20 bloklu; #15 (contract DTO'ları ve application arayüzleri) bekleniyor.
+
 - [ ] `POST /reports`: Bildirim oluşturma (multipart/form-data: photo, location, category, description, buildingId?)
 - [ ] Request validation: Contract DTO → Domain/Application'e geçiş
 - [ ] `GET /reports`: Listeleme (query: status, category, page, limit) - Student: sadece kendi
@@ -50,12 +52,12 @@ son-guncelleme: 2026-10-12
 - [ ] `POST /notifications/:id/read`: Okundu işaretle
 - [ ] `GET /buildings`: Bina listesi (konum izni yoksa fallback)
 - [ ] `GET /buildings/:id`: Bina detayı (koordinat, ad)
-- [ ] Rate limiting middleware: IP/bazlı, 100 req/dk (configurable)
+- [x] Rate limiting middleware: IP/bazlı, 100 req/dk; girişte 5/dk — `feature/hafta07-rate-limit`, PR sırada
 - [ ] PR: Bildirim + Bina endpoint'leri
 
 ### Hafta 8 (2 - 8 Kas): Güvenlik ve Validasyon
 - [ ] Input sanitization: XSS önleme, SQL injection (parametreli query zaten var)
-- [ ] Security headers: `Helmet` equivalent (CSP, HSTS, X-Frame-Options)
+- [x] Security headers: `Helmet` equivalent (CSP, HSTS, X-Frame-Options) — `feature/hafta07-rate-limit`, PR sırada
 - [ ] File upload validation: Magic bytes, size limit (stream), EXIF strip (infrastructure'a delegasyon)
 - [ ] Audit log: Her mutating request log (userId, endpoint, timestamp, result)
 - [ ] PR: Güvenlik middleware + testleri
@@ -106,8 +108,8 @@ son-guncelleme: 2026-10-12
 ---
 
 ## Teknik Borç / Öğrenilecekler
-- [ ] Shelf middleware zinciri (Pipeline, addMiddleware)
-- [ ] JWT implementation Dart'ta (package:jwt_decoder, dart_jsonwebtoken)
+- [x] Shelf middleware zinciri (Pipeline, addMiddleware)
+- [x] JWT implementation Dart'ta (dart_jsonwebtoken)
 - [ ] Multipart form-data parsing (shelf_multipart)
 - [ ] OpenAPI spec generation from code
 
