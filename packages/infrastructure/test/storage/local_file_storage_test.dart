@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:campus_infrastructure/campus_infrastructure.dart';
@@ -148,13 +149,26 @@ void main() {
     });
   });
   group('openRead and delete', () {
-    test('openRead_savedFile_returnsBytes', () async {
-      final bytes = _file(_jpegHeader, 10);
-      final saved = _expectSaved(await save(_oneChunk(bytes)));
+    // Gerçek, çözülebilen 1x1 PNG (67 bayt). Sahte başlıklı dosyayı EXIF
+    // temizliği (#53) reddeder; bu dosya iki PR'ın sırasından bağımsız geçer.
+    final png = base64Decode(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR42mNoAAAAggCB2kUIOwAAAABJRU5ErkJggg==',
+    );
+    Future<PhotoSaved> savePng() async =>
+        _expectSaved(await save(_oneChunk(png), 'image/png'));
+
+    setUp(() => storage = LocalFileStorage(root));
+
+    test('openRead_savedFile_returnsBytesOnDisk', () async {
+      final saved = await savePng();
+      final [onDisk] = await filesOnDisk();
 
       final stream = await storage.openRead(saved.photo.url);
 
-      expect(await stream!.expand((c) => c).toList(), bytes);
+      expect(
+        await stream!.expand((c) => c).toList(),
+        File(onDisk).readAsBytesSync(),
+      );
     });
 
     test('openRead_malformedUrl_returnsNull', () async {
@@ -163,7 +177,7 @@ void main() {
     });
 
     test('delete_existingFile_removesFile', () async {
-      final saved = _expectSaved(await save(_oneChunk(_file(_jpegHeader, 10))));
+      final saved = await savePng();
 
       expect(await storage.delete(saved.photo.url), isTrue);
       expect(await storage.openRead(saved.photo.url), isNull);
@@ -171,7 +185,7 @@ void main() {
     });
 
     test('delete_sameFileTwiceAtOnce_onlyOneDeletes', () async {
-      final saved = _expectSaved(await save(_oneChunk(_file(_jpegHeader, 10))));
+      final saved = await savePng();
 
       final results = await Future.wait([
         storage.delete(saved.photo.url),
