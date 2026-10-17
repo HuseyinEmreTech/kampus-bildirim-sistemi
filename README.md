@@ -255,6 +255,7 @@ docker compose -f compose.prod.yaml up -d --build
 ```
 
 - İlk açılışta `db/prod/ilk-kurulum.sh` migration'ları sürüm sırasıyla uygular ve sunucu için kısıtlı bir veritabanı hesabı açar (`APP_DB_USER`, `APP_DB_PASSWORD`).
+- `JWT_ACCESS_SECRET` ve `JWT_REFRESH_SECRET` `.env`'de tanımlı değilse compose başlamaz (en az 32 karakter, ikisi farklı; örnek üretim: `openssl rand -base64 48`).
 - Sunucu bu hesapla bağlanır: tablolardaki veriyi okur ve yazar, ama tablo silemez, değiştiremez, yeni tablo açamaz. Yönetici hesabı (`POSTGRES_USER`) yalnızca migration için kullanılır.
 - Sonradan eklenen bir migration yönetici hesabıyla elle uygulanır; yeni tablolara sunucu hesabının izni kendiliğinden verilir:
   `docker compose -f compose.prod.yaml exec -T db psql -U campus -d campus < db/migrations/V5__ornek.sql` (PowerShell'de `cmd /c "..."` içinde).

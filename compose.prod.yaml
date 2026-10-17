@@ -38,6 +38,9 @@ services:
     environment:
       # Sunucu yönetici hesabıyla değil, yalnızca veri okuyup yazabilen hesapla bağlanır.
       DATABASE_URL: postgres://${APP_DB_USER:-campus_app}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB:-campus}?sslmode=disable&max_connection_count=10&connect_timeout=5&query_timeout=10
+      # Oturum belirteçlerinin sırları (#19); sunucu bunlar olmadan açılmaz.
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET .env dosyasinda tanimli olmali}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET .env dosyasinda tanimli olmali}
     volumes:
       # Yüklenen fotoğraflar; konteyner silinse de kalır.
       - files:/data/files
