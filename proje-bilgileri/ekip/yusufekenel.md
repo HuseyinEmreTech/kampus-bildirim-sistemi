@@ -114,4 +114,5 @@ son-guncelleme: 2026-10-15
 
 ## Raporlar
 - [2026-10-15](raporlar/yusufekenel/2026-10-15.md): Kurulum, öğrenci bildirim listesi ve oluşturma ekranları (#21)
+- [2026-10-16](raporlar/yusufekenel/2026-10-16.md): Giriş ekranı ve oturum durumu, gh kurulumu
 - [2026-10-17](raporlar/yusufekenel/2026-10-17.md): #70 açıldı, "Bildirim oluştur" düğmesi, görevli listesi, Üstlen, çözüldü bildirimleri, bildirim detayı
