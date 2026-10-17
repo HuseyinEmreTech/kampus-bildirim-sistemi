@@ -1,0 +1,237 @@
+# Campus Report sunucu API'si. Elle yazılır (AGENTS.md: kod üretimi yok).
+# Görüntülemek için: https://editor.swagger.io adresine bu dosyanın içeriğini yapıştır.
+# Davranış değişince bu dosya ve proje-bilgileri/05-api-design.md aynı PR'da güncellenir.
+openapi: 3.0.3
+info:
+  title: Campus Report API
+  version: 0.1.0
+  description: >
+    Kampüs sorun bildirim sistemi sunucusu. Şu an giriş, belirteç yenileme,
+    profil ve sağlık kontrolü uçları var; bildirim uçları #15 ve #20 ile gelecek.
+
+    Bütün yanıtlarda güvenlik başlıkları ve `X-Request-Id` bulunur.
+    IP başına dakikada 100 istek, girişte dakikada 5 deneme sınırı vardır (429).
+servers:
+  - url: http://localhost:8080
+    description: Yerel geliştirme
+
+tags:
+  - name: Sistem
+  - name: Kimlik doğrulama
+  - name: Kullanıcı
+
+paths:
+  /health:
+    get:
+      tags: [Sistem]
+      summary: Sağlık kontrolü
+      responses:
+        '200':
+          description: Sunucu çalışıyor.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+
+  /api/auth/login:
+    post:
+      tags: [Kimlik doğrulama]
+      summary: E-posta ve parolayla giriş
+      description: >
+        Kullanıcı yoksa da parola yanlışsa da aynı hata döner (hangi e-postanın
+        kayıtlı olduğu belli olmaz). IP başına dakikada 5 deneme.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Giriş başarılı.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: E-posta veya parola hatalı (`INVALID_CREDENTIALS`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: INVALID_CREDENTIALS
+                  message: E-posta veya parola hatalı.
+                  details: ''
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /api/auth/refresh:
+    post:
+      tags: [Kimlik doğrulama]
+      summary: Yenileme belirteciyle yeni belirteç çifti
+      description: >
+        Kullanılan yenileme belirteci iptal edilir (rotation); aynı belirteç
+        ikinci kez gönderilirse 401 döner. Yeni yenileme belirteci saklanmalıdır.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Yeni belirteç çifti.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /api/users/me:
+    get:
+      tags: [Kullanıcı]
+      summary: Giriş yapan kullanıcının kendi profili
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profil bilgisi. Parola özeti hiçbir zaman dönmez.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Kullanıcı bulunamadı (`NOT_FOUND`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        `/api/auth/login` yanıtındaki `accessToken` (HS256, 15 dakika).
+        Başlık: `Authorization: Bearer <accessToken>`.
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: ayse@ornek.edu
+        password:
+          type: string
+          format: password
+          example: Demo.1234
+
+    RefreshRequest:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken:
+          type: string
+          description: Girişte ya da önceki yenilemede alınan belirteç (7 gün).
+
+    AuthUser:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+          example: a0000000-0000-4000-8000-000000000001
+        fullName:
+          type: string
+          example: Ayşe Yılmaz
+        role:
+          type: string
+          enum: [Student, Staff]
+
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT, 15 dakika geçerli.
+        refreshToken:
+          type: string
+          description: JWT, 7 gün geçerli, tek kullanımlık.
+        user:
+          $ref: '#/components/schemas/AuthUser'
+
+    UserProfile:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+          example: a0000000-0000-4000-8000-000000000003
+        fullName:
+          type: string
+          example: Zeynep Demir
+        email:
+          type: string
+          format: email
+          example: zeynep@ornek.edu
+        role:
+          type: string
+          enum: [Student, Staff]
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: VALIDATION_ERROR
+            message:
+              type: string
+            details:
+              type: string
+
+  responses:
+    ValidationError:
+      description: İstek gövdesi eksik ya da JSON değil (`VALIDATION_ERROR`).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Belirteç yok, geçersiz ya da süresi dolmuş (`UNAUTHORIZED`).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: İstek sınırı aşıldı (`RATE_LIMITED`).
+      headers:
+        Retry-After:
+          description: Kaç saniye sonra tekrar denenebileceği.
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

@@ -10,6 +10,8 @@ son-guncelleme: 2026-10-17
 
 Standartlar: [Mimari genel bakış](02-architecture-overview.md). Modeller: [Domain tasarımı](03-domain-design.md).
 
+Makinenin okuyabileceği tanım: `packages/server/openapi.yaml` (OpenAPI 3). Görüntülemek için içeriği [Swagger Editor](https://editor.swagger.io)'a yapıştırın. Yalnızca çalışan uçları içerir; uç eklenince aynı PR'da güncellenir.
+
 ## Endpoint'ler
 
 | Endpoint | Metot | Rol | Açıklama |
