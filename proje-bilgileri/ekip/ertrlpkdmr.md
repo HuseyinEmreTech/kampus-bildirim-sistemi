@@ -108,4 +108,5 @@ son-guncelleme: 2026-10-12
 - **Yusuf/Fatma**: File upload/download URL'leri, API contract
 ## Raporlar
 - [2026-10-12](raporlar/ertrlpkdmr/2026-10-12.md): Hafta 05 planı, compose ve V1 migration
-- [2026-10-15](raporlar/ertrlpkdmr/2026-10-15.md): Veritabanı bağlantısı (`Database`) ve testleri
+- [2026-10-15](raporlar/ertrlpkdmr/2026-10-15.md): Veritabanı bağlantısı, üstlen (Rule 02) ve depolar (#34, #40, #41, #43, #47, #48, #49)
+- [2026-10-16](raporlar/ertrlpkdmr/2026-10-16.md): Birleşen PR'lar, çözüldü işaretleme (Rule 03, Rule 04)

@@ -133,7 +133,7 @@ Bağımlılıklar arayüzle verilir; bağlama `main.dart` içinde yapılır. Zen
 | Sunucu | Dart (Shelf) | Kabul, [ADR-01](proje-bilgileri/adr/01-dart-backend-postgresql.md) |
 | Veritabanı | PostgreSQL 16 | Kabul |
 | Veritabanı erişimi | `postgres` paketi, parametreli sorgu | Öneri |
-| Şema yönetimi | Elle SQL dosyaları (`db/migrations/`); V1 migration yazıldı | Kabul |
+| Şema yönetimi | Elle SQL dosyaları (`db/migrations/`); V1-V3 migration'ları yazıldı | Kabul |
 | Test | Dart `test`, `mocktail`; entegrasyon testi gerçek PostgreSQL konteyneriyle | Öneri |
 | Konteyner | Podman + podman-compose **veya** Docker + Docker Compose | Kabul |
 | Kod kalitesi | Yerelde `dart analyze`, `flutter analyze`, kapsam; PR'da SonarQube Cloud (ücretsiz plan) | Kabul, [ADR-02](proje-bilgileri/adr/02-kalite-araci-sonarqube-cloud.md); yerel Community'de Dart yok (doğrulandı); Cloud kuruldu ve tarama yeşil (12 Ekim 2026) |
@@ -193,7 +193,7 @@ Tümü: [güvenlik ve gizlilik](proje-bilgileri/06-security-and-privacy.md). Dem
 
 ## 10. Kurulum ve çalıştırma
 
-> Veritabanı kurulumu (compose + migration) hazır; **sunucu ve istemci kodu** henüz yok. Uygulama kodu eklendikçe bu bölüm gerçek komutlarla tamamlanacaktır.
+Veritabanı kurulumu (compose + migration) hazır. Sunucu iskeleti (`/health`) çalışıyor; istemci tarafında geçici bir kök uygulama var, mobil ve web ekranları `lib/mobil/` ve `lib/web/` altında geliştiriliyor.
 
 **Gereksinimler**
 
@@ -219,6 +219,7 @@ Not: Migration'lar yalnızca veri klasörü **boşken** (ilk açılışta) otoma
 
 ```bash
 podman compose exec -T db psql -U campus -d campus < db/migrations/V2__status_history_ilk_durum.sql
+podman compose exec -T db psql -U campus -d campus < db/migrations/V3__email_buyuk_kucuk_harf_tekil.sql
 ```
 
 Sahte örnek veri (5 bina, 2 öğrenci, 2 görevli, 3 bildirim; parola `Demo.1234`):
@@ -234,6 +235,23 @@ Windows PowerShell `<` işaretini desteklemez (`RedirectionNotSupported` hatası
 ```powershell
 cmd /c "docker compose exec -T db psql -U campus -d campus < db\seed\001_ornek.sql"
 ```
+
+**Sunucu**
+
+```bash
+cd packages/server
+dart run bin/server.dart
+# http://localhost:8080/health
+```
+
+**Mobil / Web istemci**
+
+```bash
+cd packages/app
+flutter run --target lib/main.dart   # geçici kök uygulama
+```
+
+Mobil ekranlar `lib/mobil/`, web ekranlar `lib/web/` altında geliştiriliyor. Platforma özgü gerçek giriş noktası Hafta 6'da eklenecek.
 
 **Yapılandırma (planlanan)**
 

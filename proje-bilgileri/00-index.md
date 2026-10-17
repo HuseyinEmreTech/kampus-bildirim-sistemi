@@ -37,6 +37,7 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 | - | [Uygulama planı: repo iskeleti](planlar/2026-10-02-repo-iskeleti.md) | Hafta 4'ün ilk işi, adım adım | Onay bekliyor |
 | - | [ADR-01: Dart backend ve PostgreSQL](adr/01-dart-backend-postgresql.md) | Geri dönülmesi zor karar | Önerildi |
 | - | [ADR-02: Kod kalitesi aracı](adr/02-kalite-araci-sonarqube-cloud.md) | SonarQube Cloud ve yerel analiz kararı, karşılaştırma matrisi | Önerildi |
+| - | [ADR-03: Katmanlı mimari ve tek dilli ürün](adr/03-katmanli-mimari-ve-tek-dil.md) | Ürün tek dil; esneklik dağıtıma girmeyen araçlarda; çok dilli ürün reddi | Önerildi |
 | - | [ADR şablonu](adr/00-adr-template.md) | ADR yazma kuralı | Şablon |
 
 ## İzleme kayıtları
@@ -81,7 +82,7 @@ Bu dokümanların güncel kalması projenin bir parçasıdır.
 | Karar | Öneri | Durum |
 | --- | --- | --- |
 | Backend dili ve veritabanı | Dart (Shelf) ve PostgreSQL | Kabul ([ADR-01](adr/01-dart-backend-postgresql.md)) |
-| Takım büyüklüğü ve süre | 4 kişi, 15 ders haftası | Kabul ([ekip](10-ekip-ve-yol-haritasi.md)) |
+| Takım büyüklüğü ve süre | 6 kişi (hoca dağıttı), 15 ders haftası | Kabul ([ekip](10-ekip-ve-yol-haritasi.md)) |
 | Konum alma | GPS; izin yoksa bina listesi | Kabul ([mimari](11-kod-mimarisi-ve-korumalar.md#5-konum)) |
 | Çözümde sonuç fotoğrafı | Zorunlu | Kabul |
 | Sunum ve teslim tarihleri | Hafta 9 ve 15 varsayımı | Hoca'ya sorulacak |
