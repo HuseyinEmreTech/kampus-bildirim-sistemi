@@ -16,10 +16,14 @@ class StaffReportsScreen extends StatefulWidget {
     super.key,
     required this.source,
     required this.assigner,
+    this.onReportTap,
   });
 
   final StaffReportsSource source;
   final ReportAssigner assigner;
+
+  /// Karta dokununca (ör. detayı açmak için).
+  final ValueChanged<ReportListItem>? onReportTap;
 
   @override
   State<StaffReportsScreen> createState() => _StaffReportsScreenState();
@@ -151,6 +155,7 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
               },
               onRefresh: _load,
               onRetry: _showLoadingAndReload,
+              onTap: widget.onReportTap,
               actionBuilder: _view == StaffReportsView.incoming
                   ? _buildAssignButton
                   : null,

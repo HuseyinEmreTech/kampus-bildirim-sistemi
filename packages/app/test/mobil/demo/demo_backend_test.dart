@@ -4,6 +4,7 @@ import 'package:campus_app/mobil/features/auth/data/session.dart';
 import 'package:campus_app/mobil/features/notifications/data/notifications_source.dart';
 import 'package:campus_app/mobil/features/reports/data/new_report.dart';
 import 'package:campus_app/mobil/features/reports/data/report_assigner.dart';
+import 'package:campus_app/mobil/features/reports/data/report_detail_source.dart';
 import 'package:campus_app/mobil/features/reports/data/report_list_item.dart';
 import 'package:campus_app/mobil/features/reports/data/reports_source.dart';
 import 'package:campus_app/mobil/features/reports/data/staff_reports_source.dart';
@@ -77,5 +78,18 @@ void main() {
     final after = await demo.notifications.fetchFirstPage();
     expect(marked, isTrue);
     expect((after as NotificationsLoaded).unreadCount, before.unreadCount - 1);
+  });
+
+  test('detail_includesResolution_forResolvedReport', () async {
+    final demo = DemoBackend();
+    final notices = await demo.notifications.fetchFirstPage();
+    final reportId = (notices as NotificationsLoaded).items.first.reportId;
+
+    final result = await demo.reportDetail.fetch(reportId);
+
+    final detail = (result as ReportDetailLoaded).detail;
+    expect(detail.status, ReportStatus.cozuldu);
+    expect(detail.resolution?.note, isNotNull);
+    expect(detail.history.last.to, ReportStatus.cozuldu);
   });
 }

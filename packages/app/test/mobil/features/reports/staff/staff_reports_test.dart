@@ -51,12 +51,14 @@ Future<void> pumpScreen(
   WidgetTester tester,
   StaffReportsSource source, {
   ReportAssigner? assigner,
+  ValueChanged<ReportListItem>? onReportTap,
 }) async {
   await tester.pumpWidget(
     MaterialApp(
       home: StaffReportsScreen(
         source: source,
         assigner: assigner ?? FakeReportAssigner(),
+        onReportTap: onReportTap,
       ),
     ),
   );
@@ -214,5 +216,18 @@ void main() {
       StaffReportsView.mine,
       ReportCategory.guvenlik,
     ));
+  });
+
+  testWidgets('callsOnReportTap_whenCardTapped', (tester) async {
+    ReportListItem? tapped;
+    await pumpScreen(
+      tester,
+      incomingThenEmpty(),
+      onReportTap: (item) => tapped = item,
+    );
+
+    await tester.tap(find.textContaining('A Blok'));
+
+    expect(tapped?.id, 'r7');
   });
 }

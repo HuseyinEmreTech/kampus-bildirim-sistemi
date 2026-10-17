@@ -11,9 +11,11 @@ import '../features/notifications/data/notifications_source.dart';
 import '../features/notifications/presentation/notifications_screen.dart';
 import '../features/reports/data/report_assigner.dart';
 import '../features/reports/data/report_creator.dart';
+import '../features/reports/data/report_detail_source.dart';
 import '../features/reports/data/reports_source.dart';
 import '../features/reports/data/staff_reports_source.dart';
 import '../features/reports/presentation/staff/staff_reports_screen.dart';
+import '../features/reports/presentation/student/report_detail_screen.dart';
 import '../features/reports/presentation/student/reports_list_screen.dart';
 import '../shared/app_theme.dart';
 
@@ -26,6 +28,7 @@ class MobilSources {
     required this.staffReports,
     required this.assigner,
     required this.notifications,
+    required this.reportDetail,
   });
 
   MobilSources.demo(DemoBackend demo)
@@ -36,6 +39,7 @@ class MobilSources {
         staffReports: demo.staffReports,
         assigner: demo.assigner,
         notifications: demo.notifications,
+        reportDetail: demo.reportDetail,
       );
 
   final AuthSource auth;
@@ -44,6 +48,7 @@ class MobilSources {
   final StaffReportsSource staffReports;
   final ReportAssigner assigner;
   final NotificationsSource notifications;
+  final ReportDetailSource reportDetail;
 }
 
 /// Mobil uygulamanın kökü: tema; giriş yapılmadıysa giriş ekranı, yapıldıysa
@@ -62,13 +67,23 @@ class MobilApp extends StatelessWidget {
       darkTheme: buildDarkTheme(),
       home: ListenableBuilder(
         listenable: auth,
-        builder: (context, _) => _buildHome(),
+        builder: (context, _) => _buildHome(context),
       ),
     );
   }
 
-  Widget _buildHome() {
+  Widget _buildHome(BuildContext context) {
     void signOut() => unawaited(auth.signOut());
+    void openDetail(String reportId) => unawaited(
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => ReportDetailScreen(
+            reportId: reportId,
+            source: sources.reportDetail,
+          ),
+        ),
+      ),
+    );
     return switch (auth.session?.role) {
       null => LoginScreen(
         source: sources.auth,
@@ -83,12 +98,16 @@ class MobilApp extends StatelessWidget {
             ReportsListScreen(
               source: sources.myReports,
               creator: sources.creator,
+              onReportTap: (report) => openDetail(report.id),
             ),
           ),
           (
             'Bildirimler',
             Icons.notifications,
-            NotificationsScreen(source: sources.notifications),
+            NotificationsScreen(
+              source: sources.notifications,
+              onNotificationTap: (item) => openDetail(item.reportId),
+            ),
           ),
         ],
       ),
@@ -101,6 +120,7 @@ class MobilApp extends StatelessWidget {
             StaffReportsScreen(
               source: sources.staffReports,
               assigner: sources.assigner,
+              onReportTap: (report) => openDetail(report.id),
             ),
           ),
         ],

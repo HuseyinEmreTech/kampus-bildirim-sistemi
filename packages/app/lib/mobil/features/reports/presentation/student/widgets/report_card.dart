@@ -6,12 +6,15 @@ import '../../report_labels.dart';
 
 /// Listede tek bir bildirimi gösteren kart.
 class ReportCard extends StatelessWidget {
-  const ReportCard({super.key, required this.report, this.action});
+  const ReportCard({super.key, required this.report, this.action, this.onTap});
 
   final ReportListItem report;
 
   /// Kartın altında gösterilen isteğe bağlı düğme (ör. görevlinin "Üstlen"i).
   final Widget? action;
+
+  /// Karta dokununca (ör. detayı açmak için).
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +35,7 @@ class ReportCard extends StatelessWidget {
 
   Widget _buildTile() {
     return ListTile(
+      onTap: onTap,
       leading: CircleAvatar(
         backgroundColor: categoryColor(report.category),
         child: const Icon(Icons.report_problem, color: Colors.white),

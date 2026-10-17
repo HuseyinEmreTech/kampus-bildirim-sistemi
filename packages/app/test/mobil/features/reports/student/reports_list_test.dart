@@ -38,12 +38,17 @@ ReportListItem report({String place = 'A Blok'}) => ReportListItem(
   createdAt: DateTime(2026, 10, 15),
 );
 
-Future<void> pumpScreen(WidgetTester tester, ReportsSource source) async {
+Future<void> pumpScreen(
+  WidgetTester tester,
+  ReportsSource source, {
+  ValueChanged<ReportListItem>? onReportTap,
+}) async {
   await tester.pumpWidget(
     MaterialApp(
       home: ReportsListScreen(
         source: source,
         creator: AcceptingReportCreator(),
+        onReportTap: onReportTap,
       ),
     ),
   );
@@ -127,5 +132,20 @@ void main() {
 
     expect(find.byType(ReportCreateScreen), findsNothing);
     expect(find.textContaining('Kütüphane'), findsOneWidget);
+  });
+
+  testWidgets('callsOnReportTap_whenCardTapped', (tester) async {
+    ReportListItem? tapped;
+    await pumpScreen(
+      tester,
+      FakeReportsSource([
+        ReportsPageLoaded([report()]),
+      ]),
+      onReportTap: (item) => tapped = item,
+    );
+
+    await tester.tap(find.byType(ReportCard));
+
+    expect(tapped?.id, 'r1');
   });
 }

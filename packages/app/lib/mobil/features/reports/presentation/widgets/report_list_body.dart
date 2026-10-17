@@ -15,6 +15,7 @@ class ReportListBody extends StatelessWidget {
     required this.onRefresh,
     required this.onRetry,
     this.actionBuilder,
+    this.onTap,
   });
 
   final bool isLoading;
@@ -26,6 +27,9 @@ class ReportListBody extends StatelessWidget {
 
   /// Verilirse her kartın altına bu düğme konur.
   final Widget Function(ReportListItem report)? actionBuilder;
+
+  /// Verilirse karta dokununca çağrılır.
+  final ValueChanged<ReportListItem>? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -58,8 +62,14 @@ class ReportListBody extends StatelessWidget {
             : ReportCard(
                 report: items[index],
                 action: actionBuilder?.call(items[index]),
+                onTap: _tapOf(items[index]),
               ),
       ),
     );
+  }
+
+  VoidCallback? _tapOf(ReportListItem report) {
+    final onTap = this.onTap;
+    return onTap == null ? null : () => onTap(report);
   }
 }

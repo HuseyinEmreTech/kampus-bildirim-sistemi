@@ -8,9 +8,16 @@ import '../data/notifications_source.dart';
 
 /// Öğrencinin "çözüldü" bildirimleri; başlıkta okunmamış sayısı (USR 03).
 class NotificationsScreen extends StatefulWidget {
-  const NotificationsScreen({super.key, required this.source});
+  const NotificationsScreen({
+    super.key,
+    required this.source,
+    this.onNotificationTap,
+  });
 
   final NotificationsSource source;
+
+  /// Bildirime dokununca (ör. ilgili bildirimin detayını açmak için).
+  final ValueChanged<NotificationItem>? onNotificationTap;
 
   @override
   State<NotificationsScreen> createState() => _NotificationsScreenState();
@@ -106,7 +113,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _buildTile(NotificationItem item) {
+    final onTap = widget.onNotificationTap;
     return ListTile(
+      onTap: onTap == null ? null : () => onTap(item),
       leading: Icon(
         Icons.check_circle,
         color: item.isRead ? Colors.grey : Colors.green,

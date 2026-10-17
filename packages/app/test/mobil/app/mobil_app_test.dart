@@ -5,6 +5,7 @@ import 'package:campus_app/mobil/features/auth/presentation/login_screen.dart';
 import 'package:campus_app/mobil/features/auth/state/auth_controller.dart';
 import 'package:campus_app/mobil/features/notifications/presentation/notifications_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/staff/staff_reports_screen.dart';
+import 'package:campus_app/mobil/features/reports/presentation/student/report_detail_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/reports_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -63,5 +64,28 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(LoginScreen), findsOneWidget);
+  });
+
+  testWidgets('tappingReport_opensDetail', (tester) async {
+    await pumpApp(tester);
+    await login(tester, 'ayse@ornek.edu');
+
+    await tester.tap(find.textContaining('B Blok 2. kat'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ReportDetailScreen), findsOneWidget);
+  });
+
+  testWidgets('tappingNotification_opensResolvedDetail', (tester) async {
+    await pumpApp(tester);
+    await login(tester, 'ayse@ornek.edu');
+    await tester.tap(find.text('Bildirimler'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.textContaining('Bildiriminiz çözüldü'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Sonuç'), 200);
+
+    expect(find.text('Sonuç'), findsOneWidget);
   });
 }

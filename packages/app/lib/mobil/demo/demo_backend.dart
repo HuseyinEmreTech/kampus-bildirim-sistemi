@@ -5,6 +5,8 @@ import '../features/notifications/data/notifications_source.dart';
 import '../features/reports/data/new_report.dart';
 import '../features/reports/data/report_assigner.dart';
 import '../features/reports/data/report_creator.dart';
+import '../features/reports/data/report_detail.dart';
+import '../features/reports/data/report_detail_source.dart';
 import '../features/reports/data/report_list_item.dart';
 import '../features/reports/data/reports_source.dart';
 import '../features/reports/data/staff_reports_source.dart';
@@ -32,17 +34,40 @@ class DemoBackend {
   StaffReportsSource get staffReports => _staff;
   ReportAssigner get assigner => _staff;
   late final NotificationsSource notifications = _DemoNotifications(this);
+  late final ReportDetailSource reportDetail = _DemoReportDetail(this);
+
+  /// Demoda gerçek fotoğraf yok; detay ekranı yerinde kırık resim simgesi gösterir.
+  static const _photoUrl = 'https://ornek.test/demo.jpg';
 
   /// Demo tarihleri Ekim 2026'nın günleri.
   static DateTime _day(int day) => DateTime(2026, 10, day);
 
   void _seed() {
-    _add(studentId, ReportCategory.ariza, 'B Blok 2. kat', _day(15));
-    _add('baska-ogrenci', ReportCategory.guvenlik, 'Otopark girişi', _day(16));
+    _add(
+      studentId,
+      ReportCategory.ariza,
+      'B Blok 2. kat',
+      _day(15),
+    ).description = 'Koridor lambası yanmıyor';
+    _add(
+      'baska-ogrenci',
+      ReportCategory.guvenlik,
+      'Otopark girişi',
+      _day(16),
+    ).description = 'Bariyer kapanmıyor';
     final resolved =
         _add(studentId, ReportCategory.temizlik, 'Kütüphane', _day(12))
+          ..description = 'Okuma salonunda çöp kutuları taşmış'
           ..status = ReportStatus.cozuldu
-          ..assigneeId = staffId;
+          ..assigneeId = staffId
+          ..resolution = const Resolution(
+            photoUrl: _photoUrl,
+            note: 'Çöpler toplandı.',
+          );
+    resolved.history.addAll([
+      StatusChange(to: ReportStatus.ustlenildi, changedAt: _day(12)),
+      StatusChange(to: ReportStatus.cozuldu, changedAt: _day(13)),
+    ]);
     _notifications.add(
       NotificationItem(
         id: 'n1',
@@ -67,9 +92,15 @@ class DemoBackend {
       place: place,
       createdAt: createdAt,
     );
+    report.history.add(
+      StatusChange(to: ReportStatus.yeni, changedAt: createdAt),
+    );
     _reports.add(report);
     return report;
   }
+
+  _DemoReport? _find(String id) =>
+      _reports.where((report) => report.id == id).firstOrNull;
 
   /// En yeni bildirim önde.
   List<ReportListItem> _list(bool Function(_DemoReport report) where) =>
@@ -92,8 +123,11 @@ class _DemoReport {
   final ReportCategory category;
   final String place;
   final DateTime createdAt;
+  String description = '';
   ReportStatus status = ReportStatus.yeni;
   String? assigneeId;
+  Resolution? resolution;
+  final history = <StatusChange>[];
 
   ReportListItem toItem() => ReportListItem(
     id: id,
@@ -101,6 +135,18 @@ class _DemoReport {
     status: status,
     place: place,
     createdAt: createdAt,
+  );
+
+  ReportDetail toDetail() => ReportDetail(
+    id: id,
+    category: category,
+    status: status,
+    description: description,
+    place: place,
+    createdAt: createdAt,
+    photoUrl: DemoBackend._photoUrl,
+    history: List.of(history),
+    resolution: resolution,
   );
 }
 
@@ -141,12 +187,15 @@ class _DemoStudentReports implements ReportsSource, ReportCreator {
 
   @override
   Future<ReportCreateResult> create(NewReport report) async {
-    _demo._add(
-      DemoBackend.studentId,
-      report.category,
-      'Konum seçilmedi',
-      DateTime.now(),
-    );
+    _demo
+            ._add(
+              DemoBackend.studentId,
+              report.category,
+              'Konum seçilmedi',
+              DateTime.now(),
+            )
+            .description =
+        report.description;
     return const ReportCreated();
   }
 }
@@ -176,12 +225,15 @@ class _DemoStaffReports implements StaffReportsSource, ReportAssigner {
 
   @override
   Future<ReportAssignResult> assign(String reportId) async {
-    final report = _demo._reports.where((r) => r.id == reportId).firstOrNull;
+    final report = _demo._find(reportId);
     if (report == null) return const ReportAssignFailed();
     if (report.assigneeId != null) return const ReportAlreadyTaken();
     report
       ..assigneeId = DemoBackend.staffId
-      ..status = ReportStatus.ustlenildi;
+      ..status = ReportStatus.ustlenildi
+      ..history.add(
+        StatusChange(to: ReportStatus.ustlenildi, changedAt: DateTime.now()),
+      );
     return const ReportAssigned();
   }
 }
@@ -205,5 +257,18 @@ class _DemoNotifications implements NotificationsSource {
     if (index < 0) return false;
     list[index] = list[index].markedRead();
     return true;
+  }
+}
+
+class _DemoReportDetail implements ReportDetailSource {
+  _DemoReportDetail(this._demo);
+
+  final DemoBackend _demo;
+
+  @override
+  Future<ReportDetailResult> fetch(String reportId) async {
+    final report = _demo._find(reportId);
+    if (report == null) return const ReportDetailNotFound();
+    return ReportDetailLoaded(report.toDetail());
   }
 }

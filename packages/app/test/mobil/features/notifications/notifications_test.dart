@@ -31,9 +31,18 @@ NotificationItem notification(String id, {bool isRead = false}) =>
       isRead: isRead,
     );
 
-Future<void> pumpScreen(WidgetTester tester, NotificationsSource source) async {
+Future<void> pumpScreen(
+  WidgetTester tester,
+  NotificationsSource source, {
+  ValueChanged<NotificationItem>? onNotificationTap,
+}) async {
   await tester.pumpWidget(
-    MaterialApp(home: NotificationsScreen(source: source)),
+    MaterialApp(
+      home: NotificationsScreen(
+        source: source,
+        onNotificationTap: onNotificationTap,
+      ),
+    ),
   );
   await tester.pumpAndSettle();
 }
@@ -101,5 +110,18 @@ void main() {
 
     expect(find.text('İşaretlenemedi, tekrar deneyin'), findsOneWidget);
     expect(find.text('Okundu'), findsOneWidget);
+  });
+
+  testWidgets('callsOnNotificationTap_whenTapped', (tester) async {
+    NotificationItem? tapped;
+    await pumpScreen(
+      tester,
+      oneUnread(),
+      onNotificationTap: (item) => tapped = item,
+    );
+
+    await tester.tap(find.textContaining('koridor lambası n2'));
+
+    expect(tapped?.reportId, 'rapor-n2');
   });
 }

@@ -17,12 +17,16 @@ class ReportsListScreen extends StatefulWidget {
     super.key,
     required this.source,
     required this.creator,
+    this.onReportTap,
   });
 
   final ReportsSource source;
 
   /// "Bildirim oluştur" ekranına verilen kaynak.
   final ReportCreator creator;
+
+  /// Karta dokununca (ör. detayı açmak için).
+  final ValueChanged<ReportListItem>? onReportTap;
 
   @override
   State<ReportsListScreen> createState() => _ReportsListScreenState();
@@ -126,7 +130,14 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: _items.length,
-      itemBuilder: (context, index) => ReportCard(report: _items[index]),
+      itemBuilder: (context, index) {
+        final report = _items[index];
+        final onReportTap = widget.onReportTap;
+        return ReportCard(
+          report: report,
+          onTap: onReportTap == null ? null : () => onReportTap(report),
+        );
+      },
     );
   }
 }
