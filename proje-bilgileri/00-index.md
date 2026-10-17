@@ -1,7 +1,7 @@
 ---
 title: Campus Report - Proje Dokümantasyonu
 durum: Taslak
-son-guncelleme: 2026-09-30
+son-guncelleme: 2026-10-17
 ---
 
 # Campus Report: Proje Dokümantasyonu
@@ -53,6 +53,7 @@ Projede olan biten her şey bu kayıtlarda tutulur.
 | [SonarQube puanları](kayitlar/sonarqube-puanlari.md) | Tarama puanları ve bulgu çözüm günlüğü |
 | [Skill kataloğu](kayitlar/skill-katalogu.md) | Her Skill: ne, neden var, projede neden, durum |
 | [Skill, Plugin ve araç kullanım günlüğü](kayitlar/skill-ve-arac-kullanimi.md) | Haftalık: hangi Skill, nerede, neden, sonuç |
+| [Yığın PR birleşme süreci](kayitlar/2026-10-17-yigin-pr-birlesme-sureci.md) | Squash-only korumada yığın (stacked) PR'ların birleşme yolu, çıkan tuzaklar ve çakışma çözümü |
 
 ## Dokümantasyon kuralları
 

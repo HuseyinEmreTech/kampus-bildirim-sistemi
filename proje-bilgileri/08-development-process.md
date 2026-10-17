@@ -1,7 +1,7 @@
 ---
 title: Geliştirme Süreci
 durum: Taslak
-son-guncelleme: 2026-09-30
+son-guncelleme: 2026-10-17
 ---
 
 # Geliştirme Süreci
@@ -28,6 +28,17 @@ son-guncelleme: 2026-09-30
 - Commit mesajları açıklayıcıdır ve önek taşır: `feat:`, `fix:`, `docs:`, `test:`, `refactor:`.
 - Haftalık düzenli commit; toplu son gece push'u yoktur.
 - Her Pull Request incelenir; PR açıklaması "ne yaptım, hangi varsayımı yaptım, neyi bilmiyorum" özetini ve doküman güncelleme onayını içerir.
+
+### Yığın PR'lar ve squash birleşme
+
+Büyük bir iş, küçük PR'lara bölünmek için üst üste base'li zincir hâlinde açılabilir (yığın/stacked PR): her PR bir öncekinin dalını base alır. Örnek: hafta 5 veri katmanı zinciri `#52 → #60 → #61 → #62 → #63`.
+
+`main` koruması **yalnızca squash** birleşmeye izin verdiği için yığın PR'larda iki kural zorunludur (ayrıntı: [yığın PR birleşme süreci](kayitlar/2026-10-17-yigin-pr-birlesme-sureci.md)):
+
+1. **Çocuğu önce `main`'e retarget et, sonra alt PR'ı birleştir.** Base dalı silinince GitHub çocuk PR'ı otomatik kapatır.
+2. **Alt PR squash'landıktan sonra üst dalı `main`'in üzerine getir** (`git rebase --onto origin/main <eski-base-tip>` ya da `merge --squash`). Aksi hâlde PR diff'i alt PR'ı tekrar gösterir.
+
+Force-push onayı düşürdüğü için rebase sonrası **yeniden onay** gerekir; birleştirmeden önce zorunlu kontrol (`SonarCloud Code Analysis`) beklenir.
 
 ## Kalite
 
