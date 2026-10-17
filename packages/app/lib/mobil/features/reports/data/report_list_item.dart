@@ -10,12 +10,14 @@ enum ReportStatus { yeni, ustlenildi, cozuldu }
 /// görünüm modelidir; DTO gelince `ReportsSource` onu buna çevirir.
 class ReportListItem {
   const ReportListItem({
+    required this.id,
     required this.category,
     required this.status,
     required this.place,
     required this.createdAt,
   });
 
+  final String id;
   final ReportCategory category;
   final ReportStatus status;
   final String place;

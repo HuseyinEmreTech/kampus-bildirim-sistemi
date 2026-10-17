@@ -4,23 +4,40 @@ import '../../../data/report_list_item.dart';
 
 /// Listede tek bir bildirimi gösteren kart.
 class ReportCard extends StatelessWidget {
-  const ReportCard({super.key, required this.report});
+  const ReportCard({super.key, required this.report, this.action});
 
   final ReportListItem report;
 
+  /// Kartın altında gösterilen isteğe bağlı düğme (ör. görevlinin "Üstlen"i).
+  final Widget? action;
+
   @override
   Widget build(BuildContext context) {
+    final action = this.action;
     return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: _categoryColor(report.category),
-          child: const Icon(Icons.report_problem, color: Colors.white),
-        ),
-        title: Text(_categoryLabel(report.category)),
-        subtitle: Text('${report.place}\n${_formatDate(report.createdAt)}'),
-        isThreeLine: true,
-        trailing: Chip(label: Text(_statusLabel(report.status))),
+      child: Column(
+        children: [
+          _buildTile(),
+          if (action != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8, bottom: 8),
+              child: Align(alignment: Alignment.centerRight, child: action),
+            ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildTile() {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: _categoryColor(report.category),
+        child: const Icon(Icons.report_problem, color: Colors.white),
+      ),
+      title: Text(_categoryLabel(report.category)),
+      subtitle: Text('${report.place}\n${_formatDate(report.createdAt)}'),
+      isThreeLine: true,
+      trailing: Chip(label: Text(_statusLabel(report.status))),
     );
   }
 }
