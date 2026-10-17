@@ -1,3 +1,4 @@
+import 'package:campus_app/mobil/features/reports/data/report_assigner.dart';
 import 'package:campus_app/mobil/features/reports/data/report_list_item.dart';
 import 'package:campus_app/mobil/features/reports/data/reports_source.dart';
 import 'package:campus_app/mobil/features/reports/data/staff_reports_source.dart';
@@ -19,17 +20,54 @@ class FakeStaffReportsSource implements StaffReportsSource {
   }
 }
 
-ReportListItem report(String place) => ReportListItem(
+/// Verilen sonucu döndüren ve üstlenilen bildirimleri kaydeden sahte kaynak.
+class FakeReportAssigner implements ReportAssigner {
+  FakeReportAssigner([this.result = const ReportAssigned()]);
+
+  final ReportAssignResult result;
+  final assignedIds = <String>[];
+
+  @override
+  Future<ReportAssignResult> assign(String reportId) async {
+    assignedIds.add(reportId);
+    return result;
+  }
+}
+
+ReportListItem report(String place, {String id = 'r1'}) => ReportListItem(
+  id: id,
   category: ReportCategory.ariza,
   status: ReportStatus.yeni,
   place: place,
   createdAt: DateTime(2026, 10, 17),
 );
 
-Future<void> pumpScreen(WidgetTester tester, StaffReportsSource source) async {
+Future<void> pumpScreen(
+  WidgetTester tester,
+  StaffReportsSource source, {
+  ReportAssigner? assigner,
+}) async {
   await tester.pumpWidget(
-    MaterialApp(home: StaffReportsScreen(source: source)),
+    MaterialApp(
+      home: StaffReportsScreen(
+        source: source,
+        assigner: assigner ?? FakeReportAssigner(),
+      ),
+    ),
   );
+  await tester.pumpAndSettle();
+}
+
+/// Gelen sekmesi önce A Blok'u, üstlendikten sonra boş listeyi döndürür.
+FakeStaffReportsSource incomingThenEmpty() => FakeStaffReportsSource({
+  StaffReportsView.incoming: [
+    ReportsPageLoaded([report('A Blok', id: 'r7')]),
+    const ReportsPageLoaded([]),
+  ],
+});
+
+Future<void> tapAssign(WidgetTester tester) async {
+  await tester.tap(find.text('Üstlen'));
   await tester.pumpAndSettle();
 }
 
@@ -64,6 +102,7 @@ void main() {
     expect(source.requested.last, StaffReportsView.mine);
     expect(find.textContaining('Kütüphane'), findsOneWidget);
     expect(find.textContaining('A Blok'), findsNothing);
+    expect(find.text('Üstlen'), findsNothing);
   });
 
   testWidgets('showsEmptyState_whenNoReports', (tester) async {
@@ -90,6 +129,40 @@ void main() {
     await tester.tap(find.text('Tekrar dene'));
     await tester.pumpAndSettle();
 
+    expect(find.textContaining('A Blok'), findsOneWidget);
+  });
+
+  testWidgets('assign_reloadsList_whenAssigned', (tester) async {
+    final assigner = FakeReportAssigner();
+    await pumpScreen(tester, incomingThenEmpty(), assigner: assigner);
+
+    await tapAssign(tester);
+
+    expect(assigner.assignedIds, ['r7']);
+    expect(find.text('Bildirim üstlenildi'), findsOneWidget);
+    expect(find.text('Bekleyen bildirim yok'), findsOneWidget);
+  });
+
+  testWidgets('assign_showsTakenMessage_whenAlreadyTaken', (tester) async {
+    final assigner = FakeReportAssigner(const ReportAlreadyTaken());
+    await pumpScreen(tester, incomingThenEmpty(), assigner: assigner);
+
+    await tapAssign(tester);
+
+    expect(
+      find.text('Bu bildirimi başka bir görevli üstlendi'),
+      findsOneWidget,
+    );
+    expect(find.text('Bekleyen bildirim yok'), findsOneWidget);
+  });
+
+  testWidgets('assign_showsError_whenFails', (tester) async {
+    final assigner = FakeReportAssigner(const ReportAssignFailed());
+    await pumpScreen(tester, incomingThenEmpty(), assigner: assigner);
+
+    await tapAssign(tester);
+
+    expect(find.text('Üstlenilemedi, tekrar deneyin'), findsOneWidget);
     expect(find.textContaining('A Blok'), findsOneWidget);
   });
 }

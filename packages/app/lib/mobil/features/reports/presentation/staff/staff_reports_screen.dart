@@ -2,16 +2,23 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../data/report_assigner.dart';
 import '../../data/report_list_item.dart';
 import '../../data/reports_source.dart';
 import '../../data/staff_reports_source.dart';
 import '../widgets/report_list_body.dart';
 
-/// Görevlinin bildirim listesi: "Gelen" ve "Benimkiler" sekmeleri (USR 04).
+/// Görevlinin bildirim listesi: "Gelen" ve "Benimkiler" sekmeleri (USR 04);
+/// "Gelen"deki bildirimler buradan üstlenilir (USR 05).
 class StaffReportsScreen extends StatefulWidget {
-  const StaffReportsScreen({super.key, required this.source});
+  const StaffReportsScreen({
+    super.key,
+    required this.source,
+    required this.assigner,
+  });
 
   final StaffReportsSource source;
+  final ReportAssigner assigner;
 
   @override
   State<StaffReportsScreen> createState() => _StaffReportsScreenState();
@@ -22,6 +29,9 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
   StaffReportsView _view = StaffReportsView.incoming;
   bool _isLoading = true;
   bool _loadFailed = false;
+
+  /// Üstlenme isteği süren bildirim; o kartın düğmesi kilitlenir.
+  String? _assigningId;
 
   @override
   void initState() {
@@ -47,6 +57,31 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
           _loadFailed = true;
       }
     });
+  }
+
+  /// Bildirimi üstlenir, sonucu söyler ve listeyi yeniler.
+  Future<void> _assign(ReportListItem report) async {
+    setState(() => _assigningId = report.id);
+    final result = await widget.assigner.assign(report.id);
+    if (!mounted) return;
+
+    setState(() => _assigningId = null);
+    final message = switch (result) {
+      ReportAssigned() => 'Bildirim üstlenildi',
+      ReportAlreadyTaken() => 'Bu bildirimi başka bir görevli üstlendi',
+      ReportAssignFailed() => 'Üstlenilemedi, tekrar deneyin',
+    };
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+    if (result is ReportAssignFailed) return;
+    await _load();
+  }
+
+  Widget _buildAssignButton(ReportListItem report) {
+    return FilledButton.tonal(
+      onPressed: _assigningId == null ? () => _assign(report) : null,
+      child: const Text('Üstlen'),
+    );
   }
 
   void _showLoadingAndReload({StaffReportsView? view}) {
@@ -94,6 +129,9 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
               },
               onRefresh: _load,
               onRetry: _showLoadingAndReload,
+              actionBuilder: _view == StaffReportsView.incoming
+                  ? _buildAssignButton
+                  : null,
             ),
           ),
         ],

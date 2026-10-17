@@ -21,6 +21,7 @@ class FakeReportsSource implements ReportsSource {
 }
 
 ReportListItem report({String place = 'A Blok'}) => ReportListItem(
+  id: 'r1',
   category: ReportCategory.ariza,
   status: ReportStatus.yeni,
   place: place,
