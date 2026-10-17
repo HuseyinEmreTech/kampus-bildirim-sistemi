@@ -8,7 +8,7 @@ import 'package:campus_infrastructure/campus_infrastructure.dart';
 import 'package:test/test.dart';
 
 // Seed ve diğer test dosyalarıyla çakışmayan sabit kimlikler.
-const _student = 'a0000000-0000-4000-8000-0000000000d1';
+const _student = 'a0000000-0000-4000-8000-0000000000d3';
 const _staff = 'a0000000-0000-4000-8000-0000000000d2';
 const _building = 'b0000000-0000-4000-8000-0000000000d1';
 const _missing = 'c0000000-0000-4000-8000-0000000000dd';
