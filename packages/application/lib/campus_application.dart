@@ -1,7 +1,6 @@
 library;
 
 export 'src/core/app_error.dart';
-export 'src/core/error_mapper.dart';
 export 'src/dto/assign_report_command.dart';
 export 'src/dto/create_report_command.dart';
 export 'src/dto/list_reports_query.dart';
