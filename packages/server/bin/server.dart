@@ -6,7 +6,9 @@ import 'package:campus_server/src/service/password_hasher.dart';
 import 'package:campus_server/src/service/token_service.dart';
 import 'package:campus_server/src/config/jwt_config.dart';
 import 'package:campus_server/src/endpoint/auth_endpoints.dart';
+import 'package:campus_server/src/endpoint/user_endpoints.dart';
 import 'package:campus_server/src/logging/logger.dart';
+import 'package:campus_server/src/middleware/auth_middleware.dart';
 import 'package:campus_server/src/middleware/rate_limit_middleware.dart';
 import 'package:campus_server/src/middleware/request_log_middleware.dart';
 import 'package:campus_server/src/middleware/security_headers_middleware.dart';
@@ -68,6 +70,10 @@ void main() async {
       hasher: PasswordHasher(),
     ),
   );
+  final users = UserEndpoints(UserRepositoryImpl(db));
+  final protected = const Pipeline()
+      .addMiddleware(authMiddleware(tokens))
+      .addHandler(users.router.call);
 
   final health = Router()
     ..get('/health', (Request request) => Response.ok('OK'));
@@ -78,7 +84,9 @@ void main() async {
       .addMiddleware(corsHeaders())
       .addMiddleware(rateLimit(RateLimitRule.general))
       .addMiddleware(rateLimit(RateLimitRule.login, appliesTo: _isLogin))
-      .addHandler(Cascade().add(health.call).add(auth.router.call).handler);
+      .addHandler(
+        Cascade().add(health.call).add(auth.router.call).add(protected).handler,
+      );
 
   final server = await io.serve(handler, InternetAddress.anyIPv4, 8080);
   serverLog('Server listening on port ${server.port}');
