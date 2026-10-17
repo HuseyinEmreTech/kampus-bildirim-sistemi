@@ -300,7 +300,7 @@ Mobil ekranlar `lib/mobil/`, web ekranlar `lib/web/` altında geliştiriliyor. P
 
 | Değişken | Varsayılan | Açıklama |
 | --- | --- | --- |
-| `DATABASE_URL` | (yok) | PostgreSQL bağlantı adresi |
+| `DATABASE_URL` | (yok) | PostgreSQL bağlantı adresi; havuz boyutu ve zaman aşımları adresin sonundaki ayarlarla verilir (`.env.example`) |
 | `PORT` | `8080` | Sunucu portu |
 | `CAMPUS_BOUNDS` | (yok) | Kampüs sınırı (dikdörtgen koordinatları) |
 | `PHOTO_DIR` | (yok) | Fotoğrafların saklanacağı klasör |
