@@ -39,7 +39,11 @@ VALUES ($1, $2, $3, 'Ariza', 'Çözülmüş test bildirimi', '/files/test.jpg',
 
 const _historyOf = r'''
 SELECT from_status, to_status, changed_by::text FROM status_history
-WHERE report_id = $1
+WHERE report_id = $1 ORDER BY changed_at
+''';
+
+const _notificationsOf = r'''
+SELECT user_id::text, type FROM notifications WHERE report_id = $1
 ''';
 
 const _resetToNew = r'''
@@ -48,6 +52,10 @@ WHERE report_id = $1
 ''';
 
 Future<void> _deleteFixtures(Database db) async {
+  await db.execute(r'DELETE FROM notifications WHERE report_id IN ($1, $2)', [
+    _newReport,
+    _resolvedReport,
+  ]);
   await db.execute(r'DELETE FROM status_history WHERE report_id IN ($1, $2)', [
     _newReport,
     _resolvedReport,
@@ -178,6 +186,151 @@ void main() {
       final outcome = await repository.assign('abc', _staffA);
 
       expect(outcome, AssignOutcome.notFound);
+    });
+  }, skip: url == null ? 'DATABASE_URL tanımlı değil' : false);
+
+  group('ReportRepositoryImpl.resolve', () {
+    late Database db;
+    late ReportRepositoryImpl repository;
+    const photo = (
+      url: '/files/sonuc.jpg',
+      contentType: 'image/jpeg',
+      sizeBytes: 2000,
+    );
+
+    setUpAll(() {
+      db = Database.fromUrl(url!);
+      repository = ReportRepositoryImpl(db);
+    });
+    tearDownAll(() => db.close());
+
+    setUp(() async {
+      await _deleteFixtures(db);
+      await _insertFixtures(db);
+      await repository.assign(_newReport, _staffA);
+    });
+    tearDown(() => _deleteFixtures(db));
+
+    test('resolve_whenAssignee_resolvesWithPhoto', () async {
+      final outcome = await repository.resolve(
+        _newReport,
+        _staffA,
+        photo,
+        note: 'Lamba değişti',
+      );
+
+      expect(outcome, ResolveOutcome.resolved);
+      final row = await db.execute(
+        r'''
+SELECT status, resolved_at IS NOT NULL, resolution_photo_url,
+  resolution_photo_content_type, resolution_photo_size_bytes, resolution_note
+FROM reports WHERE report_id = $1
+''',
+        [_newReport],
+      );
+      expect(row.single, [
+        'Cozuldu',
+        true,
+        '/files/sonuc.jpg',
+        'image/jpeg',
+        2000,
+        'Lamba değişti',
+      ]);
+    });
+
+    test('resolve_whenAssignee_writesHistoryAndNotifiesStudent', () async {
+      await repository.resolve(_newReport, _staffA, photo);
+
+      final history = await db.execute(_historyOf, [_newReport]);
+      expect(history.map((r) => r.toList()), [
+        ['Yeni', 'Ustlenildi', _staffA],
+        ['Ustlenildi', 'Cozuldu', _staffA],
+      ]);
+      final notifications = await db.execute(_notificationsOf, [_newReport]);
+      expect(notifications.single, [_student, 'ReportResolved']);
+    });
+
+    test('resolve_whenNotAssignee_returnsNotAssignee', () async {
+      final outcome = await repository.resolve(_newReport, _staffB, photo);
+
+      expect(outcome, ResolveOutcome.notAssignee);
+      final row = await db.execute(
+        r'SELECT status FROM reports WHERE report_id = $1',
+        [_newReport],
+      );
+      expect(row.single.single, 'Ustlenildi');
+      expect(await db.execute(_notificationsOf, [_newReport]), isEmpty);
+    });
+
+    test('resolve_whenYeni_returnsInvalidTransition', () async {
+      await db.execute(r'DELETE FROM status_history WHERE report_id = $1', [
+        _newReport,
+      ]);
+      await db.execute(_resetToNew, [_newReport]);
+
+      final outcome = await repository.resolve(_newReport, _staffA, photo);
+
+      expect(outcome, ResolveOutcome.invalidTransition);
+    });
+
+    test('resolve_whenAlreadyResolved_returnsInvalidTransition', () async {
+      final outcome = await repository.resolve(_resolvedReport, _staffA, photo);
+
+      expect(outcome, ResolveOutcome.invalidTransition);
+      expect(await db.execute(_notificationsOf, [_resolvedReport]), isEmpty);
+    });
+
+    test('resolve_whenReportMissing_returnsNotFound', () async {
+      final outcome = await repository.resolve(_missingReport, _staffA, photo);
+
+      expect(outcome, ResolveOutcome.notFound);
+    });
+
+    test('resolve_whenIdNotUuid_returnsNotFound', () async {
+      final outcome = await repository.resolve('abc', _staffA, photo);
+
+      expect(outcome, ResolveOutcome.notFound);
+    });
+
+    test('resolve_whenNotificationFails_rollsBackEverything', () async {
+      // Aynı bildirim için ikinci "çözüldü" kaydı UNIQUE kuralına takılır.
+      await db.execute(
+        r'''
+INSERT INTO notifications (user_id, report_id, type, message)
+VALUES ($1, $2, 'ReportResolved', 'önceden var')
+''',
+        [_student, _newReport],
+      );
+
+      await expectLater(
+        repository.resolve(_newReport, _staffA, photo),
+        throwsA(isA<Exception>()),
+      );
+
+      final row = await db.execute(
+        r'SELECT status FROM reports WHERE report_id = $1',
+        [_newReport],
+      );
+      expect(row.single.single, 'Ustlenildi');
+      expect(await db.execute(_historyOf, [_newReport]), hasLength(1));
+    });
+
+    test('resolve_twiceAtOnce_notifiesStudentOnce', () async {
+      expect(url, contains('max_connection_count'), reason: 'havuz en az 2');
+
+      final outcomes = await Future.wait([
+        repository.resolve(_newReport, _staffA, photo),
+        repository.resolve(_newReport, _staffA, photo),
+      ]);
+
+      expect(
+        outcomes,
+        unorderedEquals([
+          ResolveOutcome.resolved,
+          ResolveOutcome.invalidTransition,
+        ]),
+      );
+      expect(await db.execute(_notificationsOf, [_newReport]), hasLength(1));
     });
   }, skip: url == null ? 'DATABASE_URL tanımlı değil' : false);
 }

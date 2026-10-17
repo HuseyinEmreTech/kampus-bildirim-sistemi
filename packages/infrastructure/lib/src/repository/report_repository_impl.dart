@@ -6,6 +6,12 @@ import '../database/uuid_format.dart';
 /// `assign` sonucu. Application'daki `AppError` (#15) gelince ona çevrilecek.
 enum AssignOutcome { assigned, alreadyAssigned, invalidTransition, notFound }
 
+/// `resolve` sonucu. Application'daki `AppError` (#15) gelince ona çevrilecek.
+enum ResolveOutcome { resolved, notAssignee, invalidTransition, notFound }
+
+/// Sonuç fotoğrafı (Rule 04). Domain'deki `Photo` (#15) gelince onunla değişecek.
+typedef ResolutionPhoto = ({String url, String contentType, int sizeBytes});
+
 /// Bildirimlerin PostgreSQL tarafı. `ReportRepository` arayüzü (#15) gelince onu uygular.
 class ReportRepositoryImpl {
   ReportRepositoryImpl(this._db);
@@ -20,12 +26,32 @@ SET assignee_id = $2, taken_at = NOW(), status = 'Ustlenildi'
 WHERE report_id = $1 AND assignee_id IS NULL AND status = 'Yeni'
 ''';
 
-  static const _insertHistorySql = r'''
-INSERT INTO status_history (report_id, from_status, to_status, changed_by)
-VALUES ($1, $2, $3, $4)
+  // Rule 03: yalnızca üstlenen görevli, yalnızca `Ustlenildi` iken çözebilir.
+  static const _resolveSql = r'''
+UPDATE reports
+SET status = 'Cozuldu', resolved_at = NOW(), resolution_photo_url = $3,
+  resolution_photo_content_type = $4, resolution_photo_size_bytes = $5,
+  resolution_note = $6
+WHERE report_id = $1 AND assignee_id = $2 AND status = 'Ustlenildi'
+RETURNING reporter_id::text
 ''';
 
+  static const _insertHistorySql = r'''
+INSERT INTO status_history (report_id, from_status, to_status, changed_by, note)
+VALUES ($1, $2, $3, $4, $5)
+''';
+
+  static const _insertResolvedNotificationSql = r'''
+INSERT INTO notifications (user_id, report_id, type, message)
+VALUES ($1, $2, 'ReportResolved', $3)
+''';
+
+  static const _resolvedMessage = 'Bildiriminiz çözüldü.';
+
   static const _statusSql = r'SELECT status FROM reports WHERE report_id = $1';
+
+  static const _statusAndAssigneeSql =
+      r'SELECT status, assignee_id::text FROM reports WHERE report_id = $1';
 
   /// [assigneeId] görevlisini bildirime atar; yalnızca `Yeni` ve görevlisiz bildirimde olur.
   /// Durum değişimi ve durum geçmişi aynı işlemde yazılır: biri olmazsa ikisi de olmaz.
@@ -54,14 +80,71 @@ VALUES ($1, $2, $3, $4)
     return AssignOutcome.alreadyAssigned;
   }
 
+  /// Bildirimi [photo] ile çözüldü işaretler; yalnızca üstlenen [assigneeId] yapabilir.
+  ///
+  /// Rule 04: durum, durum geçmişi ve öğrenciye "çözüldü" bildirimi aynı işlemde yazılır.
+  Future<ResolveOutcome> resolve(
+    String reportId,
+    String assigneeId,
+    ResolutionPhoto photo, {
+    String? note,
+  }) async {
+    if (!isUuid(reportId)) return ResolveOutcome.notFound;
+    final resolved = await _db.transaction((tx) async {
+      final rows = await tx.execute(
+        _resolveSql,
+        parameters: [
+          reportId,
+          assigneeId,
+          photo.url,
+          photo.contentType,
+          photo.sizeBytes,
+          note,
+        ],
+      );
+      if (rows.isEmpty) return false;
+
+      final reporterId = rows.single.single! as String;
+      await _insertHistory(
+        tx,
+        reportId,
+        'Ustlenildi',
+        'Cozuldu',
+        assigneeId,
+        note: note,
+      );
+      await tx.execute(
+        _insertResolvedNotificationSql,
+        parameters: [reporterId, reportId, _resolvedMessage],
+      );
+      return true;
+    });
+    if (resolved) return ResolveOutcome.resolved;
+    return _whyNotResolved(reportId, assigneeId);
+  }
+
+  Future<ResolveOutcome> _whyNotResolved(
+    String reportId,
+    String assigneeId,
+  ) async {
+    final rows = await _db.execute(_statusAndAssigneeSql, [reportId]);
+    if (rows.isEmpty) return ResolveOutcome.notFound;
+    final [status, currentAssignee] = rows.single;
+    if (status == 'Ustlenildi' && currentAssignee != assigneeId) {
+      return ResolveOutcome.notAssignee;
+    }
+    return ResolveOutcome.invalidTransition;
+  }
+
   Future<void> _insertHistory(
     TxSession tx,
     String reportId,
     String from,
     String to,
-    String changedBy,
-  ) => tx.execute(
+    String changedBy, {
+    String? note,
+  }) => tx.execute(
     _insertHistorySql,
-    parameters: [reportId, from, to, changedBy],
+    parameters: [reportId, from, to, changedBy, note],
   );
 }
