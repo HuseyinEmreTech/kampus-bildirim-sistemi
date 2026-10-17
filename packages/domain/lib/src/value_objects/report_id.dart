@@ -11,14 +11,10 @@ final class ReportId {
   /// Yeni bir UUID v4 kimliği üretir. Üretilen değer her zaman geçerlidir.
   static ReportId generate() => ReportId._(generateUuidV4());
 
-  static Result<ReportId, DomainError> create(String value) {
-    return switch (validateUuid(
-      value,
-      emptyMessage: 'reportId boş olamaz',
-      invalidMessage: 'reportId geçerli bir UUID olmalı',
-    )) {
-      Success(value: final id) => Success(ReportId._(id)),
-      Failure(error: final error) => Failure(error),
-    };
-  }
+  static Result<ReportId, DomainError> create(String value) => createUuidValue(
+    value,
+    ReportId._,
+    emptyMessage: 'reportId boş olamaz',
+    invalidMessage: 'reportId geçerli bir UUID olmalı',
+  );
 }

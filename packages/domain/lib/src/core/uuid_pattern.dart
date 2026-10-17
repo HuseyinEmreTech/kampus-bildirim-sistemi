@@ -25,3 +25,20 @@ Result<String, DomainError> validateUuid(
   }
   return Success(trimmed);
 }
+
+/// UUID değer nesneleri için ortak oluşturma yardımcısı.
+Result<T, DomainError> createUuidValue<T>(
+  String value,
+  T Function(String) factory, {
+  required String emptyMessage,
+  required String invalidMessage,
+}) {
+  return switch (validateUuid(
+    value,
+    emptyMessage: emptyMessage,
+    invalidMessage: invalidMessage,
+  )) {
+    Success(value: final id) => Success(factory(id)),
+    Failure(error: final error) => Failure(error),
+  };
+}

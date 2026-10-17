@@ -1,6 +1,7 @@
 import 'package:campus_domain/campus_domain.dart';
 
 import '../core/app_error.dart';
+import '../core/command_parser.dart';
 import '../core/error_mapper.dart';
 import '../dto/resolve_report_command.dart';
 import '../repository/report_repository.dart';
@@ -11,33 +12,21 @@ final class ReportResolveUseCase {
   final ReportRepository _repository;
 
   Future<Result<Unit, AppError>> execute(ResolveReportCommand command) async {
-    final roleResult = parseRole(command.role);
-    final reportIdResult = ReportId.create(command.reportId);
-    final assigneeIdResult = UserId.create(command.assigneeId);
-
-    final Role role;
-    switch (roleResult) {
+    final baseResult = CommandParser.parseBase(
+      role: command.role,
+      reportId: command.reportId,
+      assigneeId: command.assigneeId,
+    );
+    final BaseCommand base;
+    switch (baseResult) {
       case Success(value: final value):
-        role = value;
+        base = value;
       case Failure(error: final error):
-        return Failure(mapDomainError(error));
+        return Failure(error);
     }
-
-    final ReportId reportId;
-    switch (reportIdResult) {
-      case Success(value: final value):
-        reportId = value;
-      case Failure(error: final error):
-        return Failure(mapDomainError(error));
-    }
-
-    final UserId assigneeId;
-    switch (assigneeIdResult) {
-      case Success(value: final value):
-        assigneeId = value;
-      case Failure(error: final error):
-        return Failure(mapDomainError(error));
-    }
+    final role = base.role;
+    final reportId = base.reportId;
+    final assigneeId = base.assigneeId;
 
     if (role != Role.staff) {
       return const Failure(ForbiddenError());
