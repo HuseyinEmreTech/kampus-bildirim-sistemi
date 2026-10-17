@@ -154,4 +154,6 @@ Her yanıtta güvenlik başlıkları bulunur: `X-Content-Type-Options: nosniff`,
 
 Her yanıtta `X-Request-Id` başlığı da vardır; sunucu günlüğünde aynı istek bu kimlikle bulunur. Sunucu her isteği tek satır JSON olarak günlüğe yazar (`time`, `level`, `requestId`, `method`, `path`, `status`, `durationMs`); sorgu, başlık ve gövde günlüğe yazılmaz.
 
+Giriş gerektiren adreslerde veriyi değiştiren istekler (`POST`, `PUT`, `PATCH`, `DELETE`) ayrıca denetim kaydına yazılır: `{"audit":true,"userId","method","path","status"}`. Okuma (`GET`) istekleri denetim kaydına girmez.
+
 Yanıt gövdeleri örnektir; gerçek alanlar geliştirme sırasında bu dokümanla birlikte güncellenir.
