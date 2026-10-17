@@ -50,6 +50,16 @@ typedef ReportDetail = ({
   String? resolutionNote,
 });
 
+/// Durum geçmişinin bir satırı. İlk satırda [fromStatus] boştur (bildirim açıldı).
+typedef StatusChange = ({
+  String? fromStatus,
+  String toStatus,
+  String changedById,
+  String changedByName,
+  DateTime changedAt,
+  String? note,
+});
+
 /// Bildirimlerin PostgreSQL tarafı. `ReportRepository` arayüzü (#15) gelince onu uygular.
 class ReportRepositoryImpl {
   ReportRepositoryImpl(this._db);
@@ -96,6 +106,16 @@ JOIN users reporter ON reporter.user_id = r.reporter_id
 LEFT JOIN users assignee ON assignee.user_id = r.assignee_id
 LEFT JOIN buildings b ON b.building_id = r.building_id
 WHERE r.report_id = $1
+''';
+
+  // Eskiden yeniye; her işlem kendi NOW() değerini yazdığı için sıra doğru çıkar.
+  static const _historySql = r'''
+SELECT h.from_status, h.to_status, h.changed_by::text, u.full_name,
+  h.changed_at, h.note
+FROM status_history h
+JOIN users u ON u.user_id = h.changed_by
+WHERE h.report_id = $1
+ORDER BY h.changed_at
 ''';
 
   static const _insertHistorySql = r'''
@@ -148,6 +168,25 @@ VALUES ($1, $2, 'ReportResolved', $3)
     final rows = await _db.execute(_detailSql, [reportId]);
     if (rows.isEmpty) return null;
     return _toDetail(rows.single);
+  }
+
+  /// Bildirimin durum geçmişi, eskiden yeniye. [reportId] UUID değilse ya da
+  /// bildirim yoksa boş liste. Service önce [findById] ile yetkiyi denetler.
+  Future<List<StatusChange>> findHistory(String reportId) async {
+    if (!isUuid(reportId)) return const [];
+    final rows = await _db.execute(_historySql, [reportId]);
+    return [
+      for (final [from, to, changedById, changedByName, changedAt, note]
+          in rows)
+        (
+          fromStatus: from as String?,
+          toStatus: to! as String,
+          changedById: changedById! as String,
+          changedByName: changedByName! as String,
+          changedAt: changedAt! as DateTime,
+          note: note as String?,
+        ),
+    ];
   }
 
   ReportDetail _toDetail(List<Object?> row) {
