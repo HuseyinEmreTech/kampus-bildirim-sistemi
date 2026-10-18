@@ -12,12 +12,14 @@ import '../features/notifications/presentation/notifications_screen.dart';
 import '../features/reports/data/report_assigner.dart';
 import '../features/reports/data/report_creator.dart';
 import '../features/reports/data/report_detail_source.dart';
+import '../features/reports/data/report_resolver.dart';
 import '../features/reports/data/reports_source.dart';
 import '../features/reports/data/staff_reports_source.dart';
 import '../features/reports/presentation/staff/staff_reports_screen.dart';
 import '../features/reports/presentation/student/report_detail_screen.dart';
 import '../features/reports/presentation/student/reports_list_screen.dart';
 import '../shared/app_theme.dart';
+import '../shared/photo/photo_picker.dart';
 
 /// Ekranların kullandığı kaynaklar; şimdilik demo, sunucu hazır olunca gerçeği.
 class MobilSources {
@@ -29,6 +31,8 @@ class MobilSources {
     required this.assigner,
     required this.notifications,
     required this.reportDetail,
+    required this.resolver,
+    required this.photoPicker,
   });
 
   MobilSources.demo(DemoBackend demo)
@@ -40,6 +44,8 @@ class MobilSources {
         assigner: demo.assigner,
         notifications: demo.notifications,
         reportDetail: demo.reportDetail,
+        resolver: demo.resolver,
+        photoPicker: demo.photoPicker,
       );
 
   final AuthSource auth;
@@ -49,6 +55,8 @@ class MobilSources {
   final ReportAssigner assigner;
   final NotificationsSource notifications;
   final ReportDetailSource reportDetail;
+  final ReportResolver resolver;
+  final PhotoPicker photoPicker;
 }
 
 /// Mobil uygulamanın kökü: tema; giriş yapılmadıysa giriş ekranı, yapıldıysa
@@ -120,6 +128,8 @@ class MobilApp extends StatelessWidget {
             StaffReportsScreen(
               source: sources.staffReports,
               assigner: sources.assigner,
+              resolver: sources.resolver,
+              photoPicker: sources.photoPicker,
               onReportTap: (report) => openDetail(report.id),
             ),
           ),

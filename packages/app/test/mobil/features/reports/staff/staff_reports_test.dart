@@ -1,8 +1,11 @@
 import 'package:campus_app/mobil/features/reports/data/report_assigner.dart';
 import 'package:campus_app/mobil/features/reports/data/report_list_item.dart';
+import 'package:campus_app/mobil/features/reports/data/report_resolver.dart';
 import 'package:campus_app/mobil/features/reports/data/reports_source.dart';
 import 'package:campus_app/mobil/features/reports/data/staff_reports_source.dart';
+import 'package:campus_app/mobil/features/reports/presentation/staff/resolve_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/staff/staff_reports_screen.dart';
+import 'package:campus_app/mobil/shared/photo/photo_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -45,10 +48,30 @@ class FakeReportAssigner implements ReportAssigner {
   }
 }
 
-ReportListItem report(String place, {String id = 'r1'}) => ReportListItem(
+/// Bu testlerde çözme ekranı yalnızca açılıyor; gönderim kendi testinde.
+class UnusedResolver implements ReportResolver {
+  @override
+  Future<ReportResolveResult> resolve({
+    required String reportId,
+    required PickedPhoto photo,
+    String? note,
+  }) async => const ReportResolveFailed();
+}
+
+class UnusedPicker implements PhotoPicker {
+  @override
+  Future<PhotoPickResult> pick(PhotoSource source) async =>
+      const PhotoPickCancelled();
+}
+
+ReportListItem report(
+  String place, {
+  String id = 'r1',
+  ReportStatus status = ReportStatus.yeni,
+}) => ReportListItem(
   id: id,
   category: ReportCategory.ariza,
-  status: ReportStatus.yeni,
+  status: status,
   place: place,
   createdAt: DateTime(2026, 10, 17),
 );
@@ -64,6 +87,8 @@ Future<void> pumpScreen(
       home: StaffReportsScreen(
         source: source,
         assigner: assigner ?? FakeReportAssigner(),
+        resolver: UnusedResolver(),
+        photoPicker: UnusedPicker(),
         onReportTap: onReportTap,
       ),
     ),
@@ -254,5 +279,29 @@ void main() {
 
     expect(source.requestedPages, [1, 2]);
     expect(find.textContaining('Son yer'), findsOneWidget);
+  });
+
+  testWidgets('resolveButton_opensResolveScreen_forAssignedInMine', (
+    tester,
+  ) async {
+    final source = FakeStaffReportsSource({
+      StaffReportsView.incoming: [const ReportsPageLoaded([])],
+      StaffReportsView.mine: [
+        ReportsPageLoaded([
+          report('A Blok', id: 'r7', status: ReportStatus.ustlenildi),
+          report('Kütüphane', id: 'r8', status: ReportStatus.cozuldu),
+        ]),
+      ],
+    });
+    await pumpScreen(tester, source);
+    await tester.tap(find.text('Benimkiler'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Çöz'), findsOneWidget);
+
+    await tester.tap(find.text('Çöz'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ResolveScreen), findsOneWidget);
   });
 }

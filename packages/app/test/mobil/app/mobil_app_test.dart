@@ -4,6 +4,7 @@ import 'package:campus_app/mobil/demo/memory_session_store.dart';
 import 'package:campus_app/mobil/features/auth/presentation/login_screen.dart';
 import 'package:campus_app/mobil/features/auth/state/auth_controller.dart';
 import 'package:campus_app/mobil/features/notifications/presentation/notifications_screen.dart';
+import 'package:campus_app/mobil/features/reports/presentation/staff/resolve_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/staff/staff_reports_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/report_detail_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/reports_list_screen.dart';
@@ -87,5 +88,37 @@ void main() {
     await tester.scrollUntilVisible(find.text('Sonuç'), 200);
 
     expect(find.text('Sonuç'), findsOneWidget);
+  });
+
+  testWidgets('staffAssignsAndResolves_thenStudentIsNotified', (tester) async {
+    await pumpApp(tester);
+    await login(tester, 'gorevli@ornek.edu');
+
+    // Ayşe'nin B Blok bildirimini kartındaki düğmeyle üstlen.
+    final bBlokCard = find.ancestor(
+      of: find.textContaining('B Blok 2. kat'),
+      matching: find.byType(Card),
+    );
+    await tester.tap(
+      find.descendant(of: bBlokCard, matching: find.text('Üstlen')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Benimkiler'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Çöz'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Fotoğraf çek'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Çözüldü olarak işaretle'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ResolveScreen), findsNothing);
+
+    await tester.tap(find.text('Çıkış'));
+    await tester.pumpAndSettle();
+    await login(tester, 'ayse@ornek.edu');
+    await tester.tap(find.text('Bildirimler'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Bildiriminiz çözüldü'), findsNWidgets(2));
   });
 }

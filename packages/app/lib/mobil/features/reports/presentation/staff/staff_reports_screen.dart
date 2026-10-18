@@ -3,12 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../data/report_assigner.dart';
+import '../../../../shared/photo/photo_picker.dart';
 import '../../data/report_list_item.dart';
+import '../../data/report_resolver.dart';
 import '../../data/reports_source.dart';
 import '../../data/staff_reports_source.dart';
 import '../../state/report_pager.dart';
 import '../report_labels.dart';
 import '../widgets/report_list_body.dart';
+import 'resolve_screen.dart';
 
 /// Görevlinin bildirim listesi: "Gelen" ve "Benimkiler" sekmeleri ve kategori
 /// filtresi (USR 04); "Gelen"deki bildirimler buradan üstlenilir (USR 05).
@@ -17,11 +20,17 @@ class StaffReportsScreen extends StatefulWidget {
     super.key,
     required this.source,
     required this.assigner,
+    required this.resolver,
+    required this.photoPicker,
     this.onReportTap,
   });
 
   final StaffReportsSource source;
   final ReportAssigner assigner;
+
+  /// "Çöz" ekranı için (USR 06).
+  final ReportResolver resolver;
+  final PhotoPicker photoPicker;
 
   /// Karta dokununca (ör. detayı açmak için).
   final ValueChanged<ReportListItem>? onReportTap;
@@ -85,6 +94,30 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
         .showSnackBar(SnackBar(content: Text(message)));
     if (result is ReportAssignFailed) return;
     await _pager.reload();
+  }
+
+  /// Çözme ekranını açar; çözüldüyse listeyi yeniler.
+  Future<void> _openResolve(ReportListItem report) async {
+    final resolved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => ResolveScreen(
+          reportId: report.id,
+          resolver: widget.resolver,
+          photoPicker: widget.photoPicker,
+        ),
+      ),
+    );
+    if (resolved != true) return;
+    await _pager.reload();
+  }
+
+  /// Yalnızca üstlenilmiş (henüz çözülmemiş) bildirimde "Çöz".
+  Widget? _buildResolveButton(ReportListItem report) {
+    if (report.status != ReportStatus.ustlenildi) return null;
+    return FilledButton.tonal(
+      onPressed: () => _openResolve(report),
+      child: const Text('Çöz'),
+    );
   }
 
   Widget _buildAssignButton(ReportListItem report) {
@@ -153,9 +186,10 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
                 },
                 onRefresh: _pager.reload,
                 onRetry: () => unawaited(_pager.reset()),
-                actionBuilder: _view == StaffReportsView.incoming
-                    ? _buildAssignButton
-                    : null,
+                actionBuilder: switch (_view) {
+                  StaffReportsView.incoming => _buildAssignButton,
+                  StaffReportsView.mine => _buildResolveButton,
+                },
                 onTap: widget.onReportTap,
                 controller: _scroll,
                 isLoadingMore: _pager.isLoadingMore,

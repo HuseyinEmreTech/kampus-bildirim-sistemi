@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../features/auth/data/auth_source.dart';
 import '../features/auth/data/session.dart';
 import '../features/notifications/data/notification_item.dart';
@@ -8,8 +10,10 @@ import '../features/reports/data/report_creator.dart';
 import '../features/reports/data/report_detail.dart';
 import '../features/reports/data/report_detail_source.dart';
 import '../features/reports/data/report_list_item.dart';
+import '../features/reports/data/report_resolver.dart';
 import '../features/reports/data/reports_source.dart';
 import '../features/reports/data/staff_reports_source.dart';
+import '../shared/photo/photo_picker.dart';
 
 /// Sunucu hazır olana kadar uygulamayı telefonda çalıştırmak için bellekte
 /// duran sahte veri. Bütün ekranlar aynı veriyi paylaşır; uygulama kapanınca
@@ -33,6 +37,8 @@ class DemoBackend {
   ReportCreator get creator => _student;
   StaffReportsSource get staffReports => _staff;
   ReportAssigner get assigner => _staff;
+  ReportResolver get resolver => _staff;
+  final PhotoPicker photoPicker = _DemoPhotoPicker();
   late final NotificationsSource notifications = _DemoNotifications(this);
   late final ReportDetailSource reportDetail = _DemoReportDetail(this);
 
@@ -201,9 +207,11 @@ class _DemoStudentReports implements ReportsSource, ReportCreator {
   }
 }
 
-/// Görevli listesi ve üstlenme; sunucudaki Rule 02 gibi üstlenilmiş
-/// bildirim ikinci kez üstlenilemez.
-class _DemoStaffReports implements StaffReportsSource, ReportAssigner {
+/// Görevli listesi, üstlenme ve çözme; sunucudaki gibi üstlenilmiş bildirim
+/// ikinci kez üstlenilemez (Rule 02), yalnızca üstlenen çözer (Rule 03) ve
+/// çözülünce bildirimi açan öğrenciye "çözüldü" bildirimi düşer (Rule 04).
+class _DemoStaffReports
+    implements StaffReportsSource, ReportAssigner, ReportResolver {
   _DemoStaffReports(this._demo);
 
   final DemoBackend _demo;
@@ -238,6 +246,37 @@ class _DemoStaffReports implements StaffReportsSource, ReportAssigner {
         StatusChange(to: ReportStatus.ustlenildi, changedAt: DateTime.now()),
       );
     return const ReportAssigned();
+  }
+
+  @override
+  Future<ReportResolveResult> resolve({
+    required String reportId,
+    required PickedPhoto photo,
+    String? note,
+  }) async {
+    final report = _demo._find(reportId);
+    if (report == null) return const ReportResolveFailed();
+    if (report.assigneeId != DemoBackend.staffId ||
+        report.status != ReportStatus.ustlenildi) {
+      return const ReportResolveRejected('Bu bildirimi siz üstlenmediniz.');
+    }
+    report
+      ..status = ReportStatus.cozuldu
+      ..resolution = Resolution(photoUrl: DemoBackend._photoUrl, note: note)
+      ..history.add(
+        StatusChange(to: ReportStatus.cozuldu, changedAt: DateTime.now()),
+      );
+    _demo._notifications.insert(
+      0,
+      NotificationItem(
+        id: 'n${_demo._nextId++}',
+        reportId: report.id,
+        message: 'Bildiriminiz çözüldü: ${report.place}',
+        createdAt: DateTime.now(),
+        isRead: false,
+      ),
+    );
+    return const ReportResolved();
   }
 }
 
@@ -274,4 +313,15 @@ class _DemoReportDetail implements ReportDetailSource {
     if (report == null) return const ReportDetailNotFound();
     return ReportDetailLoaded(report.toDetail());
   }
+}
+
+/// Kamera yerine her seferinde 1x1 piksellik sahte bir PNG verir.
+class _DemoPhotoPicker implements PhotoPicker {
+  static final _png = base64Decode(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+  );
+
+  @override
+  Future<PhotoPickResult> pick(PhotoSource source) async =>
+      PhotoPicked(PickedPhoto(bytes: _png, contentType: 'image/png'));
 }

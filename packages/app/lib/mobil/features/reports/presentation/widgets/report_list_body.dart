@@ -33,8 +33,8 @@ class ReportListBody extends StatelessWidget {
   final Future<void> Function() onRefresh;
   final VoidCallback onRetry;
 
-  /// Verilirse her kartın altına bu düğme konur.
-  final Widget Function(ReportListItem report)? actionBuilder;
+  /// Verilirse kartın altına döndürdüğü düğme konur (`null`: düğme yok).
+  final Widget? Function(ReportListItem report)? actionBuilder;
 
   /// Verilirse karta dokununca çağrılır.
   final ValueChanged<ReportListItem>? onTap;
