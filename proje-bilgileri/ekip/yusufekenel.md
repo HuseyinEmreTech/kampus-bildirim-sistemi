@@ -113,4 +113,4 @@ son-guncelleme: 2026-10-15
 - **Fatma**: Web UI ortak widget'lar, responsive breakpoint'ler
 
 ## Raporlar
-- [2026-10-15](raporlar/yusufekenel/2026-10-15.md): Kurulum ve öğrenci bildirim listesi ekranı (#21)
+- [2026-10-15](raporlar/yusufekenel/2026-10-15.md): Kurulum, öğrenci bildirim listesi ve oluşturma ekranları (#21)
