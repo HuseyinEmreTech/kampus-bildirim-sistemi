@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../error_text.dart';
 import 'location_source.dart';
 
 /// Form içinde konum alanı (USR 01): "Konumumu al" ile GPS; izin yoksa ya da
@@ -104,11 +105,7 @@ class _LocationFieldViewState extends State<_LocationFieldView> {
         if (_gpsProblem case final problem? when choice is! GpsChoice)
           Text(problem),
         if (_showBuildings && choice is! GpsChoice) _buildBuildingPicker(),
-        if (error != null)
-          Text(
-            error,
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
-          ),
+        if (error != null) ErrorText(error),
       ],
     );
   }
@@ -116,7 +113,9 @@ class _LocationFieldViewState extends State<_LocationFieldView> {
   Widget _buildBuildingPicker() {
     return switch (_buildings) {
       null => const LinearProgressIndicator(),
-      BuildingsFailed() => Row(
+      // Büyük yazıda düğme alt satıra iner.
+      BuildingsFailed() => Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           const Text('Bina listesi yüklenemedi'),
           TextButton(

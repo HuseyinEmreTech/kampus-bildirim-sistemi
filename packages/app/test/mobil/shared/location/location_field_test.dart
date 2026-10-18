@@ -120,4 +120,21 @@ void main() {
 
     expect(find.byType(DropdownButton<Building>), findsOneWidget);
   });
+
+  testWidgets('buildingsFailed_doesNotOverflow_withLargeText', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 3;
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.view.reset);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pumpField(
+      tester,
+      gps: const GpsUnavailable(),
+      buildingResults: [const BuildingsFailed()],
+    );
+
+    await tapAndSettle(tester, find.text('Konumumu al'));
+
+    expect(find.text('Tekrar dene'), findsOneWidget);
+  });
 }

@@ -91,6 +91,16 @@ void main() {
     expect(formKey.currentState!.validate(), isTrue);
   });
 
+  testWidgets('preview_hasScreenReaderLabel', (tester) async {
+    final semantics = tester.ensureSemantics();
+    await pumpField(tester, FakePhotoPicker(PhotoPicked(photo())));
+
+    await tapAndSettle(tester, 'Fotoğraf çek');
+
+    expect(find.bySemanticsLabel('Seçilen fotoğraf'), findsOneWidget);
+    semantics.dispose();
+  });
+
   testWidgets('showsError_whenPhotoTooLarge', (tester) async {
     final big = photo(bytes: Uint8List(maxPhotoBytes + 1));
     await pumpField(tester, FakePhotoPicker(PhotoPicked(big)));

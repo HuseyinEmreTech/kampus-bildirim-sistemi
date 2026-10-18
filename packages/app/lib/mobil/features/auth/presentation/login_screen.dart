@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/error_text.dart';
 import '../data/auth_source.dart';
 import '../data/session.dart';
 
@@ -88,11 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
               validator: _validatePassword,
             ),
             const SizedBox(height: 16),
-            if (_errorMessage case final message?)
-              Text(
-                message,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
+            if (_errorMessage case final message?) ErrorText(message),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: _isLoading ? null : _login,

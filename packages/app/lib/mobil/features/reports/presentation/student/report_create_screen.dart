@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../shared/error_text.dart';
 import '../../../../shared/location/location_field.dart';
 import '../../../../shared/location/location_source.dart';
 import '../../../../shared/photo/photo_field.dart';
@@ -141,7 +142,7 @@ class _ReportCreateScreenState extends State<ReportCreateScreen> {
                 gps: widget.sources.gps,
                 buildings: widget.sources.buildings,
               ),
-              if (_errorMessage case final message?) _errorText(message),
+              if (_errorMessage case final message?) ErrorText(message),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: _isSubmitting ? null : _submit,
@@ -175,14 +176,11 @@ class _ReportCreateScreenState extends State<ReportCreateScreen> {
               if (field.hasError) field.validate();
             },
           ),
-          if (field.errorText case final error?) _errorText(error),
+          if (field.errorText case final error?) ErrorText(error),
         ],
       ),
     );
   }
-
-  Widget _errorText(String text) =>
-      Text(text, style: TextStyle(color: Theme.of(context).colorScheme.error));
 }
 
 String? _validateDescription(String? value) {

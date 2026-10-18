@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../error_text.dart';
 import 'photo_picker.dart';
 
 /// Önizlemenin yüksekliği.
@@ -65,6 +66,7 @@ class _PhotoFieldViewState extends State<_PhotoFieldView> {
             photo.bytes,
             height: _previewHeight,
             fit: BoxFit.cover,
+            semanticLabel: 'Seçilen fotoğraf',
             errorBuilder: (_, _, _) => const Icon(Icons.broken_image),
           ),
           TextButton(onPressed: _remove, child: const Text('Kaldır')),
@@ -84,11 +86,7 @@ class _PhotoFieldViewState extends State<_PhotoFieldView> {
               ),
             ],
           ),
-        if (error != null)
-          Text(
-            error,
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
-          ),
+        if (error != null) ErrorText(error),
       ],
     );
   }

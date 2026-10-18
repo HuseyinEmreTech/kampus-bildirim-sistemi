@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../shared/error_text.dart';
 import '../../../../shared/photo/photo_field.dart';
 import '../../../../shared/photo/photo_picker.dart';
 import '../../data/report_resolver.dart';
@@ -103,11 +104,7 @@ class _ResolveScreenState extends State<ResolveScreen> {
                 maxLines: 3,
                 maxLength: resolutionNoteMaxLength,
               ),
-              if (_errorMessage case final message?)
-                Text(
-                  message,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
+              if (_errorMessage case final message?) ErrorText(message),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: _isSubmitting ? null : _submit,
