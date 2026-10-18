@@ -1,8 +1,10 @@
 # Bu yollar değişirse Hüseyin Emre'nin onayı zorunludur (main koruması: require_code_owner_reviews).
-/packages/domain/        @HuseyinEmreTech
-/packages/application/   @HuseyinEmreTech
-/packages/contracts/     @HuseyinEmreTech
-/test/                   @HuseyinEmreTech
+# İkinci sahip (yedek) eklendi: lead bu yollarda PR açınca kendi PR'ını onaylayamadığı için
+# Ertuğrul onay verebilsin; aksi hâlde PR BLOCKED kalır.
+/packages/domain/        @HuseyinEmreTech @ertrlpkdmr
+/packages/application/   @HuseyinEmreTech @ertrlpkdmr
+/packages/contracts/     @HuseyinEmreTech @ertrlpkdmr
+/test/                   @HuseyinEmreTech @ertrlpkdmr
 /.github/                @HuseyinEmreTech
 /AGENTS.md               @HuseyinEmreTech
 /CLAUDE.md               @HuseyinEmreTech
