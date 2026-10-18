@@ -223,4 +223,89 @@ void main() {
       expect(result, isA<Failure<Report, DomainError>>());
     });
   });
+
+  group('restore', () {
+    final reportId = (ReportId.create(
+      'd4816d0a-cd8e-4442-98c0-65d3ba11be70',
+    ) as Success<ReportId, DomainError>).value;
+    final reporter =
+        (UserId.create(reporterId) as Success<UserId, DomainError>).value;
+    final photo = (Photo.create(
+      url: '/files/lamba.jpg',
+      contentType: 'image/jpeg',
+      sizeBytes: 812345,
+    ) as Success<Photo, DomainError>).value;
+    final location = (Location.create(
+      latitude: 36.5871,
+      longitude: 36.1742,
+      source: 'Gps',
+    ) as Success<Location, DomainError>).value;
+
+    test('storedAssignedReport_restoresEveryField', () {
+      final report = Report.restore(
+        id: reportId,
+        reporterId: reporter,
+        assigneeId: staffId,
+        category: Category.ariza,
+        description: 'B blok lambası yanmıyor',
+        photo: photo,
+        location: location,
+        status: ReportStatus.ustlenildi,
+        createdAt: now,
+        takenAt: now,
+      );
+
+      expect(report.id.value, reportId.value);
+      expect(report.status, ReportStatus.ustlenildi);
+      expect(report.assigneeId?.value, staffId.value);
+      expect(report.takenAt, now);
+      expect(report.resolvedAt, isNull);
+    });
+
+    test('storedResolvedReport_restoresResolution', () {
+      final report = Report.restore(
+        id: reportId,
+        reporterId: reporter,
+        assigneeId: staffId,
+        category: Category.ariza,
+        description: 'B blok lambası yanmıyor',
+        photo: photo,
+        location: location,
+        status: ReportStatus.cozuldu,
+        createdAt: now,
+        takenAt: now,
+        resolvedAt: now,
+        resolutionPhoto: photo,
+        resolutionNote: 'Lamba değişti',
+      );
+
+      expect(report.status, ReportStatus.cozuldu);
+      expect(report.resolutionPhoto?.url, photo.url);
+      expect(report.resolutionNote, 'Lamba değişti');
+    });
+
+    test('restoredAssignedReport_canResolve', () {
+      final report = Report.restore(
+        id: reportId,
+        reporterId: reporter,
+        assigneeId: staffId,
+        category: Category.ariza,
+        description: 'B blok lambası yanmıyor',
+        photo: photo,
+        location: location,
+        status: ReportStatus.ustlenildi,
+        createdAt: now,
+        takenAt: now,
+      );
+
+      final result = report.resolve(
+        assigneeId: staffId,
+        role: Role.staff,
+        resolutionPhoto: photo,
+        resolvedAt: now,
+      );
+
+      expect(result, isA<Success<Report, DomainError>>());
+    });
+  });
 }
