@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../../shared/photo/photo_picker.dart';
-import '../../data/report_creator.dart';
 import '../../data/reports_source.dart';
 import '../../state/report_pager.dart';
 import '../widgets/report_list_body.dart';
@@ -15,15 +13,13 @@ class ReportsListScreen extends StatefulWidget {
   const ReportsListScreen({
     super.key,
     required this.source,
-    required this.creator,
-    required this.photoPicker,
+    required this.createSources,
   });
 
   final ReportsSource source;
 
   /// "Bildirim oluştur" ekranına verilen kaynak.
-  final ReportCreator creator;
-  final PhotoPicker photoPicker;
+  final ReportCreateSources createSources;
 
   @override
   State<ReportsListScreen> createState() => _ReportsListScreenState();
@@ -56,10 +52,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   Future<void> _openCreateScreen() async {
     final created = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (_) => ReportCreateScreen(
-          creator: widget.creator,
-          photoPicker: widget.photoPicker,
-        ),
+        builder: (_) => ReportCreateScreen(sources: widget.createSources),
       ),
     );
     if (created != true) return;

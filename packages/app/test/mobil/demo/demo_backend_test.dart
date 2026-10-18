@@ -9,6 +9,7 @@ import 'package:campus_app/mobil/features/reports/data/report_assigner.dart';
 import 'package:campus_app/mobil/features/reports/data/report_list_item.dart';
 import 'package:campus_app/mobil/features/reports/data/reports_source.dart';
 import 'package:campus_app/mobil/features/reports/data/staff_reports_source.dart';
+import 'package:campus_app/mobil/shared/location/location_source.dart';
 import 'package:campus_app/mobil/shared/photo/photo_picker.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -48,6 +49,8 @@ void main() {
           bytes: Uint8List.fromList([1, 2, 3]),
           contentType: 'image/png',
         ),
+        location: const GpsChoice(latitude: 36.5871, longitude: 36.1742),
+        place: 'Kantin',
       ),
     );
 
