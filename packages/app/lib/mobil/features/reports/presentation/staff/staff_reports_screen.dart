@@ -78,9 +78,12 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
     unawaited(_pager.loadMore());
   }
 
-  /// Bildirimi üstlenir, sonucu söyler ve listeyi yeniler.
+  /// Bildirimi üstlenir: kart cevap beklenmeden listeden kalkar (iyimser
+  /// arayüz). Başkası aldıysa da kalkık kalır; istek başarısızsa eski yerine
+  /// döner. Sonra sonuç söylenir ve liste yenilenir.
   Future<void> _assign(ReportListItem report) async {
     setState(() => _assigningId = report.id);
+    final removal = _pager.remove(report.id);
     final result = await widget.assigner.assign(report.id);
     if (!mounted) return;
 
@@ -88,7 +91,10 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
     final message = assignResultMessage(result);
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
-    if (result is ReportAssignFailed) return;
+    if (result is ReportAssignFailed) {
+      if (removal != null) _pager.restore(removal);
+      return;
+    }
     await _pager.reload();
   }
 

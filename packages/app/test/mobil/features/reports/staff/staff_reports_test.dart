@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:campus_app/mobil/features/reports/data/report_assigner.dart';
 import 'package:campus_app/mobil/features/reports/data/report_list_item.dart';
 import 'package:campus_app/mobil/features/reports/data/report_resolver.dart';
@@ -46,6 +48,16 @@ class FakeReportAssigner implements ReportAssigner {
     assignedIds.add(reportId);
     return result;
   }
+}
+
+/// Cevabı test istediğinde veren sahte kaynak (iyimser arayüz için).
+class SlowReportAssigner implements ReportAssigner {
+  SlowReportAssigner(this.answer);
+
+  final Future<ReportAssignResult> answer;
+
+  @override
+  Future<ReportAssignResult> assign(String reportId) => answer;
 }
 
 /// Bu testlerde çözme ekranı yalnızca açılıyor; gönderim kendi testinde.
@@ -186,6 +198,23 @@ void main() {
     expect(assigner.assignedIds, ['r7']);
     expect(find.text('Bildirim üstlenildi'), findsOneWidget);
     expect(find.text('Bekleyen bildirim yok'), findsOneWidget);
+  });
+
+  testWidgets('assign_removesCard_beforeServerAnswers', (tester) async {
+    final answer = Completer<ReportAssignResult>();
+    await pumpScreen(
+      tester,
+      incomingThenEmpty(),
+      assigner: SlowReportAssigner(answer.future),
+    );
+
+    await tester.tap(find.text('Üstlen'));
+    await tester.pump();
+
+    expect(find.textContaining('A Blok'), findsNothing);
+    answer.complete(const ReportAssigned());
+    await tester.pumpAndSettle();
+    expect(find.text('Bildirim üstlenildi'), findsOneWidget);
   });
 
   testWidgets('assign_showsTakenMessage_whenAlreadyTaken', (tester) async {

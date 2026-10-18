@@ -3,6 +3,9 @@ import 'package:flutter/foundation.dart';
 import '../data/report_list_item.dart';
 import '../data/reports_source.dart';
 
+/// [ReportPager.remove] ile kaldırılan bildirim ve eski yeri.
+typedef ReportRemoval = ({int index, ReportListItem item});
+
 /// Sayfalı bildirim listesinin durumu; ekranlar `ListenableBuilder` ile dinler.
 ///
 /// Gelen sayfa tam dolu değilse son sayfa sayılır. [reset] çağrılınca önceki
@@ -88,6 +91,24 @@ class ReportPager extends ChangeNotifier {
   Future<void> retryMore() {
     _loadMoreFailed = false;
     return loadMore();
+  }
+
+  /// Bildirimi sunucu cevabını beklemeden listeden kaldırır (iyimser
+  /// arayüz); geri koymak için [restore]'a verilecek kaydı döner. Listede
+  /// yoksa `null`.
+  ReportRemoval? remove(String id) {
+    final index = _items.indexWhere((item) => item.id == id);
+    if (index < 0) return null;
+    final item = _items.removeAt(index);
+    _notify();
+    return (index: index, item: item);
+  }
+
+  /// [remove] ile kaldırılanı eski yerine koyar (istek başarısız olunca).
+  void restore(ReportRemoval removal) {
+    final index = removal.index.clamp(0, _items.length);
+    _items.insert(index, removal.item);
+    _notify();
   }
 
   /// Ekran kapandıktan sonra gelen cevap dinleyicilere iletilmez.

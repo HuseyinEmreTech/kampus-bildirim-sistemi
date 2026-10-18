@@ -91,4 +91,19 @@ void main() {
 
     expect(pager.items.single.place, 'Yeni 0');
   });
+
+  test('remove_hidesItemAtOnce_andRestorePutsItBack', () async {
+    final pager = ReportPager(FakePages([loaded(reports(3))]).fetch);
+    await pager.reload();
+    var notified = 0;
+    pager.addListener(() => notified++);
+
+    final removal = pager.remove('Yer-1');
+
+    expect(pager.items.map((r) => r.id), ['Yer-0', 'Yer-2']);
+    pager.restore(removal!);
+    expect(pager.items.map((r) => r.id), ['Yer-0', 'Yer-1', 'Yer-2']);
+    expect(notified, 2);
+    expect(pager.remove('yok'), isNull);
+  });
 }
