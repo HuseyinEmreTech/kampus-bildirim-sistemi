@@ -1,25 +1,35 @@
 import 'package:flutter/material.dart';
 
+import '../../../../shared/location/location_field.dart';
+import '../../../../shared/location/location_source.dart';
 import '../../../../shared/photo/photo_field.dart';
 import '../../../../shared/photo/photo_picker.dart';
 import '../../data/new_report.dart';
 import '../../data/report_creator.dart';
 import '../../data/report_list_item.dart';
 
-/// Öğrencinin yeni bildirim oluşturduğu ekran: kategori, açıklama, fotoğraf,
-/// gönder (USR 01).
-///
-/// Konum #21'in sonraki parçasında eklenecek. Buradaki kontroller yalnızca
-/// kullanıcıya erken uyarı içindir; asıl doğrulama sunucudadır.
-class ReportCreateScreen extends StatefulWidget {
-  const ReportCreateScreen({
-    super.key,
+/// Oluşturma ekranının kullandığı kaynaklar.
+class ReportCreateSources {
+  const ReportCreateSources({
     required this.creator,
     required this.photoPicker,
+    required this.gps,
+    required this.buildings,
   });
 
   final ReportCreator creator;
   final PhotoPicker photoPicker;
+  final LocationProvider gps;
+  final BuildingsSource buildings;
+}
+
+/// Öğrencinin yeni bildirim oluşturduğu ekran (USR 01): kategori, açıklama,
+/// yer tarifi, fotoğraf ve konum. Buradaki kontroller yalnızca kullanıcıya
+/// erken uyarı içindir; asıl doğrulama sunucudadır.
+class ReportCreateScreen extends StatefulWidget {
+  const ReportCreateScreen({super.key, required this.sources});
+
+  final ReportCreateSources sources;
 
   @override
   State<ReportCreateScreen> createState() => _ReportCreateScreenState();
@@ -28,7 +38,9 @@ class ReportCreateScreen extends StatefulWidget {
 class _ReportCreateScreenState extends State<ReportCreateScreen> {
   final _formKey = GlobalKey<FormState>();
   final _photoKey = GlobalKey<FormFieldState<PickedPhoto>>();
+  final _locationKey = GlobalKey<FormFieldState<LocationChoice>>();
   final _descriptionController = TextEditingController();
+  final _placeController = TextEditingController();
   ReportCategory? _category;
   bool _isSubmitting = false;
   String? _errorMessage;
@@ -36,24 +48,28 @@ class _ReportCreateScreenState extends State<ReportCreateScreen> {
   @override
   void dispose() {
     _descriptionController.dispose();
+    _placeController.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
     final category = _category;
     final photo = _photoKey.currentState?.value;
+    final location = _locationKey.currentState?.value;
     if (!_formKey.currentState!.validate()) return;
-    if (category == null || photo == null) return;
+    if (category == null || photo == null || location == null) return;
 
     setState(() {
       _isSubmitting = true;
       _errorMessage = null;
     });
-    final result = await widget.creator.create(
+    final result = await widget.sources.creator.create(
       NewReport(
         category: category,
         description: _descriptionController.text.trim(),
         photo: photo,
+        location: location,
+        place: _placeController.text.trim(),
       ),
     );
     if (!mounted) return;
@@ -84,34 +100,55 @@ class _ReportCreateScreenState extends State<ReportCreateScreen> {
       appBar: AppBar(title: const Text('Yeni bildirim')),
       body: Form(
         key: _formKey,
-        child: ListView(
+        // Bütün alanlar her zaman oluşturulsun ki ekran dışında kalanların
+        // doğrulaması da çalışsın (ListView görünmeyeni oluşturmaz).
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          children: [
-            _buildCategoryField(),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Açıklama',
-                border: OutlineInputBorder(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildCategoryField(),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Açıklama',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 4,
+                maxLength: reportDescriptionMaxLength,
+                validator: _validateDescription,
               ),
-              maxLines: 4,
-              maxLength: reportDescriptionMaxLength,
-              validator: _validateDescription,
-            ),
-            const SizedBox(height: 8),
-            PhotoField(
-              key: _photoKey,
-              picker: widget.photoPicker,
-              requiredMessage: 'Fotoğraf ekleyin',
-            ),
-            if (_errorMessage case final message?) _errorText(message),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: _isSubmitting ? null : _submit,
-              child: Text(_isSubmitting ? 'Gönderiliyor…' : 'Gönder'),
-            ),
-          ],
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _placeController,
+                decoration: const InputDecoration(
+                  labelText: 'Yer tarifi',
+                  hintText: 'ör. B Blok 2. kat',
+                ),
+                validator: (value) =>
+                    (value ?? '').trim().isEmpty ? 'Yer tarifi yazın' : null,
+              ),
+              const SizedBox(height: 8),
+              PhotoField(
+                key: _photoKey,
+                picker: widget.sources.photoPicker,
+                requiredMessage: 'Fotoğraf ekleyin',
+              ),
+              const SizedBox(height: 8),
+              LocationField(
+                key: _locationKey,
+                gps: widget.sources.gps,
+                buildings: widget.sources.buildings,
+              ),
+              if (_errorMessage case final message?) _errorText(message),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: _isSubmitting ? null : _submit,
+                child: Text(_isSubmitting ? 'Gönderiliyor…' : 'Gönder'),
+              ),
+            ],
+          ),
         ),
       ),
     );

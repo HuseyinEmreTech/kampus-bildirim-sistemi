@@ -80,38 +80,43 @@ class _ResolveScreenState extends State<ResolveScreen> {
       appBar: AppBar(title: const Text('Çözüldü işaretle')),
       body: Form(
         key: _formKey,
-        child: ListView(
+        // Bütün alanlar her zaman oluşturulsun ki ekran dışında kalanların
+        // doğrulaması da çalışsın (ListView görünmeyeni oluşturmaz).
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          children: [
-            const Text('Sonuç fotoğrafı'),
-            const SizedBox(height: 8),
-            PhotoField(
-              key: _photoKey,
-              picker: widget.photoPicker,
-              requiredMessage: 'Sonuç fotoğrafı ekleyin',
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _noteController,
-              decoration: const InputDecoration(
-                labelText: 'Not (isteğe bağlı)',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text('Sonuç fotoğrafı'),
+              const SizedBox(height: 8),
+              PhotoField(
+                key: _photoKey,
+                picker: widget.photoPicker,
+                requiredMessage: 'Sonuç fotoğrafı ekleyin',
               ),
-              maxLines: 3,
-              maxLength: resolutionNoteMaxLength,
-            ),
-            if (_errorMessage case final message?)
-              Text(
-                message,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _noteController,
+                decoration: const InputDecoration(
+                  labelText: 'Not (isteğe bağlı)',
+                ),
+                maxLines: 3,
+                maxLength: resolutionNoteMaxLength,
               ),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: _isSubmitting ? null : _submit,
-              child: Text(
-                _isSubmitting ? 'Gönderiliyor…' : 'Çözüldü olarak işaretle',
+              if (_errorMessage case final message?)
+                Text(
+                  message,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: _isSubmitting ? null : _submit,
+                child: Text(
+                  _isSubmitting ? 'Gönderiliyor…' : 'Çözüldü olarak işaretle',
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

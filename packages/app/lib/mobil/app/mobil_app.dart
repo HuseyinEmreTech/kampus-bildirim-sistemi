@@ -16,9 +16,11 @@ import '../features/reports/data/report_resolver.dart';
 import '../features/reports/data/reports_source.dart';
 import '../features/reports/data/staff_reports_source.dart';
 import '../features/reports/presentation/staff/staff_reports_screen.dart';
+import '../features/reports/presentation/student/report_create_screen.dart';
 import '../features/reports/presentation/student/report_detail_screen.dart';
 import '../features/reports/presentation/student/reports_list_screen.dart';
 import '../shared/app_theme.dart';
+import '../shared/location/location_source.dart';
 import '../shared/photo/photo_picker.dart';
 
 /// Ekranların kullandığı kaynaklar; şimdilik demo, sunucu hazır olunca gerçeği.
@@ -33,6 +35,8 @@ class MobilSources {
     required this.reportDetail,
     required this.resolver,
     required this.photoPicker,
+    required this.gps,
+    required this.buildings,
   });
 
   MobilSources.demo(DemoBackend demo)
@@ -46,6 +50,8 @@ class MobilSources {
         reportDetail: demo.reportDetail,
         resolver: demo.resolver,
         photoPicker: demo.photoPicker,
+        gps: demo.gps,
+        buildings: demo.buildings,
       );
 
   final AuthSource auth;
@@ -57,6 +63,8 @@ class MobilSources {
   final ReportDetailSource reportDetail;
   final ReportResolver resolver;
   final PhotoPicker photoPicker;
+  final LocationProvider gps;
+  final BuildingsSource buildings;
 }
 
 /// Mobil uygulamanın kökü: tema; giriş yapılmadıysa giriş ekranı, yapıldıysa
@@ -105,8 +113,12 @@ class MobilApp extends StatelessWidget {
             Icons.list_alt,
             ReportsListScreen(
               source: sources.myReports,
-              creator: sources.creator,
-              photoPicker: sources.photoPicker,
+              createSources: ReportCreateSources(
+                creator: sources.creator,
+                photoPicker: sources.photoPicker,
+                gps: sources.gps,
+                buildings: sources.buildings,
+              ),
               onReportTap: (report) => openDetail(report.id),
             ),
           ),

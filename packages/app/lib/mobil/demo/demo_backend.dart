@@ -13,6 +13,7 @@ import '../features/reports/data/report_list_item.dart';
 import '../features/reports/data/report_resolver.dart';
 import '../features/reports/data/reports_source.dart';
 import '../features/reports/data/staff_reports_source.dart';
+import '../shared/location/location_source.dart';
 import '../shared/photo/photo_picker.dart';
 
 /// Sunucu hazır olana kadar uygulamayı telefonda çalıştırmak için bellekte
@@ -39,6 +40,8 @@ class DemoBackend {
   ReportAssigner get assigner => _staff;
   ReportResolver get resolver => _staff;
   final PhotoPicker photoPicker = _DemoPhotoPicker();
+  final LocationProvider gps = _DemoGps();
+  final BuildingsSource buildings = _DemoBuildings();
   late final NotificationsSource notifications = _DemoNotifications(this);
   late final ReportDetailSource reportDetail = _DemoReportDetail(this);
 
@@ -175,8 +178,7 @@ class _DemoAuth implements AuthSource {
   }
 }
 
-/// Öğrencinin bildirimleri ve yeni bildirim. Konum 3. parçada geleceği için
-/// yeni bildirimin yeri "Konum seçilmedi" yazılır.
+/// Öğrencinin bildirimleri ve yeni bildirim (yer tarifiyle).
 class _DemoStudentReports implements ReportsSource, ReportCreator {
   _DemoStudentReports(this._demo);
 
@@ -198,7 +200,7 @@ class _DemoStudentReports implements ReportsSource, ReportCreator {
             ._add(
               DemoBackend.studentId,
               report.category,
-              'Konum seçilmedi',
+              report.place,
               DateTime.now(),
             )
             .description =
@@ -324,4 +326,21 @@ class _DemoPhotoPicker implements PhotoPicker {
   @override
   Future<PhotoPickResult> pick(PhotoSource source) async =>
       PhotoPicked(PickedPhoto(bytes: _png, contentType: 'image/png'));
+}
+
+/// GPS yerine her seferinde örnek bir kampüs noktası verir (gerçek sınır değil).
+class _DemoGps implements LocationProvider {
+  @override
+  Future<GpsResult> current() async =>
+      const GpsFix(latitude: 36.5871, longitude: 36.1742);
+}
+
+/// Sahte bina listesi; gerçeği sunucudaki seed verisinden gelecek.
+class _DemoBuildings implements BuildingsSource {
+  @override
+  Future<BuildingsResult> fetch() async => const BuildingsLoaded([
+    Building(id: 'demo-a', name: 'A Blok'),
+    Building(id: 'demo-b', name: 'B Blok'),
+    Building(id: 'demo-k', name: 'Kütüphane'),
+  ]);
 }
