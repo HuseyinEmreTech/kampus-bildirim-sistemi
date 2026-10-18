@@ -23,11 +23,19 @@ class ReportCard extends StatelessWidget {
       child: Column(
         children: [
           _buildTile(),
-          if (action != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 8, bottom: 8),
-              child: Align(alignment: Alignment.centerRight, child: action),
+          // Durum ve düğme altta: büyük yazıda başlığa yer kalsın; sığmazsa
+          // düğme alt satıra iner.
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 8, 8),
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Chip(label: Text(statusLabel(report.status))),
+                ?action,
+              ],
             ),
+          ),
         ],
       ),
     );
@@ -43,7 +51,6 @@ class ReportCard extends StatelessWidget {
       title: Text(categoryLabel(report.category)),
       subtitle: Text('${report.place}\n${formatDate(report.createdAt)}'),
       isThreeLine: true,
-      trailing: Chip(label: Text(statusLabel(report.status))),
     );
   }
 }

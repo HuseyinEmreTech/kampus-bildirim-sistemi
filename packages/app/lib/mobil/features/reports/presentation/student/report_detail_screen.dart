@@ -98,7 +98,7 @@ class _DetailView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _Photo(url: detail.photoUrl),
+        _Photo(url: detail.photoUrl, label: 'Bildirim fotoğrafı'),
         const SizedBox(height: 12),
         Wrap(
           spacing: 8,
@@ -114,7 +114,7 @@ class _DetailView extends StatelessWidget {
         if (resolution != null) ...[
           const SizedBox(height: 16),
           Text('Sonuç', style: textTheme.titleMedium),
-          _Photo(url: resolution.photoUrl),
+          _Photo(url: resolution.photoUrl, label: 'Sonuç fotoğrafı'),
           if (resolution.note case final note?) Text(note),
         ],
         const SizedBox(height: 16),
@@ -134,21 +134,29 @@ class _DetailView extends StatelessWidget {
   }
 }
 
-/// Fotoğraf; yüklenemezse yerinde kırık resim simgesi.
+/// Fotoğraf; yüklenemezse yerinde kırık resim simgesi. Ekran okuyucu iki
+/// durumda da [label]'ı okur.
 class _Photo extends StatelessWidget {
-  const _Photo({required this.url});
+  const _Photo({required this.url, required this.label});
 
   final String url;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
-    return Image.network(
-      url,
-      height: _photoHeight,
-      fit: BoxFit.cover,
-      errorBuilder: (_, _, _) => const SizedBox(
+    return Semantics(
+      container: true,
+      image: true,
+      label: label,
+      child: Image.network(
+        url,
         height: _photoHeight,
-        child: Center(child: Icon(Icons.broken_image)),
+        fit: BoxFit.cover,
+        excludeFromSemantics: true,
+        errorBuilder: (_, _, _) => const SizedBox(
+          height: _photoHeight,
+          child: Center(child: Icon(Icons.broken_image)),
+        ),
       ),
     );
   }

@@ -157,17 +157,22 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
               onSelectionChanged: (selection) => _selectView(selection.first),
             ),
           ),
-          DropdownButton<ReportCategory?>(
-            value: _category,
-            onChanged: _selectCategory,
-            items: [
-              const DropdownMenuItem(child: Text('Tüm kategoriler')),
-              for (final category in ReportCategory.values)
-                DropdownMenuItem(
-                  value: category,
-                  child: Text(categoryLabel(category)),
-                ),
-            ],
+          // Büyük yazıda taşmasın diye ekran genişliğini kullanır.
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: DropdownButton<ReportCategory?>(
+              value: _category,
+              onChanged: _selectCategory,
+              isExpanded: true,
+              items: [
+                const DropdownMenuItem(child: Text('Tüm kategoriler')),
+                for (final category in ReportCategory.values)
+                  DropdownMenuItem(
+                    value: category,
+                    child: Text(categoryLabel(category)),
+                  ),
+              ],
+            ),
           ),
           Expanded(
             child: ListenableBuilder(

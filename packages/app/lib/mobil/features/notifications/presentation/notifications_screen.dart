@@ -79,7 +79,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       appBar: AppBar(
         title: Badge(
           isLabelVisible: _unreadCount > 0,
-          label: Text('$_unreadCount'),
+          // Ekran okuyucu yalnızca "1" demesin.
+          label: Semantics(
+            container: true,
+            child: Text(
+              '$_unreadCount',
+              semanticsLabel: '$_unreadCount okunmamış bildirim',
+            ),
+          ),
           child: const Text('Bildirimler'),
         ),
       ),
@@ -119,6 +126,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       leading: Icon(
         Icons.check_circle,
         color: item.isRead ? Colors.grey : Colors.green,
+        semanticLabel: item.isRead ? 'Okundu' : 'Okunmadı',
       ),
       title: Text(
         item.message,
