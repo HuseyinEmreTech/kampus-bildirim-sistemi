@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../data/auth_source.dart';
 import '../data/session.dart';
 
+/// Form alanları arasındaki boşluk.
+const _fieldGap = 12.0;
+
 /// E-posta biçimi için basit kontrol: `ad@alan.uzanti`.
 final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
@@ -77,6 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
               keyboardType: TextInputType.emailAddress,
               validator: _validateEmail,
             ),
+            const SizedBox(height: _fieldGap),
             TextFormField(
               controller: _passwordController,
               decoration: const InputDecoration(labelText: 'Şifre'),
