@@ -14,11 +14,15 @@ class FakeReportsSource implements ReportsSource {
 
   final List<ReportsPageResult> results;
 
+  /// İstenen sayfa numaraları, sırayla.
+  final requestedPages = <int>[];
+
   @override
   Future<ReportsPageResult> fetchPage({
-    required int offset,
-    required int limit,
+    required int page,
+    required int pageSize,
   }) async {
+    requestedPages.add(page);
     return results.removeAt(0);
   }
 }
@@ -28,6 +32,16 @@ class AcceptingReportCreator implements ReportCreator {
   @override
   Future<ReportCreateResult> create(NewReport report) async =>
       const ReportCreated();
+}
+
+/// [count] tane bildirim; yerleri "Yer [from]", "Yer [from]+1", ...
+List<ReportListItem> reports(int count, {int from = 0}) => [
+  for (var i = from; i < from + count; i++) report(place: 'Yer $i'),
+];
+
+Future<void> scrollToEnd(WidgetTester tester) async {
+  await tester.drag(find.byType(ListView), const Offset(0, -5000));
+  await tester.pumpAndSettle();
 }
 
 ReportListItem report({String place = 'A Blok'}) => ReportListItem(
@@ -147,5 +161,48 @@ void main() {
     await tester.tap(find.byType(ReportCard));
 
     expect(tapped?.id, 'r1');
+  });
+
+  testWidgets('loadsMore_onScroll', (tester) async {
+    final source = FakeReportsSource([
+      ReportsPageLoaded(reports(reportsPageSize)),
+      ReportsPageLoaded(reports(5, from: reportsPageSize)),
+    ]);
+    await pumpScreen(tester, source);
+
+    await scrollToEnd(tester);
+    await tester.scrollUntilVisible(find.textContaining('Yer 24'), 300);
+
+    expect(source.requestedPages, [1, 2]);
+    expect(find.textContaining('Yer 24'), findsOneWidget);
+  });
+
+  testWidgets('stopsLoading_whenLastPageIsShort', (tester) async {
+    final source = FakeReportsSource([ReportsPageLoaded(reports(5))]);
+    await pumpScreen(tester, source);
+
+    await scrollToEnd(tester);
+
+    expect(source.requestedPages, [1]);
+  });
+
+  testWidgets('showsLoadMoreRetry_whenNextPageFails', (tester) async {
+    final source = FakeReportsSource([
+      ReportsPageLoaded(reports(reportsPageSize)),
+      const ReportsPageFailed(),
+      ReportsPageLoaded(reports(1, from: reportsPageSize)),
+    ]);
+    await pumpScreen(tester, source);
+    await scrollToEnd(tester);
+    await scrollToEnd(tester);
+
+    expect(find.text('Daha fazlası yüklenemedi'), findsOneWidget);
+
+    await tester.tap(find.text('Tekrar dene'));
+    await tester.pumpAndSettle();
+    await scrollToEnd(tester);
+
+    expect(source.requestedPages, [1, 2, 2]);
+    expect(find.textContaining('Yer 20'), findsOneWidget);
   });
 }

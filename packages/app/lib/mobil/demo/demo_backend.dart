@@ -178,11 +178,12 @@ class _DemoStudentReports implements ReportsSource, ReportCreator {
 
   @override
   Future<ReportsPageResult> fetchPage({
-    required int offset,
-    required int limit,
+    required int page,
+    required int pageSize,
   }) async {
     final items = _demo._list((r) => r.reporterId == DemoBackend.studentId);
-    return ReportsPageLoaded(items.skip(offset).take(limit).toList());
+    final skipped = items.skip((page - 1) * pageSize);
+    return ReportsPageLoaded(skipped.take(pageSize).toList());
   }
 
   @override

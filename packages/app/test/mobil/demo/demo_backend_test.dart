@@ -45,7 +45,7 @@ void main() {
       ),
     );
 
-    final mine = await demo.myReports.fetchPage(offset: 0, limit: 20);
+    final mine = await demo.myReports.fetchPage(page: 1, pageSize: 20);
     final first = (mine as ReportsPageLoaded).items.first;
     expect(first.category, ReportCategory.temizlik);
     final incoming = await staffList(demo, StaffReportsView.incoming);

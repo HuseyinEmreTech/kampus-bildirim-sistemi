@@ -18,13 +18,14 @@ final class ReportsPageFailed extends ReportsPageResult {
   const ReportsPageFailed();
 }
 
-/// Öğrencinin bildirimlerini sayfa sayfa getiren kaynak.
+/// Öğrencinin bildirimlerini sayfa sayfa getiren kaynak
+/// (`GET /api/me/reports?page=&pageSize=`; [page] 1'den başlar, 05-api-design).
 ///
 /// Gerçek hali sunucu ve `campus_contracts` hazır olunca yazılacak;
 /// testlerde sahte bir kaynak kullanılır.
 abstract interface class ReportsSource {
   Future<ReportsPageResult> fetchPage({
-    required int offset,
-    required int limit,
+    required int page,
+    required int pageSize,
   });
 }
