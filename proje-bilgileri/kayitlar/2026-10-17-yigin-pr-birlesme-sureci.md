@@ -68,6 +68,13 @@ Squash ile yığın PR'ın birleşimi: alt PR squash'lanınca üst PR'ın taşı
 - **Çözüm:** Yedek PR'ı kapat, asıl PR'ı (yazarı başkası olan) kurtar.
 - **Önlem:** Değiştirme/yedek PR'ları **başka bir üye** açsın; ya da asıl PR kurtarılsın.
 
+### 5. Tek sahipli yollarda yedek yok (açık sorun)
+
+- **Durum:** `.github/CODEOWNERS`'ta `/packages/domain/`, `/packages/application/`, `/packages/contracts/` ve `/test/` yollarının **tek sahibi** `@HuseyinEmreTech`. Diğer yolların (infrastructure, server, app, db) yedek sahibi var, bu dördünün yok.
+- **Sonuç:** Lead'in kendi açtığı PR'lar (#72 Application UseCase'ler, #73 kabul testleri) için CODEOWNER onayı alınamıyor; yazar kendi PR'ını onaylayamadığı için PR'lar BLOCKED kalıyor.
+- **Öneri:** Bu dört yola (en az `/packages/application/` ve `/test/`) ikinci bir sahip eklenmeli; `CODEOWNERS` `.github/` altında olduğu ve onu da lead sahiplendiği için **değişikliği lead dışında biri açmalı**, lead onaylamalı.
+- **Belge PR'ı (#71):** Yalnızca `proje-bilgileri/` altına dokunuyor (CODEOWNER yolu yok); genel 1 onay yeter. Yazar lead olduğu için yine de başka bir üye onaylamalı.
+
 ## Kontrol listesi (sonraki yığın PR'lar için)
 
 - [ ] Her PR küçük ve tek konu mu (300 satır kuralı)?

@@ -47,3 +47,4 @@ Bizim yaptığımız hatalar.
 - **Kendi PR'ını onaylayamazsın:** değiştirme/yedek PR'ları başkası açsın; force-push onayı düşürür, birleştirmeden önce yeniden onayla ve zorunlu kontrolü bekle.
 - **Çakışmada iki bağımsız özelliği de koru:** aynı dosyaya dokunan iki ayrı iş birleşirken birini diğerine feda etme.
 - **İnceleme notları:** `required_conversation_resolution` açıkken inline yorum merge'i bloklar; notları inceleme gövdesine yaz.
+- **Tek sahipli yollarda yedek yok:** `/packages/domain/`, `/packages/application/`, `/packages/contracts/`, `/test/` yollarının tek sahibi lead. Lead buralarda PR açarsa hiç kimse CODEOWNER onayı veremez; bu dört yola ikinci sahip eklenmeli.
