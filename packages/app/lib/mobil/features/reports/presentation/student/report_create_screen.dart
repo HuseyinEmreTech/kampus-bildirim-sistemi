@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 
+import '../../../../shared/photo/photo_field.dart';
+import '../../../../shared/photo/photo_picker.dart';
 import '../../data/new_report.dart';
 import '../../data/report_creator.dart';
 import '../../data/report_list_item.dart';
 
-/// Öğrencinin yeni bildirim oluşturduğu ekran: kategori, açıklama, gönder.
+/// Öğrencinin yeni bildirim oluşturduğu ekran: kategori, açıklama, fotoğraf,
+/// gönder (USR 01).
 ///
-/// Fotoğraf ve konum #21'in sonraki parçasında eklenecek. Buradaki kontroller
-/// yalnızca kullanıcıya erken uyarı içindir; asıl doğrulama sunucudadır.
+/// Konum #21'in sonraki parçasında eklenecek. Buradaki kontroller yalnızca
+/// kullanıcıya erken uyarı içindir; asıl doğrulama sunucudadır.
 class ReportCreateScreen extends StatefulWidget {
-  const ReportCreateScreen({super.key, required this.creator});
+  const ReportCreateScreen({
+    super.key,
+    required this.creator,
+    required this.photoPicker,
+  });
 
   final ReportCreator creator;
+  final PhotoPicker photoPicker;
 
   @override
   State<ReportCreateScreen> createState() => _ReportCreateScreenState();
@@ -19,6 +27,7 @@ class ReportCreateScreen extends StatefulWidget {
 
 class _ReportCreateScreenState extends State<ReportCreateScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _photoKey = GlobalKey<FormFieldState<PickedPhoto>>();
   final _descriptionController = TextEditingController();
   ReportCategory? _category;
   bool _isSubmitting = false;
@@ -32,7 +41,9 @@ class _ReportCreateScreenState extends State<ReportCreateScreen> {
 
   Future<void> _submit() async {
     final category = _category;
-    if (!_formKey.currentState!.validate() || category == null) return;
+    final photo = _photoKey.currentState?.value;
+    if (!_formKey.currentState!.validate()) return;
+    if (category == null || photo == null) return;
 
     setState(() {
       _isSubmitting = true;
@@ -42,6 +53,7 @@ class _ReportCreateScreenState extends State<ReportCreateScreen> {
       NewReport(
         category: category,
         description: _descriptionController.text.trim(),
+        photo: photo,
       ),
     );
     if (!mounted) return;
@@ -86,6 +98,12 @@ class _ReportCreateScreenState extends State<ReportCreateScreen> {
               maxLines: 4,
               maxLength: reportDescriptionMaxLength,
               validator: _validateDescription,
+            ),
+            const SizedBox(height: 8),
+            PhotoField(
+              key: _photoKey,
+              picker: widget.photoPicker,
+              requiredMessage: 'Fotoğraf ekleyin',
             ),
             if (_errorMessage case final message?) _errorText(message),
             const SizedBox(height: 16),
