@@ -14,7 +14,11 @@ Future<List<ReportListItem>> staffList(
   DemoBackend demo,
   StaffReportsView view,
 ) async {
-  final result = await demo.staffReports.fetchFirstPage(view);
+  final result = await demo.staffReports.fetchPage(
+    view,
+    page: 1,
+    pageSize: reportsPageSize,
+  );
   return (result as ReportsPageLoaded).items;
 }
 

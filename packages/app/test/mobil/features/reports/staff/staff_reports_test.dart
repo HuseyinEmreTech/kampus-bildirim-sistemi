@@ -15,12 +15,18 @@ class FakeStaffReportsSource implements StaffReportsSource {
   /// İstenen sekme ve kategori (`null`: tüm kategoriler).
   final requested = <(StaffReportsView, ReportCategory?)>[];
 
+  /// İstenen sayfa numaraları, sırayla.
+  final requestedPages = <int>[];
+
   @override
-  Future<ReportsPageResult> fetchFirstPage(
+  Future<ReportsPageResult> fetchPage(
     StaffReportsView view, {
     ReportCategory? category,
+    required int page,
+    required int pageSize,
   }) async {
     requested.add((view, category));
+    requestedPages.add(page);
     return results[view]!.removeAt(0);
   }
 }
@@ -229,5 +235,24 @@ void main() {
     await tester.tap(find.textContaining('A Blok'));
 
     expect(tapped?.id, 'r7');
+  });
+
+  testWidgets('loadsMore_onScroll', (tester) async {
+    final source = FakeStaffReportsSource({
+      StaffReportsView.incoming: [
+        ReportsPageLoaded([
+          for (var i = 0; i < reportsPageSize; i++) report('Yer $i', id: 'r$i'),
+        ]),
+        ReportsPageLoaded([report('Son yer', id: 'son')]),
+      ],
+    });
+    await pumpScreen(tester, source);
+
+    await tester.drag(find.byType(ListView), const Offset(0, -10000));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.textContaining('Son yer'), 300);
+
+    expect(source.requestedPages, [1, 2]);
+    expect(find.textContaining('Son yer'), findsOneWidget);
   });
 }

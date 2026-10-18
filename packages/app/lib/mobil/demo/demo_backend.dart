@@ -209,19 +209,21 @@ class _DemoStaffReports implements StaffReportsSource, ReportAssigner {
   final DemoBackend _demo;
 
   @override
-  Future<ReportsPageResult> fetchFirstPage(
+  Future<ReportsPageResult> fetchPage(
     StaffReportsView view, {
     ReportCategory? category,
+    required int page,
+    required int pageSize,
   }) async {
     bool inView(_DemoReport report) => switch (view) {
       StaffReportsView.incoming => report.status == ReportStatus.yeni,
       StaffReportsView.mine => report.assigneeId == DemoBackend.staffId,
     };
-    return ReportsPageLoaded(
-      _demo._list(
-        (r) => inView(r) && (category == null || r.category == category),
-      ),
+    final items = _demo._list(
+      (r) => inView(r) && (category == null || r.category == category),
     );
+    final skipped = items.skip((page - 1) * pageSize);
+    return ReportsPageLoaded(skipped.take(pageSize).toList());
   }
 
   @override
