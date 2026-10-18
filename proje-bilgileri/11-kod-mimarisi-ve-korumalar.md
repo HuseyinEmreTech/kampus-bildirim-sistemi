@@ -67,7 +67,7 @@ Her satır bir hata türünü kapatır. Hiçbiri "dikkatli olun" demez; hepsi ya
 | --- | --- | --- | --- |
 | K1 | Paket bağımlılıkları | Katman ihlali | `domain` paketinin `pubspec.yaml`'ında bağımlılık yoktur; başka paketi import eden kod derlenmez |
 | K2 | Mimari test (`test/architecture_test.dart`) | Katman ihlali, yanlış `pubspec` eklemesi | Her paketin `lib/` altındaki import'ları ve `pubspec.yaml` bağımlılıkları bölüm 2'deki tabloyla karşılaştırılır; `domain`, `application`, `contracts` içinde `dart:io` aranır. Uymayan CI'ı kırar |
-| K3 | Hataya kapalı domain | İş kuralı bozulması | Yapıcılar özel; nesne yalnızca `Report.create(...)` ile oluşur; alanlar `final`, setter yok; durum yalnızca `assign`, `resolve` metotlarıyla değişir ve geçersiz geçişte hata döner |
+| K3 | Hataya kapalı domain | İş kuralı bozulması | Yapıcılar özel; nesne `Report.create(...)` (yeni kayıt) veya `Report.restore(...)` (depodan geri kurma, kural denetlemez) ile oluşur; alanlar `final`, setter yok; durum yalnızca `assign`, `resolve` metotlarıyla değişir ve geçersiz geçişte hata döner |
 | K4 | `sealed` hata tipleri ve `switch` | Unutulan hata eşlemesi | Uygulama hataları `sealed class AppError` altındadır; sunucudaki eşleme `switch` ifadesidir. Yeni hata eklenip HTTP karşılığı yazılmazsa derleme hatası olur |
 | K5 | Önceden yazılmış kabul testleri | Kuralın yanlış anlaşılması | Her kullanıcı hikayesinin testlerini Hüseyin Emre görevden önce yazar ve `@Tags(['bekliyor'])` ile işaretler. CI bu etiketi atlar. Görevi alan kişi testi yeşile çevirir ve etiketi kaldırır |
 | K6 | CI | Bozuk kodun `main`'e girmesi | Her PR'da: biçim, `dart analyze --fatal-infos`, mimari test, tüm paketlerin testleri. Biri kırmızıysa birleştirme düğmesi kapalı. **"Biçim" adımı kaldırılamaz.** |

@@ -99,6 +99,40 @@ final class Report {
     );
   }
 
+  /// Yalnızca depo kullanır: veritabanındaki kayıtlı (doğrulanmış) veriden
+  /// nesneyi geri kurar. `create` gibi iş kuralı denetlemez; kurallar yazma
+  /// anında ve veritabanı kısıtlarında uygulanır. Kimlik, durum ve zamanlar
+  /// olduğu gibi korunur.
+  static Report restore({
+    required ReportId id,
+    required UserId reporterId,
+    required Category category,
+    required String description,
+    required Photo photo,
+    required Location location,
+    required ReportStatus status,
+    required DateTime createdAt,
+    UserId? assigneeId,
+    DateTime? takenAt,
+    DateTime? resolvedAt,
+    Photo? resolutionPhoto,
+    String? resolutionNote,
+  }) => Report._(
+    id: id,
+    reporterId: reporterId,
+    assigneeId: assigneeId,
+    category: category,
+    description: description,
+    photo: photo,
+    location: location,
+    status: status,
+    createdAt: createdAt,
+    takenAt: takenAt,
+    resolvedAt: resolvedAt,
+    resolutionPhoto: resolutionPhoto,
+    resolutionNote: resolutionNote,
+  );
+
   Result<Report, DomainError> assign({
     required UserId assigneeId,
     required Role role,
