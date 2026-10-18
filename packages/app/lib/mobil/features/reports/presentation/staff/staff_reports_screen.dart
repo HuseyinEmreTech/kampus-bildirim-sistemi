@@ -85,11 +85,7 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
     if (!mounted) return;
 
     setState(() => _assigningId = null);
-    final message = switch (result) {
-      ReportAssigned() => 'Bildirim üstlenildi',
-      ReportAlreadyTaken() => 'Bu bildirimi başka bir görevli üstlendi',
-      ReportAssignFailed() => 'Üstlenilemedi, tekrar deneyin',
-    };
+    final message = assignResultMessage(result);
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
     if (result is ReportAssignFailed) return;

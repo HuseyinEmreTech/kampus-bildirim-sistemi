@@ -121,4 +121,15 @@ void main() {
 
     expect(find.textContaining('Bildiriminiz çözüldü'), findsNWidgets(2));
   });
+
+  testWidgets('staffDetail_offersAssign', (tester) async {
+    await pumpApp(tester);
+    await login(tester, 'gorevli@ornek.edu');
+
+    await tester.tap(find.textContaining('Otopark girişi'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ReportDetailScreen), findsOneWidget);
+    expect(find.text('Üstlen'), findsOneWidget);
+  });
 }

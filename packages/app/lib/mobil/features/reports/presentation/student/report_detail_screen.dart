@@ -17,10 +17,16 @@ class ReportDetailScreen extends StatefulWidget {
     super.key,
     required this.reportId,
     required this.source,
+    this.actionBuilder,
   });
 
   final String reportId;
   final ReportDetailSource source;
+
+  /// Verilirse yüklenen detayın altında gösterilen işlem (ör. görevlinin
+  /// Üstlen / Çöz düğmesi); `reload` detayı yeniden yükler.
+  final Widget Function(ReportDetail detail, Future<void> Function() reload)?
+  actionBuilder;
 
   @override
   State<ReportDetailScreen> createState() => _ReportDetailScreenState();
@@ -61,7 +67,22 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
           ),
         ),
       },
+      bottomNavigationBar: _buildAction(),
     );
+  }
+
+  Widget? _buildAction() {
+    final actionBuilder = widget.actionBuilder;
+    if (actionBuilder == null) return null;
+    if (_result case ReportDetailLoaded(:final detail)) {
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: actionBuilder(detail, _load),
+        ),
+      );
+    }
+    return null;
   }
 }
 

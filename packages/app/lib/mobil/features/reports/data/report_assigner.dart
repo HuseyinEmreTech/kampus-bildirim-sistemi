@@ -25,3 +25,10 @@ final class ReportAssignFailed extends ReportAssignResult {
 abstract interface class ReportAssigner {
   Future<ReportAssignResult> assign(String reportId);
 }
+
+/// Üstlenme sonucunun kullanıcıya gösterilen mesajı (liste ve detay ortak).
+String assignResultMessage(ReportAssignResult result) => switch (result) {
+  ReportAssigned() => 'Bildirim üstlenildi',
+  ReportAlreadyTaken() => 'Bu bildirimi başka bir görevli üstlendi',
+  ReportAssignFailed() => 'Üstlenilemedi, tekrar deneyin',
+};

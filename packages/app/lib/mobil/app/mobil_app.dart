@@ -15,6 +15,7 @@ import '../features/reports/data/report_detail_source.dart';
 import '../features/reports/data/report_resolver.dart';
 import '../features/reports/data/reports_source.dart';
 import '../features/reports/data/staff_reports_source.dart';
+import '../features/reports/presentation/staff/staff_report_actions.dart';
 import '../features/reports/presentation/staff/staff_reports_screen.dart';
 import '../features/reports/presentation/student/report_create_screen.dart';
 import '../features/reports/presentation/student/report_detail_screen.dart';
@@ -90,12 +91,22 @@ class MobilApp extends StatelessWidget {
 
   Widget _buildHome(BuildContext context) {
     void signOut() => unawaited(auth.signOut());
-    void openDetail(String reportId) => unawaited(
+    // Görevli detayda Üstlen / Çöz de görür; öğrenci yalnızca bilgileri.
+    void openDetail(String reportId, {bool asStaff = false}) => unawaited(
       Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => ReportDetailScreen(
             reportId: reportId,
             source: sources.reportDetail,
+            actionBuilder: asStaff
+                ? (detail, reload) => StaffReportActions(
+                    detail: detail,
+                    assigner: sources.assigner,
+                    resolver: sources.resolver,
+                    photoPicker: sources.photoPicker,
+                    onChanged: reload,
+                  )
+                : null,
           ),
         ),
       ),
@@ -143,7 +154,7 @@ class MobilApp extends StatelessWidget {
               assigner: sources.assigner,
               resolver: sources.resolver,
               photoPicker: sources.photoPicker,
-              onReportTap: (report) => openDetail(report.id),
+              onReportTap: (report) => openDetail(report.id, asStaff: true),
             ),
           ),
         ],
