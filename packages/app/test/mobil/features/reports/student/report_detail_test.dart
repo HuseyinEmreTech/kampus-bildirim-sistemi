@@ -95,6 +95,38 @@ void main() {
     expect(find.text('Lamba değiştirildi.'), findsOneWidget);
   });
 
+  testWidgets('tapPhoto_opensZoomableViewer', (tester) async {
+    await pumpScreen(
+      tester,
+      FakeReportDetailSource([ReportDetailLoaded(detail())]),
+    );
+
+    await tester.tap(find.bySemanticsLabel('Bildirim fotoğrafı'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(InteractiveViewer), findsOneWidget);
+    expect(find.byType(Hero), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.byType(InteractiveViewer), findsNothing);
+    expect(find.text('B Blok 2. kat'), findsOneWidget);
+  });
+
+  testWidgets('tapResolutionPhoto_opensViewerWithItsTitle', (tester) async {
+    await pumpScreen(
+      tester,
+      FakeReportDetailSource([ReportDetailLoaded(detail(resolved: true))]),
+    );
+    final photo = find.bySemanticsLabel('Sonuç fotoğrafı');
+    await tester.scrollUntilVisible(photo, 200);
+
+    await tester.tap(photo);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(InteractiveViewer), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Sonuç fotoğrafı'), findsOneWidget);
+  });
+
   testWidgets('showsNotFound_whenMissing', (tester) async {
     await pumpScreen(
       tester,

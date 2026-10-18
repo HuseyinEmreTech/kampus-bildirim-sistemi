@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../shared/date_format.dart';
+import '../../../../shared/photo/photo_viewer_screen.dart';
 import '../../data/report_detail.dart';
 import '../../data/report_detail_source.dart';
 import '../report_labels.dart';
@@ -135,12 +136,22 @@ class _DetailView extends StatelessWidget {
 }
 
 /// Fotoğraf; yüklenemezse yerinde kırık resim simgesi. Ekran okuyucu iki
-/// durumda da [label]'ı okur.
+/// durumda da [label]'ı okur. Dokununca tam ekranda açılır.
 class _Photo extends StatelessWidget {
   const _Photo({required this.url, required this.label});
 
   final String url;
   final String label;
+
+  void _open(BuildContext context) {
+    unawaited(
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => PhotoViewerScreen(url: url, title: label),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,14 +159,21 @@ class _Photo extends StatelessWidget {
       container: true,
       image: true,
       label: label,
-      child: Image.network(
-        url,
-        height: _photoHeight,
-        fit: BoxFit.cover,
-        excludeFromSemantics: true,
-        errorBuilder: (_, _, _) => const SizedBox(
-          height: _photoHeight,
-          child: Center(child: Icon(Icons.broken_image)),
+      onTapHint: 'Büyüt',
+      child: InkWell(
+        onTap: () => _open(context),
+        child: Hero(
+          tag: url,
+          child: Image.network(
+            url,
+            height: _photoHeight,
+            fit: BoxFit.cover,
+            excludeFromSemantics: true,
+            errorBuilder: (_, _, _) => const SizedBox(
+              height: _photoHeight,
+              child: Center(child: Icon(Icons.broken_image)),
+            ),
+          ),
         ),
       ),
     );
