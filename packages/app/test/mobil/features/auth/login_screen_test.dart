@@ -97,4 +97,17 @@ void main() {
     expect(received?.role, UserRole.student);
     expect(received?.fullName, 'Ayşe Yılmaz');
   });
+
+  testWidgets('fields_haveGapBetweenThem', (tester) async {
+    await pumpScreen(tester, FakeAuthSource(const LoginFailed()));
+
+    final emailBottom = tester.getBottomLeft(
+      find.widgetWithText(TextFormField, 'E-posta'),
+    );
+    final passwordTop = tester.getTopLeft(
+      find.widgetWithText(TextFormField, 'Şifre'),
+    );
+
+    expect(passwordTop.dy - emailBottom.dy, greaterThanOrEqualTo(12));
+  });
 }
