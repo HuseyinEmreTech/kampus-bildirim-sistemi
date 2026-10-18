@@ -106,6 +106,7 @@ class MobilApp extends StatelessWidget {
             ReportsListScreen(
               source: sources.myReports,
               creator: sources.creator,
+              photoPicker: sources.photoPicker,
               onReportTap: (report) => openDetail(report.id),
             ),
           ),

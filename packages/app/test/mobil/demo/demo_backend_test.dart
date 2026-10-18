@@ -44,10 +44,12 @@ void main() {
   test('createdReport_appearsInStudentListAndIncoming', () async {
     final demo = DemoBackend();
 
+    final photo = await demo.photoPicker.pick(PhotoSource.camera);
     await demo.creator.create(
-      const NewReport(
+      NewReport(
         category: ReportCategory.temizlik,
         description: 'Kantin masaları kirli',
+        photo: (photo as PhotoPicked).photo,
       ),
     );
 
