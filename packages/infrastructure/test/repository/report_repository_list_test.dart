@@ -206,5 +206,46 @@ void main() {
       expect(withGps.place, 'Kantin önü');
       expect(withGps.buildingName, isNull);
     });
+
+    // API'deki `total`: sayfadan bağımsız, aynı süzgeçle bütün eşleşenler.
+    test('count_matchesFilterRegardlessOfPage', () async {
+      await repository.create(_report('Ariza', reporterId: _otherStudent));
+
+      expect(await repository.count(_mine), 3);
+      expect(
+        await repository.count((
+          status: null,
+          category: 'Temizlik',
+          assigneeId: null,
+          reporterId: _student,
+        )),
+        1,
+      );
+    });
+
+    test('count_withNonUuidId_returnsZero', () async {
+      expect(
+        await repository.count((
+          status: null,
+          category: null,
+          assigneeId: null,
+          reporterId: 'abc',
+        )),
+        0,
+      );
+    });
+
+    // Kimliği domain üretir; depo aynı kimlikle kaydeder.
+    test('create_withGivenId_keepsThatId', () async {
+      const givenId = 'c0000000-0000-4000-8000-0000000000b9';
+
+      final saved = await repository.create(
+        _report('Ariza'),
+        reportId: givenId,
+      );
+
+      expect(saved, givenId);
+      expect(await idsOf(_mine), contains(givenId));
+    });
   }, skip: url == null ? 'DATABASE_URL tanımlı değil' : false);
 }
