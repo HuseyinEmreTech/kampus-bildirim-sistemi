@@ -26,7 +26,9 @@ analysis_options.yaml    @HuseyinEmreTech
 # Flutter App - Yusuf (mobil), Fatma (web); yedek: Hüseyin Emre
 # Sahiplik platform bazlıdır. GitHub son eşleşen satırı kullanır: genel satır
 # taşınmamış dosyaları kapsar, alttaki özel satırlar onu geçersiz kılar.
-/packages/app/lib/            @yusufekenel @muberrayener
+# Genel satırda da yedek Hüseyin Emre: lib/ kökündeki ortak dosyalara (ör. lib/main.dart)
+# dokunan mobil ya da web PR'ı diğer platformun sahibini beklemeden onaylanabilsin.
+/packages/app/lib/            @yusufekenel @muberrayener @HuseyinEmreTech
 /packages/app/lib/mobil/      @yusufekenel @HuseyinEmreTech
 /packages/app/lib/web/        @muberrayener @HuseyinEmreTech
 /packages/app/lib/ortak/      @yusufekenel @muberrayener @HuseyinEmreTech
