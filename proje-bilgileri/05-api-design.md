@@ -1,7 +1,7 @@
 ---
 title: API Tasarımı
 durum: Taslak
-son-guncelleme: 2026-10-17
+son-guncelleme: 2026-10-19
 ---
 
 # API Tasarımı
@@ -54,8 +54,10 @@ Makinenin okuyabileceği tanım: `packages/server/openapi.yaml` (OpenAPI 3). Gö
 | 403 | `FORBIDDEN` | Rol yetkisi yok |
 | 404 | `NOT_FOUND` | Kayıt yok |
 | 409 | `CONFLICT` | Bildirim zaten üstlenilmiş |
+| 409 | `INVALID_TRANSITION` | Bildirimin şu anki durumunda bu işlem yapılamaz |
 | 422 | `OUTSIDE_CAMPUS` | Konum kampüs dışında (öneri) |
 | 429 | `RATE_LIMITED` | İstek sınırı aşıldı: IP başına dakikada 100 istek, girişte dakikada 5 deneme. `Retry-After` başlığı kaç saniye bekleneceğini söyler |
+| 500 | `INTERNAL_ERROR` | Beklenmeyen sunucu hatası; ayrıntı yalnızca sunucu günlüğüne yazılır |
 
 ## Örnekler
 
