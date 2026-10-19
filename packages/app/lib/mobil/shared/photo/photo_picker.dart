@@ -50,6 +50,13 @@ abstract interface class PhotoPicker {
   Future<PhotoPickResult> pick(PhotoSource source);
 }
 
+/// Android bellek azken uygulamayı kamera açıkken kapatabilir; o fotoğrafı
+/// yeniden açılışta geri verebilen seçiciler bunu da uygular.
+abstract interface class LostPhotoRecovery {
+  /// Kaybolan fotoğraf varsa onu (yalnızca bir kez) verir; yoksa `null`.
+  Future<PickedPhoto?> recoverLostPhoto();
+}
+
 /// Fotoğraf kurallara uymuyorsa kullanıcıya gösterilecek neden; uyuyorsa
 /// `null`. Yalnızca erken uyarıdır; asıl kontrol sunucudadır.
 String? photoProblem(PickedPhoto photo) {
