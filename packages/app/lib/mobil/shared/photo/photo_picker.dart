@@ -44,8 +44,8 @@ final class PhotoPickFailed extends PhotoPickResult {
 
 /// Kameradan ya da galeriden fotoğraf alan kaynak.
 ///
-/// Gerçek hali `image_picker` onaylanınca yazılacak; testlerde ve demoda
-/// sahte bir seçici kullanılır.
+/// Gerçek hali `ImagePickerPhotoPicker`; testlerde sahte bir seçici
+/// kullanılır.
 abstract interface class PhotoPicker {
   Future<PhotoPickResult> pick(PhotoSource source);
 }
