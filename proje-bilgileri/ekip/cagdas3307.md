@@ -1,7 +1,7 @@
 ---
 title: Çağdaş Kemal Ağca - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-10-17
+son-guncelleme: 2026-10-19
 ---
 
 # Çağdaş Kemal Ağca (@Cagdas3307) - Kişisel Plan
@@ -26,20 +26,20 @@ son-guncelleme: 2026-10-17
 - [x] JWT: HS256, access 15dk, refresh 7 gün, secret config'den
 - [x] Auth middleware: `Authorization: Bearer` → `request.context['user'] = UserContext`
 - [x] Role guard: `requireRole('Staff')` middleware
-- [x] PR: Auth endpoints + middleware testleri — 4 PR'a bölündü, ilki #67 (review bekliyor)
+- [x] PR: Auth endpoints + middleware testleri — 4 PR'a bölündü: #67 (birleşti), #80, #81, #82 (review bekliyor)
 
 ### Hafta 5 (12 - 18 Eki): Bildirim Endpoint'leri - Öğrenci
-> Durum (17 Eki): #20 bloklu; #15 (contract DTO'ları ve application arayüzleri) bekleniyor.
+> Durum (19 Eki): #15 birleşti, #20'ye başlandı. Hata eşleme, listeleme ve üstlenme dalları hazır; sunucuya bağlamak için #17 bekleniyor.
 
 - [ ] `POST /reports`: Bildirim oluşturma (multipart/form-data: photo, location, category, description, buildingId?)
 - [ ] Request validation: Contract DTO → Domain/Application'e geçiş
-- [ ] `GET /reports`: Listeleme (query: status, category, page, limit) - Student: sadece kendi
+- [x] `GET /reports`: Listeleme (query: status, category, page, limit) - Student: sadece kendi — `feature/hafta05-report-list`, PR sırada
 - [ ] `GET /reports/:id`: Detay (foto URL, konum, durum geçmişi)
-- [ ] Hata eşleme: Domain/Application hataları → HTTP 400/404/409/422
+- [x] Hata eşleme: Domain/Application hataları → HTTP 400/404/409/422 — `feature/hafta05-hata-esleme`, PR sırada
 - [ ] PR: Her endpoint ayrı PR, contract testleri ile
 
 ### Hafta 6 (19 - 25 Eki): Bildirim Endpoint'leri - Görevli
-- [ ] `POST /reports/:id/assign`: Üstlenme (Rule 02: 409 eğer dolu)
+- [x] `POST /reports/:id/assign`: Üstlenme (Rule 02: 409 eğer dolu) — API tasarımına göre `PUT /api/reports/{id}/assignment`, `feature/hafta05-report-assign`, PR sırada
 - [ ] `POST /reports/:id/resolve`: Çözme (multipart: resolutionPhoto, resolutionNote?)
 - [ ] Rule 03: Sadece assignee çözebilir → 403
 - [ ] Rule 04: Resolution photo zorunlu → 422
@@ -59,12 +59,12 @@ son-guncelleme: 2026-10-17
 - [ ] Input sanitization: XSS önleme, SQL injection (parametreli query zaten var)
 - [x] Security headers: `Helmet` equivalent (CSP, HSTS, X-Frame-Options) — `feature/hafta07-rate-limit`, PR sırada
 - [ ] File upload validation: Magic bytes, size limit (stream), EXIF strip (infrastructure'a delegasyon)
-- [ ] Audit log: Her mutating request log (userId, endpoint, timestamp, result)
+- [x] Audit log: Her mutating request log (userId, endpoint, timestamp, result) — `feature/hafta08-audit-log`, PR sırada
 - [ ] PR: Güvenlik middleware + testleri
 
 ### Hafta 9 (9 - 15 Kas): 1. Sunum ve API Dokümantasyonu
 - [ ] **1. Sunum** (varsayım): API demo
-- [ ] OpenAPI/Swagger spec: `package:shelf_openapi` veya manuel YAML
+- [x] OpenAPI/Swagger spec: `package:shelf_openapi` veya manuel YAML — manuel YAML (health, login, refresh, users/me), `feature/hafta09-openapi`, PR sırada
 - [ ] API dokümantasyonu: `/docs` endpoint (Scalar/Swagger UI)
 - [ ] Request/Response örnekleri her endpoint için
 - [ ] PR: API docs + contract testleri
@@ -77,7 +77,7 @@ son-guncelleme: 2026-10-17
 - [ ] PR: Gelişmiş listeleme + benchmark
 
 ### Hafta 11 (23 - 29 Kas): Kalan Endpoint'ler ve Loglama
-- [ ] `GET /users/me`: Profil bilgisi
+- [x] `GET /users/me`: Profil bilgisi — `feature/hafta11-users-me`, PR sırada
 - [ ] `PATCH /users/me`: Profil güncelleme (ad, şifre değiştirme)
 - [ ] Structured logging: `requestId` correlation, latency, DB query log (slow query)
 - [ ] Error tracking: Sentry entegrasyonu (opsiyonel, ücretsiz plan)
