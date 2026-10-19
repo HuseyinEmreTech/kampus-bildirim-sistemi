@@ -254,6 +254,26 @@ void main() {
       expect(maxPhotoPixels, 25 * 1000 * 1000);
     });
 
+    test('save_defaultConcurrentDecodes', () {
+      expect(maxConcurrentPhotoDecodes, 2);
+    });
+
+    // Sınır 1 iken aynı anda gelen yüklemeler sırayla işlenir; hiçbiri kaybolmaz.
+    test('save_manyAtOnceWithLimitOne_allSaved', () async {
+      storage = LocalFileStorage(
+        root,
+        maxSizeBytes: _limit,
+        maxConcurrentDecodes: 1,
+      );
+
+      final results = await Future.wait([
+        for (var i = 0; i < 4; i++) save(_oneChunk(_png()), 'image/png'),
+      ]);
+
+      expect(results, everyElement(isA<PhotoSaved>()));
+      expect(await filesOnDisk(), hasLength(4));
+    });
+
     test('save_reportIdNotUuid_returnsInvalidReportId', () async {
       final result = await storage.save(
         '../../etc',

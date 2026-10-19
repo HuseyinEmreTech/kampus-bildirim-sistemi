@@ -5,12 +5,19 @@ import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
 
+import 'concurrency_limit.dart';
+
 /// Rule 07: fotoğraf en fazla 5 MB.
 const maxPhotoSizeBytes = 5 * 1024 * 1024;
 
 /// Açılacak en büyük fotoğraf: 25 megapiksel. Küçük bir dosya çok büyük en/boy
 /// bildirebilir; açılınca belleği doldurmasın diye önce yalnızca başlığa bakılır.
 const maxPhotoPixels = 25 * 1000 * 1000;
+
+/// Aynı anda çözülecek en fazla fotoğraf. Her biri 25 MP'de yüzlerce MB bellek
+/// isteyebilir; aynı anda gelen çok sayıda yükleme sunucunun belleğini
+/// doldurmasın diye fazlası sırada bekler.
+const maxConcurrentPhotoDecodes = 2;
 
 /// Fotoğrafın neden kabul edilmediği. `AppError` (#15) gelince ona çevrilecek.
 enum PhotoError { invalidFormat, sizeExceeded, invalidReportId }
@@ -44,11 +51,13 @@ class LocalFileStorage {
     this._root, {
     this.maxSizeBytes = maxPhotoSizeBytes,
     this.maxPixels = maxPhotoPixels,
-  });
+    int maxConcurrentDecodes = maxConcurrentPhotoDecodes,
+  }) : _decodes = ConcurrencyLimit(maxConcurrentDecodes);
 
   final Directory _root;
   final int maxSizeBytes;
   final int maxPixels;
+  final ConcurrencyLimit _decodes;
 
   static const _urlPrefix = '/files';
   static const _headerLength = 8;
@@ -160,13 +169,14 @@ class LocalFileStorage {
     String url,
     String contentType,
   ) async {
-    final original = await partFile.readAsBytes();
     final limit = maxPixels;
     // Çözme ve sıkıştırma işlemciyi saniyeler boyunca meşgul eder; sunucu
     // diğer isteklere cevap verebilsin diye ayrı bir isolate'te yapılır.
-    final cleaned = await Isolate.run(
-      () => _reencode(original, contentType, limit),
-    );
+    // Dosya sıra gelince belleğe okunur; bekleyenler yalnızca diskte durur.
+    final cleaned = await _decodes.run(() async {
+      final original = await partFile.readAsBytes();
+      return Isolate.run(() => _reencode(original, contentType, limit));
+    });
     if (cleaned case PhotoRejected()) return cleaned;
     final bytesOut = (cleaned as _Cleaned).bytes;
     // Yeniden kodlanan dosya girdiden büyük çıkabilir; sınır diskteki dosya için de geçerli.
