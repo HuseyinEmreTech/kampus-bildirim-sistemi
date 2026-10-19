@@ -173,7 +173,15 @@ class LocalFileStorage {
     if (bytesOut.length > maxSizeBytes) {
       return const PhotoRejected(PhotoError.sizeExceeded);
     }
-    await File(_pathFor(url)).writeAsBytes(bytesOut, flush: true);
+    // Önce geçici adla yazılır: yazma yarıda kalırsa (disk dolu) asıl adla
+    // yarım bir fotoğraf kalmaz.
+    final cleanFile = File('${_pathFor(url)}.temiz');
+    try {
+      await cleanFile.writeAsBytes(bytesOut, flush: true);
+      await cleanFile.rename(_pathFor(url));
+    } finally {
+      if (await cleanFile.exists()) await cleanFile.delete();
+    }
     return PhotoSaved((
       url: url,
       contentType: contentType,
