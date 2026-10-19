@@ -111,3 +111,4 @@ son-guncelleme: 2026-10-12
 - [2026-10-15](raporlar/ertrlpkdmr/2026-10-15.md): Veritabanı bağlantısı, üstlen (Rule 02) ve depolar (#34, #40, #41, #43, #47, #48, #49)
 - [2026-10-16](raporlar/ertrlpkdmr/2026-10-16.md): Birleşen PR'lar, çözüldü işaretleme (Rule 03, Rule 04)
 - [2026-10-17](raporlar/ertrlpkdmr/2026-10-17.md): Bütün PR'lar birleşti (#52-#66); hafta 6-10 işleri yerelde hazır
+- [2026-10-18](raporlar/ertrlpkdmr/2026-10-18.md): ReportRepository'nin PostgreSQL karşılığı; HTTPS, günlük sınırı ve kurtarma tatbikatı (yerel)
