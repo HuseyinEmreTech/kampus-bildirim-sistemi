@@ -1,7 +1,7 @@
 ---
 title: Ekip ve 15 Haftalık Yol Haritası
 durum: Onaylandı
-son-guncelleme: 2026-10-12
+son-guncelleme: 2026-10-21
 ---
 
 # Ekip ve 15 Haftalık Yol Haritası
@@ -20,6 +20,9 @@ Proje ekiple ve GitHub üzerinden (branch, Pull Request) yürütülür; **herkes
 | Yusuf Ekenel | `yusufekenel` | Flutter Mobil (Android/iOS/Web) | `campus_app` mobil ekranları (öğrenci + görevli), platform kanalları | [Plan](ekip/yusufekenel.md) |
 | Fatma Müberra Yener | `muberrayener` | Flutter Web / Test & QA | `campus_app` web responsive, test stratejisi, SonarQube, otomasyon | [Plan](ekip/muberrayener.md) |
 | Emir Kerem Çakıcı | `KeremC23` | Esnek Destek / Test & Kalite | Kabul testleri yeşile çevirme, entegrasyon/E2E test, hata takibi, dokümantasyon | [Plan](ekip/emirkerem.md) |
+| Murat Yaman | `yamanmurat761` | Web İstemcisi | Ayrı web istemcisi (HTML/CSS/JS), filtre/sayfalama, SQL inceleme | [Dağıtım](ekip/gorev-dagilimi-2026.md) |
+
+Dil ve iş dağılımı: [ADR-04](adr/04-cok-dilli-web-ve-servisler.md) ve [görev dağılımı](ekip/gorev-dagilimi-2026.md). Çekirdek Dart; web HTML/JS, Python ve C# servisleri ayrı yüzeyler.
 
 Görevler, her iş bağımsız ilerleyebilecek ve tek PR'a sığacak büyüklükte kesildi; ilk haftalar herkes için kurulum ve ısınmadır.
 

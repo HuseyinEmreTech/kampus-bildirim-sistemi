@@ -8,7 +8,7 @@ son-guncelleme: 2026-10-17
 
 Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf ve konumla bildirir, görevli üstlenir ve çözer, çözülünce öğrenciye sistemde haber gider.
 
-> **Durum (12 Ekim 2026):** Proje onaylandı, **altı kişilik ekip kuruldu** (Hüseyin Emre, Yusuf Ekenel, Ertuğrul Pekdemir, Çağdaş Kemal Ağca, Fatma Müberra Yener, Emir Kerem Çakıcı). Kod henüz yok; hafta 5 sprinti başladı (12-18 Eki). İlk iş: Application UseCase'ler, Repository implementasyonu, Auth endpoint'ler, Web bildirim listesi.
+> **Durum (21 Ekim 2026):** Proje onaylandı, **yedi kişilik ekip** (Hüseyin Emre, Yusuf Ekenel, Ertuğrul Pekdemir, Çağdaş Kemal Ağca, Fatma Müberra Yener, Emir Kerem Çakıcı, Murat Yaman). Dil/iş dağılımı ve çok dilli yüzeyler: [ADR-04](adr/04-cok-dilli-web-ve-servisler.md).
 
 ## Buradan başla
 
@@ -37,7 +37,8 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 | - | [Uygulama planı: repo iskeleti](planlar/2026-10-02-repo-iskeleti.md) | Hafta 4'ün ilk işi, adım adım | Onay bekliyor |
 | - | [ADR-01: Dart backend ve PostgreSQL](adr/01-dart-backend-postgresql.md) | Geri dönülmesi zor karar | Önerildi |
 | - | [ADR-02: Kod kalitesi aracı](adr/02-kalite-araci-sonarqube-cloud.md) | SonarQube Cloud ve yerel analiz kararı, karşılaştırma matrisi | Önerildi |
-| - | [ADR-03: Katmanlı mimari ve tek dilli ürün](adr/03-katmanli-mimari-ve-tek-dil.md) | Ürün tek dil; esneklik dağıtıma girmeyen araçlarda; çok dilli ürün reddi | Önerildi |
+| - | [ADR-03: Katmanlı mimari ve tek dilli ürün](adr/03-katmanli-mimari-ve-tek-dil.md) | Ürün tek dil; esneklik dağıtıma girmeyen araçlarda; çok dilli ürün reddi | Yerini ADR-04 aldı (kısmen) |
+| - | [ADR-04: Çok dilli yüzeyler](adr/04-cok-dilli-web-ve-servisler.md) | Çekirdek Dart; web HTML/JS, Python ve C# servisleri; neden ve riskler | Önerildi |
 | - | [ADR şablonu](adr/00-adr-template.md) | ADR yazma kuralı | Şablon |
 
 ## İzleme kayıtları

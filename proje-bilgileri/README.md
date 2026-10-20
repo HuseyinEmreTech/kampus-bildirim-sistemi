@@ -1,7 +1,7 @@
 ---
 title: Proje Bilgileri Vault'u
 durum: Güncel
-son-guncelleme: 2026-10-02
+son-guncelleme: 2026-10-21
 ---
 
 # Campus Report: Proje Bilgileri
@@ -20,7 +20,7 @@ Bu klasör **Campus Report** projesinin bütün dokümantasyonudur: ne yaptığ�
 | --- | --- |
 | Projenin amacı, kapsamı ve sınırları | [01 Proje kapsamı](01-project-scope.md) |
 | Ekip, kimin neden sorumlu olduğu, 15 haftalık takvim | [10 Ekip ve yol haritası](10-ekip-ve-yol-haritasi.md) |
-| Her üyenin hafta hafta görevleri ve günlük raporları (ne yaptı, ne yapamadı, ne değişti, neyi neden seçti) | [Hüseyin Emre](ekip/huseyinemretech.md), [Ertuğrul Pekdemir](ekip/ertrlpkdmr.md), [Çağdaş Kemal Ağca](ekip/cagdas3307.md), [Yusuf Ekenel](ekip/yusufekenel.md), [Fatma Müberra Yener](ekip/muberrayener.md), [Emir Kerem Çakıcı](ekip/emirkerem.md) |
+| Her üyenin hafta hafta görevleri ve günlük raporları (ne yaptı, ne yapamadı, ne değişti, neyi neden seçti) | [Hüseyin Emre](ekip/huseyinemretech.md), [Ertuğrul Pekdemir](ekip/ertrlpkdmr.md), [Çağdaş Kemal Ağca](ekip/cagdas3307.md), [Yusuf Ekenel](ekip/yusufekenel.md), [Fatma Müberra Yener](ekip/muberrayener.md), [Emir Kerem Çakıcı](ekip/emirkerem.md), [Murat Yaman](ekip/yamanmurat.md) |
 | Mimari ve hataları önleyen korumalar | [02 Mimari genel bakış](02-architecture-overview.md), [11 Kod mimarisi ve korumalar](11-kod-mimarisi-ve-korumalar.md) |
 | Domain, iş kuralları (Rule 00-07) | [03 Domain tasarımı](03-domain-design.md) |
 | Geri dönülmesi zor kararlar | [ADR-01 Dart ve PostgreSQL](adr/01-dart-backend-postgresql.md), [ADR-02 Kod kalitesi aracı](adr/02-kalite-araci-sonarqube-cloud.md) |
@@ -37,7 +37,7 @@ Kimin ne yaptığı GitHub'da da izlenebilir: her iş bir issue, her issue bir k
 2. **Kendi planın:** `ekip/` altında adının yazdığı dosya. Bu hafta ne yapacağın, dokunmayacağın yerler ve hocanın sana sorabileceği sorular orada.
 3. **Kurallar:** [Kod mimarisi ve korumalar](11-kod-mimarisi-ve-korumalar.md) (kod nereye yazılır) ve [AGENTS.md](../AGENTS.md) (yapay zeka aracına verdiğin kurallar).
 4. **Görevin:** GitHub'da sana atanmış issue. Issue'daki kabul ölçütü ve dosya listesi esastır.
-5. **Çalıştığın her gün:** [şablonla](Templates/gunluk-rapor.md) günlük rapor yaz (`ekip/raporlar/<adın>/YYYY-AA-GG.md`): ne yaptın, ne yapamadın, ne değişti, neyi neden tercih ettin, yapay zeka, takıldığın yer.
+5. **Çalıştığın her gün:** [şablonla](Templates/gunluk-rapor.md) günlük rapor yaz (`ekip/raporlar/<adın>/YYYY-AA-GG.md`): ne yaptın, ne yapamadın, ne değişti, neyi neden tercih ettin, yapay zeka (**harcanan token dahil**), takıldığın yer.
 
 ### Yapay zeka araçları için
 
@@ -53,6 +53,7 @@ Kimin ne yaptığı GitHub'da da izlenebilir: her iş bir issue, her issue bir k
 | **Yusuf Ekenel** | Flutter Mobil | `app` (mobil ekranlar), test senaryoları | Kurulum ve Git; test senaryoları ve sahte veri listesi | [Plan](ekip/yusufekenel.md) |
 | **Fatma Müberra Yener** | Flutter Web / Test & QA | `app` (web), test stratejisi | Kurulum; test altyapısı; web responsive layout | [Plan](ekip/muberrayener.md) |
 | **Emir Kerem Çakıcı** | Esnek Destek / Test | `test`, dokümantasyon | Kurulum; öğrenme; kabul testleri yeşile çevirme | [Plan](ekip/emirkerem.md) |
+| **Murat Yaman** | Web İstemcisi | Ayrı web istemcisi (HTML/CSS/JS) | Kurulum; web listeleme ve filtreleme | [Dağıtım](ekip/gorev-dagilimi-2026.md) |
 
 Hafta 8'den sonra Ertuğrul yeni bildirim ekranını, Çağdaş görevli ekranlarını yazar; Yusuf her hafta bir öğrenci ekranı yapar. Hafta 14 test haftasıdır, hafta 15'te teslim edilir.
 
