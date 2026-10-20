@@ -32,6 +32,15 @@ Yapay zeka çıktısı taslak kabul edilir; okunur, doğrulanır ve gerektiğind
 - Anlaşılmayan kod projeye alınmaz.
 - Yapay zekanın yazdığı test ve ADR taslaktır; satır satır incelenir.
 
+## Token kullanımı
+
+Her günlük raporda o gün yapay zeka araçlarında harcanan **yaklaşık token** yazılır. Amaç maliyeti ve verimi görmek, hocaya somut veri sunmak.
+
+- Araçta oturum/toplam token görünüyorsa o değer yazılır.
+- Görünmüyorsa tahmin edilir ve **"tahmini"** olarak işaretlenir.
+- Birden çok araç kullanıldıysa araç adıyla birlikte yazılır: `Claude Code ~120k`, `Copilot ~15k`.
+- Sır veya kişisel veri içeren prompt'lar yazılmaz; yalnızca miktar.
+
 ## Review süresi
 
 Yapay zekanın ürettiği işin okunup doğrulanması süre alır. Her Pull Request için ölçülür.

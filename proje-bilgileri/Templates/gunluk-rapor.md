@@ -31,6 +31,7 @@ pr: "#"
 ## Yapay zeka
 
 - Araç ve model:
+- Harcanan token (yaklaşık): (araçta görünen oturum/toplam token; yoksa tahmini olduğunu yaz)
 - Ne sordum:
 - Çıktıda neyi değiştirdim veya reddettim, neden:
 - Anlamadığım ve öğrendiğim:

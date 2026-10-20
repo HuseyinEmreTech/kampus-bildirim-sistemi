@@ -1,7 +1,7 @@
 ---
 title: "ADR-03: Katmanlı Mimari ve Tek Dilli Ürün"
-durum: Önerildi
-son-guncelleme: 2026-10-15
+durum: Yerini ADR-04 aldı (kısmen)
+son-guncelleme: 2026-10-21
 ---
 
 # ADR-03: Katmanlı Mimari ve Tek Dilli Ürün
@@ -10,7 +10,7 @@ son-guncelleme: 2026-10-15
 
 ## Durum
 
-**Önerildi.** Ekip ve Kerem'in görüşü bekleniyor (bkz. [Açık sorular](#açık-sorular)). Karar bu ADR ile kayda geçer; geri dönüşü zor olduğu için ADR'a girer.
+**Yerini kısmen [ADR-04](04-cok-dilli-web-ve-servisler.md) aldı (2026-10-21).** Çekirdek ürün Dart'ta kalıyor; ancak web istemcisi, Python servisi ve C# servisi gibi çok dilli yüzeyler ADR-04 ile ekleniyor. Bu ADR tarihsel kayıt olarak durur; silinmez.
 
 ## Bağlam
 
@@ -68,3 +68,4 @@ son-guncelleme: 2026-10-15
 | Tarih | Değişiklik |
 | --- | --- |
 | 2026-10-15 | İlk taslak, durum: Önerildi. Hocanın ders notları (dil serbest; dağıtık = gereksiz karmaşıklık borcu) temel alındı. |
+| 2026-10-21 | Durum "Yerini ADR-04 aldı (kısmen)". Çekirdek Dart; web/Python/C# yüzeyleri ADR-04 ile eklendi. |

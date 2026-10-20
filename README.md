@@ -4,7 +4,7 @@
 
 **Kampüs sorun bildirim sistemi.** Öğrenci kampüste gördüğü sorunu fotoğraf ve konumla bildirir, görevli "ilgileniyorum" diyerek üstlenir ve çözer, çözülünce öğrenciye sistemde haber gider.
 
-*Yapay Zeka Destekli Yazılım Geliştirme dersi dönem projesi. **Altı kişilik ekip**: Hüseyin Emre, Yusuf Ekenel, Ertuğrul Pekdemir, Çağdaş Kemal Ağca, Fatma Müberra Yener, Emir Kerem Çakıcı.*
+*Yapay Zeka Destekli Yazılım Geliştirme dersi dönem projesi. **Yedi kişilik ekip**: Hüseyin Emre, Yusuf Ekenel, Ertuğrul Pekdemir, Çağdaş Kemal Ağca, Fatma Müberra Yener, Emir Kerem Çakıcı, Murat Yaman.*
 
 ## Ekip ve çalışma düzeni
 
@@ -18,6 +18,7 @@ Proje ekiple, GitHub üzerinde branch ve Pull Request ile yürütülür. Ders cu
 | Yusuf Ekenel | `yusufekenel` | Flutter Mobil | `campus_app` mobil ekranları (Android, iOS, Web), platform kanalları |
 | Fatma Müberra Yener | `muberrayener` | Flutter Web / Test & QA | `campus_app` web responsive, test stratejisi, SonarQube, otomasyon |
 | Emir Kerem Çakıcı | `KeremC23` | Esnek Destek / Test & Kalite | Kabul testleri, entegrasyon/E2E test, hata takibi, dokümantasyon |
+| Murat Yaman | `yamanmurat761` | Web İstemcisi | Ayrı web istemcisi (HTML/CSS/JS), filtre/sayfalama, SQL inceleme |
 
 **Kurallar:** `main`'e doğrudan commit yok; her iş kendi branch'inde küçük PR ile gelir, en az bir kişi inceler. Herkes her hafta en az bir anlamlı commit atar. Commit mesajı önekli ve Türkçe (`feat:`, `fix:`, `docs:`, `test:`). Şifre, token ve gerçek öğrenci verisi repo'ya girmez. Haftalık hedefler, kişi bazlı görevler ve takvim: [Ekip ve 15 haftalık yol haritası](proje-bilgileri/10-ekip-ve-yol-haritasi.md).
 
@@ -140,6 +141,10 @@ Bağımlılıklar arayüzle verilir; bağlama `main.dart` içinde yapılır. Zen
 | Dağıtım | VPS üzerinde compose, HTTPS | Planlandı |
 
 Paket sürümleri pub.dev'de kontrol edildikten sonra eklenecek. Değişiklik geçmişi: [teknoloji değişiklikleri](proje-bilgileri/kayitlar/teknoloji-degisiklikleri.md).
+
+### Çok dilli yüzeyler (neden?)
+
+Hoca farklı bir mimari deneyip **nerede zorlandığımızı** görmek istiyor; ekip de kendi güçlü olduğu dilde çalışmak istiyor. Bu yüzden çekirdeği bozmadan kenarları çok dilli yaptık: **Dart/Shelf + PostgreSQL çekirdek kalır**; web istemcisi HTML/CSS/JS, bildirim/rapor için Python, dışa aktarma/istatistik için C# servisi eklenir. Transaction gerektiren işler (Rule 04) çekirdekte kalır. Karar, gerekçe, riskler ve geri dönüş planı: [ADR-04](proje-bilgileri/adr/04-cok-dilli-web-ve-servisler.md).
 
 ## 7. Domain modeli ve kurallar
 
