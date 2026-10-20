@@ -1,5 +1,11 @@
 import 'dart:io';
 
+import 'package:campus_infrastructure/campus_infrastructure.dart';
+import 'package:campus_server/src/service/auth_service.dart';
+import 'package:campus_server/src/service/password_hasher.dart';
+import 'package:campus_server/src/service/token_service.dart';
+import 'package:campus_server/src/config/jwt_config.dart';
+import 'package:campus_server/src/endpoint/auth_endpoints.dart';
 import 'package:campus_server/src/logging/logger.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
@@ -36,16 +42,37 @@ Middleware corsHeaders() {
 }
 
 void main() async {
-  final router = Router();
+  final env = Platform.environment;
+  final jwtConfig = JwtConfig.fromEnvironment(env);
+  final databaseUrl = env['DATABASE_URL'];
+  if (jwtConfig == null || databaseUrl == null || databaseUrl.isEmpty) {
+    serverLog(
+      'Sunucu açılamadı: DATABASE_URL, JWT_ACCESS_SECRET ve '
+      'JWT_REFRESH_SECRET tanımlı olmalı (sırlar en az '
+      '${JwtConfig.minSecretLength} karakter ve birbirinden farklı).',
+    );
+    exitCode = 1;
+    return;
+  }
 
-  router.get('/health', (Request request) {
-    return Response.ok('OK');
-  });
+  final db = Database.fromUrl(databaseUrl);
+  final tokens = TokenService(jwtConfig);
+  final auth = AuthEndpoints(
+    AuthService(
+      users: UserRepositoryImpl(db),
+      sessions: SessionRepositoryImpl(db),
+      tokens: tokens,
+      hasher: PasswordHasher(),
+    ),
+  );
+
+  final health = Router()
+    ..get('/health', (Request request) => Response.ok('OK'));
 
   final handler = const Pipeline()
       .addMiddleware(logRequests())
       .addMiddleware(corsHeaders())
-      .addHandler(router.call);
+      .addHandler(Cascade().add(health.call).add(auth.router.call).handler);
 
   final server = await io.serve(handler, InternetAddress.anyIPv4, 8080);
   serverLog('Server listening on port ${server.port}');

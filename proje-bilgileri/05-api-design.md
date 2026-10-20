@@ -1,7 +1,7 @@
 ---
 title: API Tasarımı
 durum: Taslak
-son-guncelleme: 2026-10-02
+son-guncelleme: 2026-10-17
 ---
 
 # API Tasarımı
@@ -14,7 +14,8 @@ Standartlar: [Mimari genel bakış](02-architecture-overview.md). Modeller: [Dom
 
 | Endpoint | Metot | Rol | Açıklama |
 | --- | --- | --- | --- |
-| `/api/auth/login` | POST | Herkes | Giriş yapar, oturum bilgisi döner |
+| `/api/auth/login` | POST | Herkes | Giriş yapar; erişim ve yenileme belirteci döner |
+| `/api/auth/refresh` | POST | Herkes | Yenileme belirteciyle yeni belirteç çifti alır; eski belirteç iptal olur |
 | `/api/reports` | POST | Öğrenci | Yeni bildirim (fotoğraf, konum, kategori, açıklama) |
 | `/api/reports` | GET | Görevli | Sayfalı liste; `status`, `category`, `assignee`, `page`, `pageSize` |
 | `/api/me/reports` | GET | Öğrenci | Kendi bildirimleri, sayfalı |
@@ -45,7 +46,8 @@ Standartlar: [Mimari genel bakış](02-architecture-overview.md). Modeller: [Dom
 | Durum | Kod | Ne zaman |
 | --- | --- | --- |
 | 400 | `VALIDATION_ERROR` | Geçersiz istek |
-| 401 | `UNAUTHORIZED` | Giriş yok |
+| 401 | `UNAUTHORIZED` | Giriş yok, erişim ya da yenileme belirteci geçersiz/süresi dolmuş |
+| 401 | `INVALID_CREDENTIALS` | E-posta veya parola hatalı (hangisi olduğu söylenmez) |
 | 403 | `FORBIDDEN` | Rol yetkisi yok |
 | 404 | `NOT_FOUND` | Kayıt yok |
 | 409 | `CONFLICT` | Bildirim zaten üstlenilmiş |
@@ -62,8 +64,20 @@ curl -X POST "http://localhost:8080/api/auth/login" \
 ```
 
 ```json
-{ "token": "<oturum-belirteci>", "user": { "userId": "5c98741b-64c8-49de-9e68-3d7a2f44802b", "fullName": "Ayşe Yılmaz", "role": "Student" } }
+{ "accessToken": "<erisim-belirteci>", "refreshToken": "<yenileme-belirteci>", "user": { "userId": "5c98741b-64c8-49de-9e68-3d7a2f44802b", "fullName": "Ayşe Yılmaz", "role": "Student" } }
 ```
+
+Erişim belirteci 15 dakika, yenileme belirteci 7 gün geçerlidir (HS256 JWT). Korumalı isteklerde `Authorization: Bearer <erisim-belirteci>` gönderilir.
+
+### Belirteç yenileme
+
+```bash
+curl -X POST "http://localhost:8080/api/auth/refresh" \
+  -H "Content-Type: application/json" \
+  -d '{"refreshToken":"<yenileme-belirteci>"}'
+```
+
+Yanıt girişle aynı biçimdedir. Kullanılan yenileme belirteci iptal edilir; aynı belirteç ikinci kez gönderilirse `401 UNAUTHORIZED`.
 
 ### Bildirim oluştur
 
@@ -71,7 +85,7 @@ Fotoğraf yüklemesi için `multipart/form-data` kullanılır (öneri).
 
 ```bash
 curl -X POST "http://localhost:8080/api/reports" \
-  -H "Authorization: Bearer <oturum-belirteci>" \
+  -H "Authorization: Bearer <erisim-belirteci>" \
   -F "category=Ariza" \
   -F "description=B blok 2. kat koridor lambası yanmıyor" \
   -F "locationSource=Gps" -F "latitude=36.5871" -F "longitude=36.1742" -F "place=B Blok 2. kat" \
@@ -86,7 +100,7 @@ Yanıt `201`: [Domain tasarımındaki örnek veri](03-domain-design.md#örnek-ve
 
 ```bash
 curl -X PUT "http://localhost:8080/api/reports/d4816d0a-cd8e-4442-98c0-65d3ba11be70/assignment" \
-  -H "Authorization: Bearer <oturum-belirteci>"
+  -H "Authorization: Bearer <erisim-belirteci>"
 ```
 
 Başarılıysa `200` ve `status: "Ustlenildi"`. Başkası üstlenmişse:
@@ -99,7 +113,7 @@ Başarılıysa `200` ve `status: "Ustlenildi"`. Başkası üstlenmişse:
 
 ```bash
 curl -X PUT "http://localhost:8080/api/reports/d4816d0a-cd8e-4442-98c0-65d3ba11be70/resolution" \
-  -H "Authorization: Bearer <oturum-belirteci>" \
+  -H "Authorization: Bearer <erisim-belirteci>" \
   -F "note=Lamba değiştirildi." \
   -F "resolutionPhoto=@sonuc.jpg;type=image/jpeg"
 ```
@@ -110,7 +124,7 @@ Sonuç fotoğrafı zorunludur (`multipart/form-data`); yoksa `400 VALIDATION_ERR
 
 ```bash
 curl "http://localhost:8080/api/me/notifications?page=1&pageSize=20" \
-  -H "Authorization: Bearer <oturum-belirteci>"
+  -H "Authorization: Bearer <erisim-belirteci>"
 ```
 
 ```json
