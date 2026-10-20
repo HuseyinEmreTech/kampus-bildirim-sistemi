@@ -60,8 +60,9 @@ typedef ReportFilter = ({
   String? reporterId,
 });
 
-/// Liste ekranındaki bir bildirim kartı.
-typedef ReportSummary = ({
+/// Liste ekranındaki bir bildirim kartı. Application'daki `ReportSummary` ile
+/// adı çakışmasın diye `ReportListRow`.
+typedef ReportListRow = ({
   String reportId,
   String category,
   String description,
@@ -108,10 +109,11 @@ RETURNING reporter_id::text
 ''';
 
   static const _createSql = r'''
-INSERT INTO reports (reporter_id, category, description, photo_url,
+INSERT INTO reports (report_id, reporter_id, category, description, photo_url,
   photo_content_type, photo_size_bytes, latitude, longitude, place,
   location_source, building_id)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+VALUES (COALESCE($12::uuid, gen_random_uuid()), $1, $2, $3, $4, $5, $6, $7, $8,
+  $9, $10, $11)
 RETURNING report_id::text
 ''';
 
@@ -148,6 +150,15 @@ ORDER BY r.created_at DESC, r.report_id DESC
 LIMIT $5 OFFSET $6
 ''';
 
+  // [_listSql] ile aynı süzgeç; sayfadan bağımsız toplam (API'deki `total`).
+  static const _countSql = r'''
+SELECT count(*) FROM reports r
+WHERE ($1::text IS NULL OR r.status = $1::text)
+  AND ($2::text IS NULL OR r.category = $2::text)
+  AND ($3::uuid IS NULL OR r.assignee_id = $3::uuid)
+  AND ($4::uuid IS NULL OR r.reporter_id = $4::uuid)
+''';
+
   // Eskiden yeniye; her işlem kendi NOW() değerini yazdığı için sıra doğru çıkar.
   static const _historySql = r'''
 SELECT h.from_status, h.to_status, h.changed_by::text, u.full_name,
@@ -177,28 +188,31 @@ VALUES ($1, $2, 'ReportResolved', $3)
 
   /// Bildirimi `Yeni` olarak kaydeder ve kimliğini döner. İlk durum geçmişi satırı
   /// (boş → `Yeni`) aynı işlemde yazılır. Bina kimliğinin var olduğunu service
-  /// önceden `BuildingRepositoryImpl.findById` ile denetler.
-  Future<String> create(NewReport report) => _db.transaction((tx) async {
-    final rows = await tx.execute(
-      _createSql,
-      parameters: [
-        report.reporterId,
-        report.category,
-        report.description,
-        report.photo.url,
-        report.photo.contentType,
-        report.photo.sizeBytes,
-        report.latitude,
-        report.longitude,
-        report.place,
-        report.locationSource,
-        report.buildingId,
-      ],
-    );
-    final reportId = rows.single.single! as String;
-    await _insertHistory(tx, reportId, null, 'Yeni', report.reporterId);
-    return reportId;
-  });
+  /// önceden `BuildingRepositoryImpl.findById` ile denetler. Kimliği domain ürettiyse
+  /// [reportId] ile verilir; verilmezse veritabanı üretir.
+  Future<String> create(NewReport report, {String? reportId}) =>
+      _db.transaction((tx) async {
+        final rows = await tx.execute(
+          _createSql,
+          parameters: [
+            report.reporterId,
+            report.category,
+            report.description,
+            report.photo.url,
+            report.photo.contentType,
+            report.photo.sizeBytes,
+            report.latitude,
+            report.longitude,
+            report.place,
+            report.locationSource,
+            report.buildingId,
+            reportId,
+          ],
+        );
+        final savedId = rows.single.single! as String;
+        await _insertHistory(tx, savedId, null, 'Yeni', report.reporterId);
+        return savedId;
+      });
 
   /// [reportId] UUID değilse ya da bildirim yoksa `null`. Yetki burada denetlenmez:
   /// öğrenci yalnızca kendi bildirimini görür (Rule 01), service [ReportDetail.reporterId]
@@ -213,7 +227,7 @@ VALUES ($1, $2, 'ReportResolved', $3)
   /// [filter]'a uyan bildirimler, yeniden eskiye. [offset] kadarını atlar, en çok
   /// [limit] tane döner. Sayfa geçersizse ya da süzgeçteki bir kimlik UUID değilse
   /// boş liste döner: hiçbir bildirim eşleşmez, veritabanına gidilmez.
-  Future<List<ReportSummary>> list(
+  Future<List<ReportListRow>> list(
     ReportFilter filter, {
     required int limit,
     required int offset,
@@ -256,6 +270,22 @@ VALUES ($1, $2, 'ReportResolved', $3)
           createdAt: createdAt! as DateTime,
         ),
     ];
+  }
+
+  /// [filter]'a uyan bütün bildirimlerin sayısı; sayfa sayısı bundan hesaplanır.
+  /// Süzgeçteki bir kimlik UUID değilse hiçbir bildirim eşleşmez: 0.
+  Future<int> count(ReportFilter filter) async {
+    if (!_isUuidOrNull(filter.assigneeId) ||
+        !_isUuidOrNull(filter.reporterId)) {
+      return 0;
+    }
+    final rows = await _db.execute(_countSql, [
+      filter.status,
+      filter.category,
+      filter.assigneeId,
+      filter.reporterId,
+    ]);
+    return rows.single.single! as int;
   }
 
   /// Bildirimin durum geçmişi, eskiden yeniye. [reportId] UUID değilse ya da
