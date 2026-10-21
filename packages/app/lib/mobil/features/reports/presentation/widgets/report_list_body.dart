@@ -14,6 +14,7 @@ class ReportListBody extends StatelessWidget {
     required this.emptyMessage,
     required this.onRefresh,
     required this.onRetry,
+    this.actionBuilder,
   });
 
   final bool isLoading;
@@ -22,6 +23,10 @@ class ReportListBody extends StatelessWidget {
   final String emptyMessage;
   final Future<void> Function() onRefresh;
   final VoidCallback onRetry;
+
+  /// Verilirse her kartın altına bu düğme konur.
+  /// `null` dönerse o kartta düğme olmaz.
+  final Widget? Function(ReportListItem report)? actionBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +56,10 @@ class ReportListBody extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 120),
                 child: Center(child: Text(emptyMessage)),
               )
-            : ReportCard(report: items[index]),
+            : ReportCard(
+                report: items[index],
+                action: actionBuilder?.call(items[index]),
+              ),
       ),
     );
   }

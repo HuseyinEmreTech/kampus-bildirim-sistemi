@@ -1,3 +1,4 @@
+import 'report_list_item.dart';
 import 'reports_source.dart';
 
 /// Görevli listesinin sekmeleri (USR 04).
@@ -14,5 +15,10 @@ enum StaffReportsView {
 /// Şimdilik yalnızca ilk sayfa; sayfa biçimi kararından sonra sayfalama
 /// eklenecek. Gerçek hali sunucu ve `campus_contracts` hazır olunca yazılacak.
 abstract interface class StaffReportsSource {
-  Future<ReportsPageResult> fetchFirstPage(StaffReportsView view);
+  /// [category] verilirse yalnızca o kategori (`category=` parametresi);
+  /// `null` ise tüm kategoriler.
+  Future<ReportsPageResult> fetchFirstPage(
+    StaffReportsView view, {
+    ReportCategory? category,
+  });
 }
