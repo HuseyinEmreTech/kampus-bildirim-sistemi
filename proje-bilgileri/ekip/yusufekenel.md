@@ -116,3 +116,4 @@ son-guncelleme: 2026-10-22
 - [2026-10-15](raporlar/yusufekenel/2026-10-15.md): Kurulum, öğrenci bildirim listesi ve oluşturma ekranları (#21)
 - [2026-10-16](raporlar/yusufekenel/2026-10-16.md): Giriş ekranı ve oturum durumu, gh kurulumu
 - [2026-10-21](raporlar/yusufekenel/2026-10-21.md): #84-86 ve #89 birleşti; oturum durumu ve Üstlen + filtre PR'ları hazırlandı
+- [2026-10-22](raporlar/yusufekenel/2026-10-22.md): Haftalık görev durumu tablosu, plandaki kutular işaretlendi
