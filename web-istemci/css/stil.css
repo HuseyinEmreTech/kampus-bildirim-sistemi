@@ -1,0 +1,182 @@
+/* Campus Report web istemcisi. Renkler değişken olarak tanımlı; koyu tema sistem ayarından gelir. */
+
+:root {
+  --arka: #f5f6f8;
+  --yuzey: #ffffff;
+  --metin: #1b1f24;
+  --metin-ikincil: #5b6470;
+  --kenar: #d6dae0;
+  --vurgu: #7a1f2b; /* Bordo takım */
+  --vurgu-metin: #ffffff;
+  --odak: #2563eb;
+  --hata-arka: #fdecee;
+  --hata-metin: #9f1d2c;
+  --uyari-arka: #fff6e0;
+  --uyari-metin: #7a4a00;
+  --yaricap: 10px;
+  --golge: 0 1px 2px rgb(0 0 0 / 6%), 0 4px 16px rgb(0 0 0 / 6%);
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --arka: #111418;
+    --yuzey: #1a1e24;
+    --metin: #e8eaed;
+    --metin-ikincil: #a1a9b4;
+    --kenar: #313842;
+    --vurgu: #c24a5a;
+    --odak: #6ea0ff;
+    --hata-arka: #3a1a1f;
+    --hata-metin: #ffb3bd;
+    --uyari-arka: #3a2e12;
+    --uyari-metin: #ffd98a;
+    --golge: none;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--arka);
+  color: var(--metin);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.ikincil {
+  color: var(--metin-ikincil);
+  margin: 0;
+}
+
+/* Form öğeleri */
+
+.alan {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+label {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+input {
+  width: 100%;
+  min-height: 44px; /* dokunmatik hedef */
+  padding: 10px 12px;
+  border: 1px solid var(--kenar);
+  border-radius: 8px;
+  background: var(--yuzey);
+  color: var(--metin);
+  font: inherit;
+}
+
+input[aria-invalid='true'] {
+  border-color: var(--hata-metin);
+}
+
+:focus-visible {
+  outline: 2px solid var(--odak);
+  outline-offset: 2px;
+}
+
+.buton {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--kenar);
+  border-radius: 8px;
+  background: var(--yuzey);
+  color: var(--metin);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.buton.birincil {
+  width: 100%;
+  border-color: var(--vurgu);
+  background: var(--vurgu);
+  color: var(--vurgu-metin);
+}
+
+.buton:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.mesaj {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+}
+
+.mesaj[data-tur='hata'] {
+  background: var(--hata-arka);
+  color: var(--hata-metin);
+}
+
+.mesaj[data-tur='uyari'] {
+  background: var(--uyari-arka);
+  color: var(--uyari-metin);
+}
+
+/* Giriş ekranı */
+
+.giris-govdesi {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.giris-karti {
+  width: 100%;
+  max-width: 400px;
+  padding: 32px 24px;
+  background: var(--yuzey);
+  border: 1px solid var(--kenar);
+  border-radius: var(--yaricap);
+  box-shadow: var(--golge);
+}
+
+.giris-baslik {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+
+.marka {
+  margin: 0;
+  color: var(--vurgu);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 480px) {
+  .giris-govdesi {
+    place-items: start stretch;
+  }
+
+  .giris-karti {
+    padding: 24px 16px;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+}

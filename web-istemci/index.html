@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Giriş · Campus Report</title>
+    <link rel="stylesheet" href="css/stil.css" />
+    <script type="module" src="js/giris-sayfasi.js"></script>
+  </head>
+  <body class="giris-govdesi">
+    <main class="giris-karti">
+      <header class="giris-baslik">
+        <p class="marka">Campus Report</p>
+        <h1>Görevli girişi</h1>
+        <p class="ikincil">Kampüs sorun bildirimlerini görmek için giriş yapın.</p>
+      </header>
+
+      <form id="giris-formu" novalidate>
+        <div class="alan">
+          <label for="email">E-posta</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="username"
+            inputmode="email"
+            required
+          />
+        </div>
+
+        <div class="alan">
+          <label for="parola">Parola</label>
+          <input
+            id="parola"
+            name="parola"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+
+        <p id="giris-mesaji" class="mesaj" role="alert" aria-live="assertive" hidden></p>
+
+        <button id="giris-butonu" type="submit" class="buton birincil">Giriş yap</button>
+      </form>
+
+      <noscript>
+        <p class="mesaj" data-tur="hata">Bu sayfa JavaScript gerektirir.</p>
+      </noscript>
+    </main>
+  </body>
+</html>
