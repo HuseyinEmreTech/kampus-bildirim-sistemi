@@ -56,6 +56,7 @@ Projede olan biten her şey bu kayıtlarda tutulur.
 | [Skill, Plugin ve araç kullanım günlüğü](kayitlar/skill-ve-arac-kullanimi.md) | Haftalık: hangi Skill, nerede, neden, sonuç |
 | [Yığın PR birleşme süreci](kayitlar/2026-10-17-yigin-pr-birlesme-sureci.md) | Squash-only korumada yığın (stacked) PR'ların birleşme yolu, çıkan tuzaklar ve çakışma çözümü |
 | [18 Ekim 2026 - PR birleşme ve issue notları](kayitlar/2026-10-18-pr-birlesme-ve-issue-notlari.md) | Günün PR/issue özeti, kararlar ve açık sorular |
+| [23 Ekim 2026 - SQL incelemesi](kayitlar/2026-10-23-sql-inceleme.md) | Migration ve sorguların ölçümlü incelemesi (50.000 bildirim): yavaş sorgu yok, gizli riskler ve öneriler |
 
 ## Dokümantasyon kuralları
 
