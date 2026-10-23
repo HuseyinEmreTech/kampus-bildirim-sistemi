@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bildirimler · Campus Report</title>
+    <link rel="stylesheet" href="css/stil.css" />
+    <script type="module" src="js/raporlar-sayfasi.js"></script>
+  </head>
+  <body>
+    <header class="ust-cubuk">
+      <div class="ust-cubuk-ic">
+        <span class="marka">Campus Report</span>
+        <span id="sahte-rozet" class="rozet sahte" hidden title="Sunucuya bağlanılmıyor; veriler uydurma.">
+          Sahte veri
+        </span>
+        <span class="bosluk"></span>
+        <span id="kullanici-adi" class="ikincil"></span>
+        <button id="cikis-butonu" type="button" class="buton">Çıkış</button>
+      </div>
+    </header>
+
+    <main class="sayfa">
+      <div class="sayfa-baslik">
+        <h1 id="liste-basligi" tabindex="-1">Bildirimler</h1>
+        <p id="sayac" class="ikincil" aria-live="polite"></p>
+      </div>
+
+      <form id="filtreler" class="filtre-cubugu" aria-label="Filtreler">
+        <div class="alan">
+          <label for="filtre-durum">Durum</label>
+          <select id="filtre-durum" name="status">
+            <option value="">Tümü</option>
+          </select>
+        </div>
+        <div class="alan">
+          <label for="filtre-kategori">Kategori</label>
+          <select id="filtre-kategori" name="category">
+            <option value="">Tümü</option>
+          </select>
+        </div>
+        <div class="alan">
+          <label for="filtre-bina">Bina</label>
+          <select id="filtre-bina" name="building" disabled aria-describedby="bina-notu">
+            <option value="">Tümü</option>
+          </select>
+          <small id="bina-notu" class="ikincil">API henüz bina filtresini desteklemiyor.</small>
+        </div>
+        <div class="alan">
+          <label for="filtre-sayfa-boyutu">Sayfa başına</label>
+          <select id="filtre-sayfa-boyutu" name="pageSize"></select>
+        </div>
+        <button id="filtre-temizle" type="button" class="buton">Filtreleri temizle</button>
+      </form>
+
+      <div id="durum-kutusu" class="durum-kutusu" hidden>
+        <p id="durum-baslik" class="durum-baslik"></p>
+        <p id="durum-aciklama" class="ikincil"></p>
+        <button id="durum-buton" type="button" class="buton" hidden></button>
+      </div>
+
+      <ul id="rapor-listesi" class="rapor-listesi" aria-labelledby="liste-basligi" aria-busy="false"></ul>
+
+      <nav id="sayfalama" class="sayfalama" aria-label="Sayfalar" hidden>
+        <button id="onceki-sayfa" type="button" class="buton">← Önceki</button>
+        <span id="sayfa-bilgisi" class="ikincil"></span>
+        <button id="sonraki-sayfa" type="button" class="buton">Sonraki →</button>
+      </nav>
+    </main>
+
+    <template id="rapor-sablonu">
+      <li class="rapor">
+        <div class="rapor-gorsel"></div>
+        <div class="rapor-govde">
+          <div class="rapor-etiketler">
+            <span class="rozet kategori"></span>
+            <span class="rozet durum"></span>
+          </div>
+          <p class="rapor-aciklama"></p>
+          <p class="rapor-meta ikincil">
+            <span class="rapor-yer"></span>
+            <span aria-hidden="true">·</span>
+            <time class="rapor-tarih"></time>
+          </p>
+        </div>
+      </li>
+    </template>
+
+    <template id="iskelet-sablonu">
+      <li class="rapor iskelet" aria-hidden="true">
+        <div class="rapor-gorsel"></div>
+        <div class="rapor-govde">
+          <span class="iskelet-cizgi kisa"></span>
+          <span class="iskelet-cizgi"></span>
+          <span class="iskelet-cizgi orta"></span>
+        </div>
+      </li>
+    </template>
+
+    <noscript><p class="mesaj" data-tur="hata">Bu sayfa JavaScript gerektirir.</p></noscript>
+  </body>
+</html>
