@@ -1,0 +1,12 @@
+{
+  "name": "campus-web-istemci",
+  "private": true,
+  "description": "Campus Report için ayrı web istemcisi (HTML/CSS/JS). Bağımlılık yok.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
