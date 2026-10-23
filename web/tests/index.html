@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Web istemcisi testleri</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 16px; }
+      .pass { color: #1a7f37; }
+      .fail { color: #c62828; }
+    </style>
+  </head>
+  <body>
+    <h1>Web istemcisi testleri</h1>
+    <ul id="sonuclar"></ul>
+    <script type="module">
+      import { run } from './harness.js';
+      import './api.test.js';
+      import './reports.test.js';
+
+      run(document.getElementById('sonuclar'));
+    </script>
+  </body>
+</html>

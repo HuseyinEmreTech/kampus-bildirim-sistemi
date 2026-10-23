@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Campus Report · Giriş</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="page-login">
+    <main class="login-card">
+      <h1 class="brand">Campus Report</h1>
+      <p class="muted">Kampüs sorun bildirim sistemi</p>
+      <form id="giris-formu" novalidate>
+        <label for="email">E-posta</label>
+        <input id="email" name="email" type="email" autocomplete="username" required />
+        <label for="password">Parola</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required />
+        <p id="giris-hatasi" class="form-error" role="alert" hidden></p>
+        <button type="submit" class="button button--primary">Giriş yap</button>
+      </form>
+    </main>
+    <script type="module" src="js/login-page.js"></script>
+  </body>
+</html>

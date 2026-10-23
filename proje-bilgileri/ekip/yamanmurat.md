@@ -1,7 +1,7 @@
 ---
 title: Murat Yaman - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-10-21
+son-guncelleme: 2026-10-24
 ---
 
 # Murat Yaman (@yamanmurat761) - Kişisel Plan
@@ -21,8 +21,8 @@ son-guncelleme: 2026-10-21
 
 - [ ] Repoyu klonla, `.env.example` → `.env`, `compose.yaml` ile PostgreSQL'i çalıştır.
 - [ ] [Başlangıç rehberi](00-baslangic-rehberi.md) ve [ADR-04](../adr/04-cok-dilli-web-ve-servisler.md) oku.
-- [ ] Web istemcisi iskeleti: giriş, token saklama, 401 yönlendirme (#90).
-- [ ] Bildirim listesi: kategori/durum/bina filtreleri + sayfalama (#90).
+- [x] Web istemcisi iskeleti: giriş, token saklama, 401 yönlendirme (#90).
+- [x] Bildirim listesi: kategori/durum/bina filtreleri + sayfalama (#90).
 - [ ] SQL incelemesi: migration ve sorguları gözden geçir; yavaş sorgu notu çıkar.
 
 ## Sınırlar
