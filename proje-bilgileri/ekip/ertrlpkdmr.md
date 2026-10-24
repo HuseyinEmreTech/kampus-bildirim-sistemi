@@ -112,3 +112,5 @@ son-guncelleme: 2026-10-12
 - [2026-10-16](raporlar/ertrlpkdmr/2026-10-16.md): Birleşen PR'lar, çözüldü işaretleme (Rule 03, Rule 04)
 - [2026-10-17](raporlar/ertrlpkdmr/2026-10-17.md): Bütün PR'lar birleşti (#52-#66); hafta 6-10 işleri yerelde hazır
 - [2026-10-18](raporlar/ertrlpkdmr/2026-10-18.md): ReportRepository'nin PostgreSQL karşılığı; HTTPS, günlük sınırı ve kurtarma tatbikatı (yerel)
+- [2026-10-19](raporlar/ertrlpkdmr/2026-10-19.md): #87 ve #88 açıldı; depo arayüzü parçalara bölündü, #81'e güvenlik notu
+- [2026-10-24](raporlar/ertrlpkdmr/2026-10-24.md): Depo çeviri fonksiyonları ve fotoğraf işleme sınırı PR'ları; ekipteki değişiklikler (Murat, ADR-04)
