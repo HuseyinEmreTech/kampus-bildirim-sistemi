@@ -1,7 +1,7 @@
 ---
 title: Hüseyin Emre - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-10-12
+son-guncelleme: 2026-10-24
 ---
 
 # Hüseyin Emre (@HuseyinEmreTech) - Kişisel Plan
@@ -144,3 +144,9 @@ Bu, [ADR-02](../adr/02-kalite-araci-sonarqube-cloud.md) kararının (Dart tarama
 - Coverage (`flutter test --coverage` + `sonar.dart.lcov.reportPaths`), README'ye Quality Gate badge ve branch protection'da `SonarCloud Code Analysis` zorunlu check — planlı, henüz yapılmadı.
 - Ekip erişimi: SonarCloud → organization → Members üzerinden üyelerin eklenmesi.
 - `analysis_options.yaml`'de commit'lenmemiş yerel değişiklik var (bu işin kapsamı dışında).
+
+## Raporlar
+
+- [2026-10-02](raporlar/huseyin-emre/2026-10-02.md): Ekip kurulumu, `main` koruması, doküman iskeleti
+- [2026-10-21](raporlar/huseyin-emre/2026-10-21.md): PR inceleme ve birleştirme, issue güncelleme, doküman/ADR, token kaydı
+- [2026-10-24](raporlar/huseyin-emre/2026-10-24.md): PR denetimi (#97-#99), Sonar kapsam düzeltmesi (#100, #102), JS bug düzeltmesi (#103), şablon ve kayıtlar (#101, #104, #107), yerel–bulut karşılaştırması (#108)
