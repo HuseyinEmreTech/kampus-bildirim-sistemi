@@ -111,6 +111,7 @@ Karşılaştırma matrisi ve gerekçeler: [ADR-02](../adr/02-kalite-araci-sonarq
 | Tarih | Commit | Araç | Bug | Vulnerability | Hotspot | Code Smell | Coverage | Duplication | Teknik borç | Not |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-24 | `2e99f72` (main) | SonarQube Cloud | 0 | 0 | 0 | 4 | %80,1 | %0,0 | 1 sa 5 dk | 96 dosya; eksik kapsam düzeltmesinden (#100, #102) sonraki ilk tam tarama. Önceki taramaların değerleri kaydedilmemişti |
+| 2026-10-24 | `56cfed0` (main) | SonarQube Cloud | 0 | 0 | 0 | 4 | %80,9 | %0,0 | 1 sa 5 dk | 98 dosya; #105 ve #106 birleştikten sonra |
 
 ## Bulgu çözüm günlüğü
 
