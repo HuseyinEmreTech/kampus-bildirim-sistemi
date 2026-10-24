@@ -38,6 +38,33 @@ Yöntem: `podman run -d -p 127.0.0.1:9005:9000 -e SONAR_ES_BOOTSTRAP_CHECKS_DISA
 
 SonarQube Community yerelde çalışıyor ama **Dart dilini taramıyor**. Yerelde yalnızca `secrets`, `docker`, `yaml`, `json` ve `text` taraması yapabilir. Dart için seçenekler aşağıdaki araştırmada.
 
+## Yerel–bulut karşılaştırması (2026-10-24)
+
+Aynı depo, aynı `sonar-project.properties` ile yerel SonarQube Community'de (26.9.0, `127.0.0.1:9005`) tarandı. Amaç: Cloud'un sonuçlarının doğru olup olmadığını çapraz kontrol etmek.
+
+| Ölçüt | Yerel Community | SonarQube Cloud | Sonuç |
+| --- | --- | --- | --- |
+| Dizinlenen dosya | 10 (yalnız `web/`) | 98 (88 Dart + 10 web) | Bulut Dart'ı görüyor; yerel göremiyor (eklenti yok) |
+| `web/` ncloc | 586 | 586 | Aynı |
+| `web/` code smell | 1 (`javascript:S7721`, `web/js/api.js:24`) | 1 (aynı kural, aynı dosya) | Aynı |
+| `web/` bug | 0 | 0 | Aynı (#103 düzeltmesinden sonra) |
+| `web/` güvenlik açığı / hotspot | 0 / 0 | 0 / 0 | Aynı |
+| `web/` coverage | %0 (JS kapsamı üretilmiyor) | %0 | Aynı |
+| Proje toplam coverage | Ölçülemiyor (Dart eklentisi yok) | %80,9 | Yerel doğrulayamaz |
+| Dart bulguları (3 × `dart:S107`) | Görünmüyor | 3 | Yerel doğrulayamaz |
+
+Sonuç: Bulut, doğrulanabilen web alt kümesinde yerelle birebir aynı sonucu veriyor (10 dosya, 586 ncloc, aynı tek bulgu, 0 bug). Dosya sayısı depoyla tutarlı (98). Dart tarafı Community'de eklenti olmadığı için yerelde çapraz kontrol edilemiyor; bu bir bulut hatası değil, araç sınırı. Dart kapsamı ve bulgular Cloud'dan alınmaya devam eder.
+
+### Yerel çalıştırma notu (2026-10-24)
+
+Bu makinede yerel taramayı çalıştırırken çıkan üç engel ve çözümü:
+
+- Disk %95 doluydu; Elasticsearch "high disk watermark" nedeniyle dizin yazmadı ve SonarQube kapandı. Geçici veri klasörü `/tmp`'ye bağlandı.
+- Rootless podman uid eşlemesi: `--userns=keep-id:uid=1000,gid=0` (yoksa konteynerdeki `sonarqube` kullanıcısı veri klasörüne yazamıyor).
+- SELinux: birim bağlama `:Z` etiketiyle yapıldı.
+- Konteyner `sonarqube:community` 26.9.0.129388, `127.0.0.1:9005`; tarayıcı `sonarsource/sonar-scanner-cli:latest`; yerel geçici yönetici hesabı (parola yazılmaz). Deneme sonrası konteyner ve geçici veri silindi.
+- Depo klasöründe izlenmeyen yerel bir `gizli/` klasörü var; tarayıcı içindeki `tsconfig.json`'u bağlam için gördü ama kapsam dışı olduğu için analiz etmedi.
+
 ## Dart desteği araştırması (2026-09-30)
 
 Soru: Dart/Flutter kodunu SonarQube ile nasıl tarayabiliriz? Bilgiler resmi Sonar dokümanlarından ve Sonar topluluk forumundan alındı; erişim tarihi 30 Eylül 2026.
