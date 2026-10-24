@@ -14,9 +14,11 @@ Issue #92, [ADR-04](../../proje-bilgileri/adr/04-cok-dilli-web-ve-servisler.md).
 | --- | --- | --- |
 | `GET /health` | Herkes | `200 { "status": "ok" }` |
 | `GET /api/stats/summary` | Görevli (`Staff`) | `200 { "total", "byStatus": { "Yeni", "Ustlenildi", "Cozuldu" }, "byCategory": { "Ariza", "Temizlik", "Guvenlik", "Diger" }, "averageResolutionHours" }` |
+| `GET /api/stats/export.csv` | Görevli (`Staff`) | `200 text/csv`: `reportId,category,status,place,buildingId,createdAt,takenAt,resolvedAt` (UTC, ISO 8601). Açıklama ve kişi kimlikleri yok |
 
 - Her durum ve kategori, bildirim olmasa da `0` ile döner.
 - `averageResolutionHours`: çözülen bildirimlerin oluşturulmadan çözülmeye ortalama süresi (saat, 1 ondalık); çözülen yoksa `null`.
+- CSV: RFC 4180 (virgül, CRLF), UTF-8 BOM'lu (Excel Türkçe karakterleri doğru göstersin). `=`, `+`, `-`, `@` ile başlayan metnin önüne `'` eklenir; dosyayı açan görevlinin Excel'inde formül çalışmasın (CSV injection). Satırlar veritabanından geldikçe yazılır, bellekte toplanmaz.
 - Hata biçimi çekirdekle aynı: belirteç yok/geçersiz `401 UNAUTHORIZED`, öğrenci `403 FORBIDDEN`; gövde `{ "error": { "code", "message", "details" } }`.
 
 ## Çalıştırma
@@ -52,5 +54,4 @@ docker run --rm -p 8090:8080 -e DATABASE_URL=... -e JWT_ACCESS_SECRET=... rapor-
 
 ## Sonra
 
-- `GET /api/stats/export.csv`: bildirimlerin kişisel veri içermeyen CSV dışa aktarımı.
 - CI işi ve `compose.yaml`'a ekleme: entegrasyon sahibi Hüseyin (ADR-04).
