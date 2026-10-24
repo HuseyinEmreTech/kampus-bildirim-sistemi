@@ -13,8 +13,11 @@ Closes #
 ## Yapay zeka kullanımı
 
 - Araç ve model:
+- Neden bu araç/model (alternatifi varsa neden seçilmedi):
+- Kullanılan skill (yoksa "yok"):
 - Ne sordum (kısa):
 - Çıktıda neyi değiştirdim / reddettim:
+- Harcanan token (yaklaşık; araçta görünmüyorsa "tahmini" yaz):
 - Anlamadığım veya emin olmadığım yer (boş bırakma; yoksa "yok" yaz):
 
 ## Doküman
