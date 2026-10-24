@@ -22,7 +22,8 @@ class FakeAuthSource implements AuthSource {
 }
 
 const session = Session(
-  token: 'sahte-belirtec',
+  accessToken: 'sahte-erisim',
+  refreshToken: 'sahte-yenileme',
   userId: '5c98741b-64c8-49de-9e68-3d7a2f44802b',
   fullName: 'Ayşe Yılmaz',
   role: UserRole.student,
