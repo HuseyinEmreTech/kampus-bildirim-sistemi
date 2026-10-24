@@ -1,23 +1,24 @@
 ---
 title: SonarQube Puanları ve Bulgu Çözüm Günlüğü
 durum: Güncel
-son-guncelleme: 2026-09-30
+son-guncelleme: 2026-10-24
 ---
 
 # SonarQube Puanları ve Bulgu Çözüm Günlüğü
 
 ← [İndeks](../00-index.md)
 
-Her kod commit'inden sonra tarama yapılır; sonuçlar ve çözülen bulgular burada tutulur. **Henüz kod olmadığı için tarama yapılmadı ve tabloda değer yoktur; değerler uydurulmaz.**
+Her kod commit'inden sonra tarama yapılır; sonuçlar ve çözülen bulgular burada tutulur. Değerler SonarCloud API'sinden alınır, uydurulmaz.
 
 ## Araç durumu
 
 | Araç | Durum |
 | --- | --- |
+| SonarQube Cloud (`https://sonarcloud.io`) | **Doğrulandı (2026-10-24):** GitHub Actions `sonar.yml` ile her PR ve `main` push'ta tarama; 96 dosya dizinli, kalite kapısı yeşil |
 | SonarQube (`http://localhost:9005`) | **Doğrulandı (2026-09-30):** `sonarqube:community` 26.9.0.129388 konteyneri yaklaşık 30 saniyede `UP` oldu, arayüz `200` döndü; deneme sonrası konteyner silindi |
 | SonarQube'un Dart desteği | **Community'de yok** (yerelde doğrulandı). **Developer Edition ve SonarQube Cloud'da var**; ücretsiz Cloud planı önerildi (aşağıdaki araştırma) |
 | `dart analyze`, `flutter analyze` | Yedek: kod oluşunca her commit'te çalıştırılır |
-| Test kapsamı (coverage) | Test yazılınca ölçülür |
+| Test kapsamı (coverage) | **Ölçülüyor (2026-10-24):** LCOV (`coverage/lcov.info`); Dart kapsamı %80,1. Web JS için tarayıcı testleri LCOV üretmediğinden kapsam ölçülmüyor |
 
 ## Doğrulama kaydı (2026-09-30)
 
@@ -109,7 +110,7 @@ Karşılaştırma matrisi ve gerekçeler: [ADR-02](../adr/02-kalite-araci-sonarq
 
 | Tarih | Commit | Araç | Bug | Vulnerability | Hotspot | Code Smell | Coverage | Duplication | Teknik borç | Not |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| | | | | | | | | | | Henüz tarama yok |
+| 2026-10-24 | `2e99f72` (main) | SonarQube Cloud | 0 | 0 | 0 | 4 | %80,1 | %0,0 | 1 sa 5 dk | 96 dosya; eksik kapsam düzeltmesinden (#100, #102) sonraki ilk tam tarama. Önceki taramaların değerleri kaydedilmemişti |
 
 ## Bulgu çözüm günlüğü
 
@@ -117,10 +118,13 @@ Bulgular toplu değil tek tek çözülür. Her bulgu için hangi yolun seçildi�
 
 | Tarih | Commit | Kural | Dosya | Yol | Süre | Ne öğrendim |
 | --- | --- | --- | --- | --- | --- | --- |
-| | | | | | | |
+| 2026-10-24 | PR #103 | `javascript:S9383` (3 adet) | `web/js/reports-page.js` | Yapay zeka çözdü, CI ile doğrulandı | ~10 dk | Olay dinleyicilerinde "beklenmeyen" (fire-and-forget) promise niyeti `void` ile açıkça işaretlenir; aksi hâlde güvenilirlik puanı düşer |
+
+**Açık bulgular (2026-10-24):** 3 × `dart:S107` (çok parametreli kurucular, `packages/domain/lib/src/report/report.dart`) ve 1 × `javascript:S7721` (`web/js/api.js`, `toResult` dış kapsama taşınmalı). Kalite kapısını düşürmüyorlar (bakım notu); tek tek ele alınacak.
 
 ## Özet (her hafta güncellenir)
 
 | Hafta | Yeni bulgu | Çözülen | Kalan | Coverage |
 | --- | --- | --- | --- | --- |
 | 3 | 0 | 0 | 0 | - |
+| 6 | 4 | 3 | 4 | %80,1 |
