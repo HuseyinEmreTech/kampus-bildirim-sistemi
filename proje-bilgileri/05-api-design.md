@@ -1,7 +1,7 @@
 ---
 title: API Tasarımı
 durum: Taslak
-son-guncelleme: 2026-10-17
+son-guncelleme: 2026-10-24
 ---
 
 # API Tasarımı
@@ -34,6 +34,7 @@ Standartlar: [Mimari genel bakış](02-architecture-overview.md). Modeller: [Dom
 | `status` | `GET /api/reports` | Hayır | `Yeni`, `Ustlenildi`, `Cozuldu` |
 | `category` | `GET /api/reports` | Hayır | `Ariza`, `Temizlik`, `Guvenlik`, `Diger` |
 | `assignee` | `GET /api/reports` | Hayır | `me` ise yalnızca isteği yapan görevlinin üstlendikleri |
+| `buildingId` | `GET /api/reports` | Hayır | Öneri (web istemcisi, #90): yalnızca bu binadaki bildirimler. Sunucuda henüz yok |
 | `page` | Listeler | Hayır | 1'den başlar, varsayılan 1 |
 | `pageSize` | Listeler | Hayır | Varsayılan 20, en fazla 100 |
 
