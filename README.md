@@ -103,7 +103,7 @@ Roller: **Student** (bildirim açar, kendi bildirimlerini görür) ve **Staff** 
 
 **İlk sürümde olmayacaklar:** push bildirimi, puan ve yorum, yeniden açma, kayıt ol ekranı (hesaplar seed veriden), yönetici paneli, otomatik atama, harita ısı görünümü, yapay zeka ile kategori önerisi, çoklu kampüs. Gerekçeler: [kapsam](proje-bilgileri/01-project-scope.md#6-kapsam).
 
-**Bilinçli sadeleştirmeler (kapsam ve ölçek):** tek sunucu, tek veritabanı; mikroservis, mesaj kuyruğu ve önbellek yok. Birkaç yüz kullanıcı için bunlar gereksiz karmaşıklık borcu olurdu.
+**Bilinçli sadeleştirmeler (kapsam ve ölçek):** tek PostgreSQL veritabanı; dağıtık mikroservis ağı, mesaj kuyruğu ve önbellek yok. Python rapor servisi çekirdek API'ye tek yönlü bağlıdır; transaction gerektiren işler Dart çekirdeğinde kalır.
 
 ## 5. Mimari
 
@@ -132,6 +132,7 @@ Bağımlılıklar arayüzle verilir; bağlama `main.dart` içinde yapılır. Zen
 | --- | --- | --- |
 | İstemci | Flutter (Dart 3.13.0, Flutter 3.47.0) | Kabul |
 | Sunucu | Dart (Shelf) | Kabul, [ADR-01](proje-bilgileri/adr/01-dart-backend-postgresql.md) |
+| Python rapor servisi | FastAPI; çekirdek REST API'sinden raporları CSV dışa aktarır | Eklendi |
 | Veritabanı | PostgreSQL 16 | Kabul |
 | Veritabanı erişimi | `postgres` paketi, parametreli sorgu | Öneri |
 | Şema yönetimi | Elle SQL dosyaları (`db/migrations/`); V1-V4 migration'ları yazıldı | Kabul |
@@ -273,6 +274,32 @@ cd packages/server
 dart run bin/server.dart
 # http://localhost:8080/health
 ```
+
+**Python rapor dışa aktarma servisi**
+
+Servis çekirdek API'den görevli rapor listesini okur; authorization belirtecini
+çekirdeğe iletir ve sayfaları CSV olarak dışa aktarır. Bildirim veya rapor
+verisini yazmaz. Servis sözleşmesi, filtreler, yerel test ve Docker adımları:
+[Python servis dokümantasyonu](services/python-report-service/docs/service-contract.md).
+
+```powershell
+cd services\python-report-service
+$env:CORE_API_BASE_URL = "http://localhost:8080"
+$env:CORE_API_TIMEOUT_SECONDS = "10"
+$env:CORE_API_PAGE_SIZE = "100"
+$env:SERVICE_HOST = "127.0.0.1"
+$env:SERVICE_PORT = "8001"
+$env:SERVICE_HEALTHCHECK_HOST = "127.0.0.1"
+$env:SERVICE_HEALTHCHECK_TIMEOUT_SECONDS = "2"
+$env:REPORT_EXPORT_FILENAME = "reports.csv"
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements-dev.txt
+python -m app
+```
+
+Servis `http://localhost:8001/health` adresinde health check sunar. CSV dışa
+aktarma isteği görevli access token'ı gerektirir.
 
 **Canlı ortam (sunucu + veritabanı konteynerde)**
 
