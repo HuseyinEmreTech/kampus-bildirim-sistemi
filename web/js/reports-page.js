@@ -43,7 +43,7 @@ async function loadReports() {
 
 function goToPage(page) {
   filters = { ...filters, page };
-  loadReports();
+  void loadReports();
   window.scrollTo({ top: 0 });
 }
 
@@ -72,10 +72,10 @@ function start() {
   form.category.value = filters.category;
   form.addEventListener('change', () => {
     filters = { ...filters, ...Object.fromEntries(new FormData(form)), page: 1 };
-    loadReports();
+    void loadReports();
   });
 
-  loadBuildings().then(loadReports);
+  void loadBuildings().then(loadReports);
 }
 
 start();
