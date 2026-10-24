@@ -33,6 +33,23 @@ app.MapGet(
             Results.Ok(await stats.GetSummaryAsync(cancel)))
     .RequireAuthorization(Auth.StaffPolicy);
 
+// Excel'de açılabilen CSV; satırlar veritabanından geldikçe yazılır.
+app.MapGet(
+        "/api/stats/export.csv",
+        async (IStatsSource stats, HttpResponse response, CancellationToken cancel) =>
+        {
+            response.ContentType = "text/csv; charset=utf-8";
+            response.Headers.ContentDisposition = "attachment; filename=\"bildirimler.csv\"";
+            await using var writer = new StreamWriter(response.Body, new UTF8Encoding(false));
+            // BOM: Excel Türkçe karakterleri doğru göstersin.
+            await writer.WriteAsync("\uFEFF" + ReportCsv.Header);
+            await foreach (var row in stats.ExportAsync(cancel))
+            {
+                await writer.WriteAsync(ReportCsv.Line(row));
+            }
+        })
+    .RequireAuthorization(Auth.StaffPolicy);
+
 app.Run();
 
 /// <summary>Testlerin (WebApplicationFactory) uygulamayı bulabilmesi için.</summary>

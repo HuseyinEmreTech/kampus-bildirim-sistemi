@@ -32,6 +32,18 @@ public sealed class FakeStats : IStatsSource
 
     public Task<StatsSummary> GetSummaryAsync(CancellationToken cancel) =>
         Task.FromResult(Summary);
+
+    public List<ReportExportRow> Rows { get; } = [];
+
+    public async IAsyncEnumerable<ReportExportRow> ExportAsync(
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancel)
+    {
+        foreach (var row in Rows)
+        {
+            await Task.Yield();
+            yield return row;
+        }
+    }
 }
 
 public sealed class ApiTests(ApiFactory factory) : IClassFixture<ApiFactory>
@@ -88,11 +100,45 @@ public sealed class ApiTests(ApiFactory factory) : IClassFixture<ApiFactory>
         Assert.Equal(3.2, body.GetProperty("averageResolutionHours").GetDouble());
     }
 
-    private Task<HttpResponseMessage> Get(string token)
+    [Fact]
+    public async Task Export_StaffToken_ReturnsCsvWithHeaderAndRows()
+    {
+        factory.Stats.Rows.Clear();
+        factory.Stats.Rows.Add(new ReportExportRow(
+            "b0000000-0000-4000-8000-000000000001",
+            "Ariza",
+            "Cozuldu",
+            "B blok, 2. kat",
+            null,
+            new DateTimeOffset(2026, 10, 2, 9, 15, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 10, 2, 10, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 10, 2, 11, 40, 0, TimeSpan.Zero)));
+
+        var response = await Get(Token("Staff"), "/api/stats/export.csv");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("text/csv", response.Content.Headers.ContentType?.MediaType);
+        var csv = await response.Content.ReadAsStringAsync();
+        Assert.Equal(
+            ReportCsv.Header +
+            "b0000000-0000-4000-8000-000000000001,Ariza,Cozuldu,\"B blok, 2. kat\",," +
+            "2026-10-02T09:15:00Z,2026-10-02T10:00:00Z,2026-10-02T11:40:00Z\r\n",
+            csv.TrimStart('\uFEFF'));
+    }
+
+    [Fact]
+    public async Task Export_StudentToken_Returns403()
+    {
+        var response = await Get(Token("Student"), "/api/stats/export.csv");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    private Task<HttpResponseMessage> Get(string token, string path = "/api/stats/summary")
     {
         var client = factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        return client.GetAsync("/api/stats/summary");
+        return client.GetAsync(path);
     }
 
     /// <summary>Dart çekirdeğinin ürettiği belirtecin aynısı: sub, role, iss.</summary>
