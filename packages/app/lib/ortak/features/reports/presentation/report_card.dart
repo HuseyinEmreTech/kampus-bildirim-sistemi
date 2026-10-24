@@ -9,15 +9,21 @@ class ReportCard extends StatelessWidget {
     required this.report,
     this.onTap,
     this.isSelected = false,
+    this.action,
   });
 
   final ReportListItem report;
   final VoidCallback? onTap;
   final bool isSelected;
 
+  /// Kartın altında sağda gösterilen isteğe bağlı düğme (ör. görevlinin
+  /// "Üstlen"i); verilmezse kart eskisi gibidir.
+  final Widget? action;
+
   @override
   Widget build(BuildContext context) {
     final color = _categoryColor(report.category);
+    final action = this.action;
     return Card(
       clipBehavior: Clip.antiAlias,
       color: isSelected
@@ -30,12 +36,23 @@ class ReportCard extends StatelessWidget {
             : SystemMouseCursors.click,
         hoverColor: Theme.of(context).colorScheme.primary
             .withValues(alpha: 0.08),
-        child: ListTile(
-          leading: _thumbnail(color),
-          title: Text(_categoryLabel(report.category)),
-          subtitle: Text('${report.place}\n${_formatDate(report.createdAt)}'),
-          isThreeLine: true,
-          trailing: StatusBadge(status: report.status),
+        child: Column(
+          children: [
+            ListTile(
+              leading: _thumbnail(color),
+              title: Text(_categoryLabel(report.category)),
+              subtitle: Text(
+                '${report.place}\n${_formatDate(report.createdAt)}',
+              ),
+              isThreeLine: true,
+              trailing: StatusBadge(status: report.status),
+            ),
+            if (action != null)
+              Padding(
+                padding: const EdgeInsets.only(right: 8, bottom: 8),
+                child: Align(alignment: Alignment.centerRight, child: action),
+              ),
+          ],
         ),
       ),
     );
