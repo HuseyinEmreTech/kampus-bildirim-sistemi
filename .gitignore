@@ -32,6 +32,12 @@ build/
 coverage/
 *.iml
 
+# --- Python servis ---
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+
 # --- Obsidian (proje-bilgileri vault'u): kişisel oturum durumu ---
 **/.obsidian/workspace.json
 **/.obsidian/workspace-mobile.json
