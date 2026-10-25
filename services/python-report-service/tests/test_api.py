@@ -50,6 +50,17 @@ def test_export_requires_bearer_token():
     assert response.status_code == 401
 
 
+def test_export_documents_unauthorized_response_in_openapi():
+    with TestClient(app) as client:
+        response = client.get("/openapi.json")
+
+    export_responses = response.json()["paths"]["/api/reports/export"]["get"]["responses"]
+    assert "401" in export_responses
+    assert export_responses["401"]["description"]
+    assert "502" in export_responses
+    assert export_responses["502"]["description"]
+
+
 def test_export_rejects_unknown_status_and_category():
     with TestClient(app) as client:
         status_response = client.get(
@@ -225,6 +236,69 @@ def test_export_maps_core_auth_rejection():
         app.dependency_overrides.clear()
 
     assert response.status_code == 403
+
+
+@pytest.mark.parametrize(
+    "upstream_status",
+    [500, 503],
+)
+def test_export_maps_core_server_errors_to_bad_gateway(upstream_status):
+    def handler(request):
+        return httpx.Response(upstream_status)
+
+    async def override_core_client():
+        async with make_core_client(handler) as core_client:
+            yield core_client
+
+    app.dependency_overrides[get_core_client] = override_core_client
+    try:
+        with TestClient(app) as client:
+            response = client.get(
+                "/api/reports/export",
+                headers={"Authorization": "Bearer staff-token"},
+            )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 502
+
+
+def test_export_returns_bad_gateway_for_incomplete_pagination():
+    def handler(request):
+        page = int(request.url.params["page"])
+        items = [
+            {
+                "reportId": "report-1",
+                "category": "Ariza",
+                "description": "Lamba bozuk",
+                "status": "Yeni",
+                "createdAt": "2026-10-24T10:00:00Z",
+                "location": {"place": "B Blok"},
+            }
+        ] if page == 1 else []
+        return httpx.Response(
+            200,
+            json={
+                "items": items,
+                "total": 2,
+            },
+        )
+
+    async def override_core_client():
+        async with make_core_client(handler) as core_client:
+            yield core_client
+
+    app.dependency_overrides[get_core_client] = override_core_client
+    try:
+        with TestClient(app) as client:
+            response = client.get(
+                "/api/reports/export",
+                headers={"Authorization": "Bearer staff-token"},
+            )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 502
 
 
 def test_export_returns_bad_gateway_for_invalid_core_response():

@@ -53,8 +53,8 @@ geçersiz değer varsa başlamaz. Varsayılan değer kullanılmaz.
 | `CORE_API_PAGE_SIZE` | Çekirdek API'den istenecek sayfa boyutu (1-100) |
 | `SERVICE_HOST` | Uvicorn'un dinleyeceği adres |
 | `SERVICE_PORT` | Servis portu (1-65535) |
-| `SERVICE_HEALTHCHECK_HOST` | Docker health check'in bağlanacağı host |
-| `SERVICE_HEALTHCHECK_TIMEOUT_SECONDS` | Health check HTTP isteğinin zaman aşımı |
+| `SERVICE_HEALTHCHECK_HOST` | Docker health check'in TCP bağlantısı kuracağı host |
+| `SERVICE_HEALTHCHECK_TIMEOUT_SECONDS` | Health check TCP bağlantısı zaman aşımı |
 | `REPORT_EXPORT_FILENAME` | CSV indirme dosya adı (yol değil) |
 
 ## Yerel çalıştırma
@@ -77,10 +77,12 @@ python -m pip install -r requirements-dev.txt
 python -m app
 ```
 
-Health check adresi `SERVICE_HEALTHCHECK_HOST` ve `SERVICE_PORT` ayarlarına göre
-oluşur. `SERVICE_HOST` dinleme adresidir; Docker'da çoğunlukla `0.0.0.0` olacağı
-için health check hedefinden ayrı yapılandırılır. CSV indirmek için çekirdek
-API'den alınmış görevli access token'ını iletin:
+Docker health check, `SERVICE_HEALTHCHECK_HOST` ve `SERVICE_PORT` ayarlarına
+TCP bağlantısı kurarak servis portunun dinlediğini kontrol eder; HTTP isteği
+göndermez. Ayrı `/health` endpoint'i uygulama seviyesinde kontrol için
+kullanılabilir. `SERVICE_HOST` dinleme adresidir; Docker'da çoğunlukla
+`0.0.0.0` olacağı için health check hedefinden ayrı yapılandırılır. CSV
+indirmek için çekirdek API'den alınmış görevli access token'ını iletin:
 
 ```powershell
 curl.exe -H "Authorization: Bearer <access-token>" `
@@ -112,7 +114,7 @@ docker run --rm -p 8001:8001 `
   campus-python-report-service
 ```
 
-Konteyner içindeki health check `/health` endpoint'ini denetler. Docker ağı
-çekirdek API'ye erişemiyorsa `CORE_API_BASE_URL` değerini o ağda erişilebilir
-çekirdek API adresine göre ayarlayın. Host port eşlemesinde sağdaki port,
-`SERVICE_PORT` ile aynı olmalıdır.
+Konteyner içindeki health check, yapılandırılmış host ve portta TCP bağlantısı
+kurar. Docker ağı çekirdek API'ye erişemiyorsa `CORE_API_BASE_URL` değerini o
+ağda erişilebilir çekirdek API adresine göre ayarlayın. Host port eşlemesinde
+sağdaki port, `SERVICE_PORT` ile aynı olmalıdır.

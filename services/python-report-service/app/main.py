@@ -12,12 +12,14 @@ from app.settings import Settings, get_settings
 
 CSV_FIELDS = ("reportId", "category", "description", "status", "createdAt", "place")
 SPREADSHEET_FORMULA_PREFIXES = ("=", "+", "-", "@")
+INVALID_CORE_RESPONSE_DETAIL = "Core API returned an invalid response."
+INVALID_REPORT_DETAIL = "Core API returned an invalid report."
 
 app = FastAPI(title="Campus Report Python Service")
 
 
 async def get_core_client(
-    settings: Settings = Depends(get_settings),
+    settings: Annotated[Settings, Depends(get_settings)],
 ) -> AsyncIterator[httpx.AsyncClient]:
     async with httpx.AsyncClient(
         base_url=settings.core_api_base_url,
@@ -38,7 +40,7 @@ def _require_bearer_token(authorization: str | None) -> str:
 
 def _core_payload_items(payload: Any) -> tuple[list[dict[str, Any]], int]:
     if not isinstance(payload, dict):
-        raise HTTPException(status_code=502, detail="Core API returned an invalid response.")
+        raise HTTPException(status_code=502, detail=INVALID_CORE_RESPONSE_DETAIL)
 
     items = payload.get("items")
     total = payload.get("total")
@@ -49,9 +51,68 @@ def _core_payload_items(payload: Any) -> tuple[list[dict[str, Any]], int]:
         or total < 0
         or any(not isinstance(item, dict) for item in items)
     ):
-        raise HTTPException(status_code=502, detail="Core API returned an invalid response.")
+        raise HTTPException(status_code=502, detail=INVALID_CORE_RESPONSE_DETAIL)
 
     return items, total
+
+
+def _report_query_params(
+    page: int,
+    page_size: int,
+    status: ReportStatus | None,
+    category: ReportCategory | None,
+    assignee: str | None,
+) -> dict[str, str | int]:
+    params: dict[str, str | int] = {"page": page, "pageSize": page_size}
+    if status is not None:
+        params["status"] = status.value
+    if category is not None:
+        params["category"] = category.value
+    if assignee is not None:
+        params["assignee"] = assignee
+    return params
+
+
+def _raise_for_core_status(upstream: httpx.Response) -> None:
+    if 400 <= upstream.status_code < 500:
+        raise HTTPException(
+            status_code=upstream.status_code,
+            detail="Core API rejected the request.",
+        )
+    if upstream.status_code < 200 or upstream.status_code >= 300:
+        raise HTTPException(status_code=502, detail="Core API request failed.")
+
+
+async def _fetch_report_page(
+    core_client: httpx.AsyncClient,
+    page: int,
+    page_size: int,
+    authorization: str,
+    status: ReportStatus | None,
+    category: ReportCategory | None,
+    assignee: str | None,
+) -> tuple[list[dict[str, Any]], int]:
+    params = _report_query_params(page, page_size, status, category, assignee)
+    try:
+        upstream = await core_client.get(
+            "/api/reports",
+            params=params,
+            headers={"Authorization": authorization},
+        )
+    except httpx.RequestError as error:
+        raise HTTPException(
+            status_code=502,
+            detail="Core API is unavailable.",
+        ) from error
+
+    _raise_for_core_status(upstream)
+    try:
+        return _core_payload_items(upstream.json())
+    except ValueError as error:
+        raise HTTPException(
+            status_code=502,
+            detail=INVALID_CORE_RESPONSE_DETAIL,
+        ) from error
 
 
 async def _fetch_reports(
@@ -66,42 +127,15 @@ async def _fetch_reports(
     page = 1
 
     while True:
-        params: dict[str, str | int] = {"page": page, "pageSize": page_size}
-        if status is not None:
-            params["status"] = status.value
-        if category is not None:
-            params["category"] = category.value
-        if assignee is not None:
-            params["assignee"] = assignee
-
-        try:
-            upstream = await core_client.get(
-                "/api/reports",
-                params=params,
-                headers={"Authorization": authorization},
-            )
-        except httpx.RequestError as error:
-            raise HTTPException(
-                status_code=502,
-                detail="Core API is unavailable.",
-            ) from error
-
-        if 400 <= upstream.status_code < 500:
-            raise HTTPException(
-                status_code=upstream.status_code,
-                detail="Core API rejected the request.",
-            )
-        if upstream.status_code < 200 or upstream.status_code >= 300:
-            raise HTTPException(status_code=502, detail="Core API request failed.")
-
-        try:
-            items, total = _core_payload_items(upstream.json())
-        except ValueError as error:
-            raise HTTPException(
-                status_code=502,
-                detail="Core API returned an invalid response.",
-            ) from error
-
+        items, total = await _fetch_report_page(
+            core_client,
+            page,
+            page_size,
+            authorization,
+            status,
+            category,
+            assignee,
+        )
         reports.extend(items)
         if len(reports) >= total:
             return reports[:total]
@@ -131,14 +165,14 @@ def _report_csv(reports: list[dict[str, Any]]) -> str:
             not isinstance(report.get(field), str)
             for field in required_fields
         ):
-            raise HTTPException(status_code=502, detail="Core API returned an invalid report.")
+            raise HTTPException(status_code=502, detail=INVALID_REPORT_DETAIL)
 
         location = report.get("location")
         if not isinstance(location, dict):
-            raise HTTPException(status_code=502, detail="Core API returned an invalid report.")
+            raise HTTPException(status_code=502, detail=INVALID_REPORT_DETAIL)
         place = location.get("place")
         if place is not None and not isinstance(place, str):
-            raise HTTPException(status_code=502, detail="Core API returned an invalid report.")
+            raise HTTPException(status_code=502, detail=INVALID_REPORT_DETAIL)
 
         row = {
             "reportId": report.get("reportId"),
@@ -158,8 +192,16 @@ async def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.get("/api/reports/export")
+@app.get(
+    "/api/reports/export",
+    responses={
+        401: {"description": "Bearer access token is missing or invalid."},
+        502: {"description": "Core API is unavailable or returned an invalid response."},
+    },
+)
 async def export_reports(
+    core_client: Annotated[httpx.AsyncClient, Depends(get_core_client)],
+    settings: Annotated[Settings, Depends(get_settings)],
     status: Annotated[
         ReportStatus | None,
         Query(description="Rapor durumu filtresi."),
@@ -168,10 +210,11 @@ async def export_reports(
         ReportCategory | None,
         Query(description="Rapor kategorisi filtresi."),
     ] = None,
-    assignee: str | None = Query(default=None),
-    authorization: str | None = Header(default=None),
-    core_client: httpx.AsyncClient = Depends(get_core_client),
-    settings: Settings = Depends(get_settings),
+    assignee: Annotated[
+        str | None,
+        Query(description="Atanan görevliye göre rapor filtresi."),
+    ] = None,
+    authorization: Annotated[str | None, Header()] = None,
 ) -> Response:
     token = _require_bearer_token(authorization)
     reports = await _fetch_reports(
