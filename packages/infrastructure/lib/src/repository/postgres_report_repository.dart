@@ -15,7 +15,7 @@ final class PostgresReportRepository implements ReportRepository {
   final ReportRepositoryImpl _reports;
 
   static const _databaseFailure = UnknownError('veritabanı işlemi başarısız');
-  static const _notYetConnected = UnknownError('bu işlem henüz bağlı değil');
+  static const _unreadableRow = UnknownError('kayıtlı bildirim okunamadı');
 
   /// Kimlik domain'den gelir ([Report.id]). Oluşma zamanı ise veritabanının
   /// saatinden yazılır: üstlenme ve çözülme zamanları da oradan gelir, iki farklı
@@ -44,26 +44,62 @@ final class PostgresReportRepository implements ReportRepository {
         };
       });
 
-  /// Çözme, liste ve detay bir sonraki PR'da bağlanacak (#17). O zamana kadar
-  /// hata döner; sunucu bu üç ucu henüz bu sınıfa bağlamamalı.
+  /// Rule 03 ve Rule 04: yalnızca üstlenen görevli çözer; durum, geçmiş ve
+  /// öğrenciye bildirim aynı işlemde yazılır.
   @override
   Future<Result<Unit, AppError>> resolve(
     ReportId reportId,
     UserId assigneeId,
     Photo resolutionPhoto, {
     String? note,
-  }) async => const Failure(_notYetConnected);
+  }) => _guard(() async {
+    final outcome = await _reports.resolve(
+      reportId.value,
+      assigneeId.value,
+      photoRow(resolutionPhoto),
+      note: note,
+    );
+    return switch (outcome) {
+      ResolveOutcome.resolved => const Success(Unit.value),
+      ResolveOutcome.notAssignee => const Failure(ForbiddenError()),
+      ResolveOutcome.invalidTransition => const Failure(
+        InvalidTransitionError(),
+      ),
+      ResolveOutcome.notFound => const Failure(NotFoundError()),
+    };
+  });
 
+  /// Sayfa ve toplam aynı süzgeçle iki sorguda alınır. [limit] ve [offset]'i
+  /// use case denetler; geçersizse depo boş sayfa döner.
   @override
   Future<Result<Paginated<ReportSummary>, AppError>> list({
     required ReportListFilter filter,
     required int limit,
     required int offset,
-  }) async => const Failure(_notYetConnected);
+  }) => _guard(() async {
+    final rowFilter = filterRow(filter);
+    final rows = await _reports.list(rowFilter, limit: limit, offset: offset);
+    final total = await _reports.count(rowFilter);
+    return Success(
+      Paginated(
+        items: [for (final row in rows) summaryOf(row)],
+        total: total,
+        page: limit > 0 ? offset ~/ limit + 1 : 1,
+        pageSize: limit,
+      ),
+    );
+  });
 
+  /// Bildirim yoksa `null`. Yetki burada denetlenmez (Rule 01 use case'te).
   @override
-  Future<Result<Report?, AppError>> findById(ReportId reportId) async =>
-      const Failure(_notYetConnected);
+  Future<Result<Report?, AppError>> findById(ReportId reportId) =>
+      _guard(() async {
+        final row = await _reports.findById(reportId.value);
+        if (row == null) return const Success(null);
+        final report = restoreReport(row);
+        if (report == null) return const Failure(_unreadableRow);
+        return Success(report);
+      });
 
   // Veritabanı hatası (bağlantı, zaman aşımı) istisna olarak gelir; servis akışı
   // istisnayla yönetilmez, [UnknownError]'a çevrilir. Programlama hataları
