@@ -37,6 +37,8 @@ coverage/
 __pycache__/
 .pytest_cache/
 *.py[cod]
+services/python-report-service/.coverage
+services/python-report-service/coverage.xml
 
 # --- Obsidian (proje-bilgileri vault'u): kişisel oturum durumu ---
 **/.obsidian/workspace.json

@@ -1,7 +1,7 @@
 ---
 title: SonarQube Puanları ve Bulgu Çözüm Günlüğü
 durum: Güncel
-son-guncelleme: 2026-10-24
+son-guncelleme: 2026-10-25
 ---
 
 # SonarQube Puanları ve Bulgu Çözüm Günlüğü
@@ -18,7 +18,16 @@ Her kod commit'inden sonra tarama yapılır; sonuçlar ve çözülen bulgular bu
 | SonarQube (`http://localhost:9005`) | **Doğrulandı (2026-09-30):** `sonarqube:community` 26.9.0.129388 konteyneri yaklaşık 30 saniyede `UP` oldu, arayüz `200` döndü; deneme sonrası konteyner silindi |
 | SonarQube'un Dart desteği | **Community'de yok** (yerelde doğrulandı). **Developer Edition ve SonarQube Cloud'da var**; ücretsiz Cloud planı önerildi (aşağıdaki araştırma) |
 | `dart analyze`, `flutter analyze` | Yedek: kod oluşunca her commit'te çalıştırılır |
-| Test kapsamı (coverage) | **Ölçülüyor (2026-10-24):** LCOV (`coverage/lcov.info`); Dart kapsamı %80,1. Web JS için tarayıcı testleri LCOV üretmediğinden kapsam ölçülmüyor |
+| Test kapsamı (coverage) | **Ölçülüyor (2026-10-24):** LCOV (`coverage/lcov.info`); Dart kapsamı %80,1. Web JS için tarayıcı testleri LCOV üretmediğinden kapsam ölçülmüyor. Python kapsam XML'i Sonar'a gönderilecek şekilde yapılandırıldı; Cloud sonucu ilk CI çalışmasında doğrulanacak |
+
+## Python servis analizi (2026-10-25)
+
+`services/python-report-service/app` Sonar kaynaklarına, `tests` Sonar testlerine
+eklendi. Sonar işinde Python 3.12 ve `requirements-dev.txt` kurulup pytest-cov
+ile `coverage.xml` üretiliyor; `sonar.python.coverage.reportPaths` bu dosyayı
+okuyor. Yerel Docker doğrulamasında 23 test geçti ve toplam kapsam %87 ölçüldü.
+Bu yalnızca test/rapor üretiminin doğrulamasıdır; SonarCloud analizi ve kalite
+kapısı sonucu **ilk CI taramasına kadar doğrulanmadı**.
 
 ## Doğrulama kaydı (2026-09-30)
 
