@@ -71,12 +71,15 @@ void main() async {
   final health = Router()
     ..get('/health', (Request request) => Response.ok('OK'));
 
+  final clientKey = clientIpBehind(trustedProxiesFrom(env));
   final handler = const Pipeline()
       .addMiddleware(logRequests())
-      .addMiddleware(securityHeaders())
       .addMiddleware(corsHeaders())
-      .addMiddleware(rateLimit(RateLimitRule.general))
-      .addMiddleware(rateLimit(RateLimitRule.login, appliesTo: _isLogin))
+      .addMiddleware(securityHeaders())
+      .addMiddleware(rateLimit(RateLimitRule.general, keyOf: clientKey))
+      .addMiddleware(
+        rateLimit(RateLimitRule.login, appliesTo: _isLogin, keyOf: clientKey),
+      )
       .addHandler(Cascade().add(health.call).add(auth.router.call).handler);
 
   final server = await io.serve(handler, InternetAddress.anyIPv4, 8080);

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:campus_server/src/middleware/rate_limit_middleware.dart';
 import 'package:shelf/shelf.dart';
@@ -87,4 +88,58 @@ void main() {
   test('clientIp_withoutConnectionInfo_isUnknown', () {
     expect(clientIp(req('1.1.1.1')), 'unknown');
   });
+
+  group('clientIpBehind', () {
+    const proxy = '10.0.0.1';
+    final keyOf = clientIpBehind({proxy});
+
+    Request from(String ip, {String? forwardedFor}) => Request(
+      'GET',
+      Uri.parse('http://localhost/api/reports'),
+      headers: {'x-forwarded-for': ?forwardedFor},
+      context: {'shelf.io.connection_info': _Connection(ip)},
+    );
+
+    test('directClient_headerIgnored', () {
+      // Proxy olmayan istemci başlığa sahte IP yazsa da kendi adresi sayılır.
+      expect(keyOf(from('5.5.5.5', forwardedFor: '1.2.3.4')), '5.5.5.5');
+    });
+
+    test('trustedProxy_usesForwardedClient', () {
+      expect(keyOf(from(proxy, forwardedFor: '1.2.3.4')), '1.2.3.4');
+    });
+
+    test('trustedProxy_spoofedPrefix_usesLastUntrustedHop', () {
+      // İstemci "9.9.9.9" yazmış, proxy gerçek adresi (1.2.3.4) sona eklemiş.
+      expect(keyOf(from(proxy, forwardedFor: '9.9.9.9, 1.2.3.4')), '1.2.3.4');
+    });
+
+    test('trustedProxy_noHeader_usesProxyAddress', () {
+      expect(keyOf(from(proxy)), proxy);
+    });
+
+    test('emptyTrustList_sameAsClientIp', () {
+      final plain = clientIpBehind({});
+      expect(plain(from(proxy, forwardedFor: '1.2.3.4')), proxy);
+    });
+  });
+
+  test('trustedProxiesFrom_parsesCommaSeparatedList', () {
+    final env = {'TRUSTED_PROXIES': ' 10.0.0.1, ,10.0.0.2'};
+    expect(trustedProxiesFrom(env), {'10.0.0.1', '10.0.0.2'});
+    expect(trustedProxiesFrom({}), isEmpty);
+  });
+}
+
+class _Connection implements HttpConnectionInfo {
+  _Connection(String ip) : remoteAddress = InternetAddress(ip);
+
+  @override
+  final InternetAddress remoteAddress;
+
+  @override
+  int get remotePort => 50000;
+
+  @override
+  int get localPort => 8080;
 }

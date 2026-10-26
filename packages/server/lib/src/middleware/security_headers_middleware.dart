@@ -12,7 +12,8 @@ const securityHeaderValues = {
   // Başka siteye geçerken adres bilgisi gönderilmesin.
   'referrer-policy': 'no-referrer',
   // HTTPS ile gelindiyse bir yıl boyunca yalnızca HTTPS kullanılsın.
-  // HTTP üzerinden tarayıcılar bu başlığı yok sayar.
+  // HTTP üzerinden (ör. yerelde localhost:8080) tarayıcılar bu başlığı yok
+  // sayar; etkili olması için yayında sunucu HTTPS arkasında olmalı.
   'strict-transport-security': 'max-age=31536000',
   // Kişisel veri içeren yanıtlar önbelleğe yazılmasın.
   'cache-control': 'no-store',

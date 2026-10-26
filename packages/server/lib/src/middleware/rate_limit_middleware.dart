@@ -66,12 +66,48 @@ Middleware rateLimit(
 }
 
 /// Bağlantının IP adresi. Bilinmiyorsa (ör. testte) `unknown`.
-/// Not: sunucu bir proxy arkasına konursa burası proxy'nin adresini görür.
+/// Sunucu bir proxy arkasındaysa burası proxy'nin adresini görür; o durumda
+/// [clientIpBehind] kullanılır.
 String clientIp(Request request) {
   final info = request.context['shelf.io.connection_info'];
   if (info is HttpConnectionInfo) return info.remoteAddress.address;
   return 'unknown';
 }
+
+/// Ters proxy (Nginx, Cloudflare) arkasında gerçek istemci IP'si.
+///
+/// Proxy, istemcinin adresini `X-Forwarded-For` başlığına ekler. Bu başlığı
+/// istemci de yazabildiği için yalnızca bağlantı [trustedProxies]'teki bir
+/// adresten geliyorsa okunur; aksi hâlde herkes sahte IP yazıp sınırı
+/// atlatabilirdi. Başlık sağdan sola okunur (her proxy sona ekler) ve
+/// güvenilir olmayan ilk adres istemci sayılır. Liste boşsa (varsayılan)
+/// başlık hiç okunmaz, [clientIp] ile aynıdır.
+RateLimitKey clientIpBehind(Set<String> trustedProxies) {
+  return (Request request) {
+    final direct = clientIp(request);
+    if (!trustedProxies.contains(direct)) return direct;
+    final forwarded = request.headers['x-forwarded-for'] ?? '';
+    final hops = forwarded
+        .split(',')
+        .map((hop) => hop.trim())
+        .where((hop) => hop.isNotEmpty);
+    for (final hop in hops.toList().reversed) {
+      if (!trustedProxies.contains(hop)) return hop;
+    }
+    return direct;
+  };
+}
+
+/// `TRUSTED_PROXIES` ortam değişkeni: virgülle ayrılmış proxy IP'leri.
+/// Tanımlı değilse boş küme; proxy başlıklarına güvenilmez.
+Set<String> trustedProxiesFrom(Map<String, String> env) =>
+    (env[trustedProxiesKey] ?? '')
+        .split(',')
+        .map((ip) => ip.trim())
+        .where((ip) => ip.isNotEmpty)
+        .toSet();
+
+const trustedProxiesKey = 'TRUSTED_PROXIES';
 
 Response _tooManyRequests(Duration retryAfter) {
   // Yukarı yuvarlanmış saniye; en az 1.
