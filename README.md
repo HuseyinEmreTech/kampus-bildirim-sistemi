@@ -328,6 +328,7 @@ Sunucunun önüne Caddy konur: dışarıdan gelen istekleri şifreli (HTTPS) kar
 
 ```bash
 # .env: ALAN_ADI=kampus.example.com (alan adı bu bilgisayarın IP'sini göstermeli)
+# .env: SUNUCU_ADRESI=127.0.0.1 (sunucunun 8080'i dışarıya kapanır, istekler yalnızca HTTPS'ten gelir)
 docker compose -f compose.prod.yaml --profile https up -d --build
 # https://kampus.example.com/health
 ```
