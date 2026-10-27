@@ -46,6 +46,7 @@ Projede teknoloji yığınına eklenen, değiştirilen veya elenen her şey bura
 | 2026-10-02 | Konum | Yalnızca GPS | GPS; izin yoksa bina listesi | Kullanıcı izin vermezse de bildirim açılabilsin |
 | 2026-10-02 | Kayıt sistemi | Commit başına kayıt dosyası ve betik | PR açıklaması kayıt; kişi başına günlük rapor (`ekip/raporlar/`) | 4 kişide ortak indeks dosyası merge çakışması üretir |
 | 2026-10-15 | EXIF temizleme (Rule 07) | Seçilmedi | `image` 4.12.0 ile yeniden kodlama (yalnızca pikseller kalır); 25 megapiksel üstü açılmaz | Elle EXIF bölümü kırpmaya göre gizlenmiş içeriği de temizler. Yerel denemede 12 MP, 5,5 MB JPEG yaklaşık 1,7 sn ve 120 MB bellek; sunucuda ölçülmedi |
+| 2026-10-27 | Mobil oturum saklama | Oturum yalnızca bellekte; uygulama kapanınca düşüyordu | `flutter_secure_storage` 11.2.0, varsayılan Android şifrelemesi (README: RSA OAEP + AES-GCM); oturum tek anahtarda JSON. Manifest'te `android:allowBackup="false"` | USR 07 otomatik giriş; belirteçler düz metin saklanmasın. Yedekleme kapalı: paket README'sine göre yedekten dönen kayıt "Failed to unwrap key" hatası verebilir. En düşük Android SDK 23 gerekir, uygulama `flutter.minSdkVersion` kullanıyor. Hüseyin onayı: #21 yorumu (2026-10-18). Cihazda denenmedi |
 
 ## Elenenler
 
