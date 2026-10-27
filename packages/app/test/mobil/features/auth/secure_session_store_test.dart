@@ -1,6 +1,7 @@
 import 'package:campus_app/mobil/features/auth/data/secure_session_store.dart';
 import 'package:campus_app/mobil/features/auth/data/session.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const session = Session(
@@ -79,6 +80,19 @@ void main() {
 
     await store.clear();
 
+    expect(await store.read(), isNull);
+  });
+
+  test('defaultStorage_writeReadClear_usesFlutterSecureStorage', () async {
+    // Paketin kendi test deposu: gerçek Keystore yerine bellekte tutar.
+    FlutterSecureStorage.setMockInitialValues({});
+    final store = SecureSessionStore();
+
+    await store.write(session);
+    final read = await store.read();
+    await store.clear();
+
+    expect(read?.accessToken, session.accessToken);
     expect(await store.read(), isNull);
   });
 
