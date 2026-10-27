@@ -9,15 +9,22 @@ import 'package:test/test.dart';
 
 // Seed verisiyle çakışmayan sabit kimlik; her testten önce kurulur, sonra silinir.
 const _user = 'a0000000-0000-4000-8000-0000000000e1';
+const _otherUser = 'a0000000-0000-4000-8000-0000000000e2';
 
 // Gerçek uygulamada sunucu bunları rastgele belirteçten SHA-256 ile üretir.
 const _hashA = 'test-hash-a';
 const _hashB = 'test-hash-b';
 const _hashC = 'test-hash-c';
+const _hashD = 'test-hash-d';
 
 const _insertUser = r'''
 INSERT INTO users (user_id, full_name, email, password_hash, role)
 VALUES ($1, 'Test Öğrenci', 'oturum@test.edu', 'test-hash', 'Student')
+''';
+
+const _insertOtherUser = r'''
+INSERT INTO users (user_id, full_name, email, password_hash, role)
+VALUES ($1, 'Test Öğrenci 2', 'oturum2@test.edu', 'test-hash', 'Student')
 ''';
 
 const _insertExpiredSession = r'''
@@ -35,9 +42,14 @@ FROM sessions WHERE refresh_token_hash = $1
 ''';
 
 Future<void> _deleteFixtures(Database db) async {
-  await db.execute(r'DELETE FROM sessions WHERE user_id = $1', [_user]);
-  await db.execute(r'DELETE FROM users WHERE user_id = $1', [_user]);
+  for (final user in [_user, _otherUser]) {
+    await db.execute(r'DELETE FROM sessions WHERE user_id = $1', [user]);
+    await db.execute(r'DELETE FROM users WHERE user_id = $1', [user]);
+  }
 }
+
+Future<bool> _isActive(Database db, String hash) async =>
+    (await db.execute(_selectSession, [hash])).single[1]! as bool;
 
 DateTime _inSevenDays() => DateTime.now().add(const Duration(days: 7));
 
@@ -109,6 +121,42 @@ void main() {
       final rotated = await repository.rotate(_hashA, _hashB, _inSevenDays());
 
       expect(rotated, isNull);
+    });
+
+    test('rotate_reusedToken_revokesAllSessionsOfUser', () async {
+      // Çalınan belirteç önce saldırganca kullanılır (A -> B); gerçek kullanıcı
+      // eski A ile gelince kullanıcının bütün açık oturumları kapanır (#81).
+      await repository.create(_user, _hashA, _inSevenDays());
+      await repository.create(_user, _hashD, _inSevenDays());
+      await repository.rotate(_hashA, _hashB, _inSevenDays());
+
+      final reused = await repository.rotate(_hashA, _hashC, _inSevenDays());
+
+      expect(reused, isNull);
+      expect(await _isActive(db, _hashB), isFalse);
+      expect(await _isActive(db, _hashD), isFalse);
+      expect(await db.execute(_selectSession, [_hashC]), isEmpty);
+    });
+
+    test('rotate_reusedToken_keepsOtherUsersSessions', () async {
+      await db.execute(_insertOtherUser, [_otherUser]);
+      await repository.create(_otherUser, _hashD, _inSevenDays());
+      await repository.create(_user, _hashA, _inSevenDays());
+      await repository.rotate(_hashA, _hashB, _inSevenDays());
+
+      await repository.rotate(_hashA, _hashC, _inSevenDays());
+
+      expect(await _isActive(db, _hashD), isTrue);
+    });
+
+    test('rotate_expiredToken_keepsOtherSessions', () async {
+      // Süresi dolmuş ama iptal edilmemiş belirteç yeniden kullanım sayılmaz.
+      await db.execute(_insertExpiredSession, [_user, _hashA]);
+      await repository.create(_user, _hashD, _inSevenDays());
+
+      await repository.rotate(_hashA, _hashB, _inSevenDays());
+
+      expect(await _isActive(db, _hashD), isTrue);
     });
 
     test('rotate_sameTokenAtOnce_onlyOneWins', () async {
