@@ -322,6 +322,19 @@ docker compose -f compose.prod.yaml up -d --build
 
 Fotoğraflar `files` adlı kalıcı diskte (`/data/files`) durur. HTTPS (Caddy) dağıtım kararından sonra eklenecek.
 
+**Canlıda hesap açmak**
+
+Kayıt ekranı yok ve demo seed'i (`Demo.1234`) canlıya yüklenmez; hesaplar `db/hesap/hesap-ekle.sql` ile tek tek açılır. Parola komut satırına yazılmaz, `PAROLA` ortam değişkeninden okunur (en az 10 karakter). Rol `Student` ya da `Staff`.
+
+```bash
+read -rs PAROLA && export PAROLA
+docker compose -f compose.prod.yaml exec -T -e PAROLA db psql -U campus -d campus \
+  -v ad="Zeynep Demir" -v eposta=zeynep@kampus.edu.tr -v rol=Staff < db/hesap/hesap-ekle.sql
+unset PAROLA
+```
+
+PowerShell'de (5.1 dahil): `$p = Read-Host -AsSecureString "Parola"; $env:PAROLA = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($p))`, sonra `Get-Content db\hesap\hesap-ekle.sql | docker compose -f compose.prod.yaml exec -T -e PAROLA db psql -U campus -d campus -v ad="Zeynep Demir" -v eposta=zeynep@kampus.edu.tr -v rol=Staff`, en sonda `Remove-Item Env:PAROLA`.
+
 **Mobil / Web istemci**
 
 ```bash
