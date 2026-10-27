@@ -320,7 +320,21 @@ docker compose -f compose.prod.yaml up -d --build
 - Sonradan eklenen bir migration yönetici hesabıyla elle uygulanır; yeni tablolara sunucu hesabının izni kendiliğinden verilir:
   `docker compose -f compose.prod.yaml exec -T db psql -U campus -d campus < db/migrations/V5__ornek.sql` (PowerShell'de `cmd /c "..."` içinde).
 
-Fotoğraflar `files` adlı kalıcı diskte (`/data/files`) durur. HTTPS (Caddy) dağıtım kararından sonra eklenecek.
+Fotoğraflar `files` adlı kalıcı diskte (`/data/files`) durur.
+
+**HTTPS (isteğe bağlı, `https` profili)**
+
+Sunucunun önüne Caddy konur: dışarıdan gelen istekleri şifreli (HTTPS) karşılar, içeride sunucuya iletir. Ayarlar `Caddyfile`'dadır.
+
+```bash
+# .env: ALAN_ADI=kampus.example.com (alan adı bu bilgisayarın IP'sini göstermeli)
+docker compose -f compose.prod.yaml --profile https up -d --build
+# https://kampus.example.com/health
+```
+
+- Gerçek bir alan adında Caddy, Let's Encrypt sertifikasını kendisi alır ve yeniler; 80 ve 443 portlarının dışarıya açık olması gerekir. `ALAN_ADI=localhost` ise Caddy kendi yerel sertifikasını kullanır; tarayıcı uyarı verir, yalnızca deneme içindir.
+- HTTP'ye gelen istek HTTPS'e yönlendirilir. 6 MB'tan büyük istek (Rule 07: fotoğraf en fazla 5 MB) sunucuya ulaşmadan reddedilir (413).
+- Profil verilmezse Caddy açılmaz; sunucu eskisi gibi `8080`'den HTTP ile çalışır. Hangi yolun kullanılacağı dağıtım kararına bağlı (hafta 11).
 
 **Canlıda hesap açmak**
 
