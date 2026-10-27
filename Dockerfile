@@ -13,9 +13,14 @@ COPY packages/infrastructure packages/infrastructure
 COPY packages/server packages/server
 
 # packages/app bir Flutter paketi; bu imajda Flutter yok ve sunucu ona bağlı değil.
-# Önce Windows satır sonları (CRLF) LF'ye çevrilir; yoksa satır eşleşmez.
+# Önce Windows satır sonları (CRLF) LF'ye çevrilir. Satır, girinti ve boşluk ne olursa
+# olsun silinir; silinmediyse derleme anlaşılır bir mesajla durur (sessizce bozulmaz).
 RUN sed -i 's/\r$//' pubspec.yaml \
-  && sed -i '/^  - packages\/app$/d' pubspec.yaml \
+  && sed -i '/^[[:space:]]*-[[:space:]]*packages\/app[[:space:]]*$/d' pubspec.yaml \
+  && if grep -Eq 'packages/app([^a-z_]|$)' pubspec.yaml; then \
+       echo 'pubspec.yaml: packages/app satiri silinemedi, Dockerfile guncellenmeli' >&2; \
+       exit 1; \
+     fi \
   && dart pub get
 RUN mkdir -p /cikti/files \
   && dart compile exe packages/server/bin/server.dart -o /cikti/server
