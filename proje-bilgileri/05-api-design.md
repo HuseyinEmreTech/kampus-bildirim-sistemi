@@ -149,12 +149,14 @@ curl "http://localhost:8080/api/me/notifications?page=1&pageSize=20" \
     }
   ],
   "page": 1,
-  "pageSize": 20,
-  "total": 1
+  "pageSize": 20
+  
 }
 ```
 
-Hiç bildirim yoksa `items` boş dizi, `unreadCount` 0 döner.
+Hiç bildirim yoksa `items` boş dizi, `unreadCount` 0 döner. Yalnızca öğrenci (görevli `403`) ve yalnızca kendi bildirimleri (Rule 01). `page` 1'den küçük ya da `pageSize` 1-100 dışında ise `400`. Toplam sayı (`total`) depoda henüz yok.
+
+`PUT /api/me/notifications/{id}/read`: `200 { "notificationId", "read": true }`. Bildirim yoksa ya da başkasınınsa `404 NOT_FOUND` (var olduğu belli edilmez). İkinci kez okundu yapmak ilk okunma zamanını değiştirmez.
 
 ### Bina listesi
 
