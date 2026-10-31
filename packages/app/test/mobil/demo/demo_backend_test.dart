@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:campus_app/mobil/demo/demo_backend.dart';
 import 'package:campus_app/mobil/features/auth/data/auth_source.dart';
 import 'package:campus_app/mobil/features/auth/data/session.dart';
@@ -7,6 +9,7 @@ import 'package:campus_app/mobil/features/reports/data/report_assigner.dart';
 import 'package:campus_app/mobil/features/reports/data/report_list_item.dart';
 import 'package:campus_app/mobil/features/reports/data/reports_source.dart';
 import 'package:campus_app/mobil/features/reports/data/staff_reports_source.dart';
+import 'package:campus_app/mobil/shared/photo/photo_picker.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Future<List<ReportListItem>> staffList(
@@ -38,9 +41,13 @@ void main() {
     final demo = DemoBackend();
 
     await demo.creator.create(
-      const NewReport(
+      NewReport(
         category: ReportCategory.temizlik,
         description: 'Kantin masaları kirli',
+        photo: PickedPhoto(
+          bytes: Uint8List.fromList([1, 2, 3]),
+          contentType: 'image/png',
+        ),
       ),
     );
 
