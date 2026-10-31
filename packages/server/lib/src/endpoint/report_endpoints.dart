@@ -13,11 +13,7 @@ import '../middleware/role_guard_middleware.dart';
 /// görmesi, Rule 02 tek üstlenen) use case'lerdedir; burası isteği okur ve
 /// sonucu JSON'a çevirir.
 class ReportEndpoints {
-  ReportEndpoints({
-    required ListReportsUseCase listReports,
-    required ReportAssignUseCase assignReport,
-  }) : _listReports = listReports,
-       _assignReport = assignReport;
+  ReportEndpoints({required this._listReports, required this._assignReport});
 
   final ListReportsUseCase _listReports;
   final ReportAssignUseCase _assignReport;
