@@ -36,9 +36,13 @@ class FakeReportRepository implements ReportRepository {
     return nextList;
   }
 
+  Report? lastCreated;
+
   @override
-  Future<Result<ReportId, AppError>> create(Report report) =>
-      throw UnimplementedError();
+  Future<Result<ReportId, AppError>> create(Report report) async {
+    lastCreated = report;
+    return Success(report.id);
+  }
 
   @override
   Future<Result<Unit, AppError>> assign(

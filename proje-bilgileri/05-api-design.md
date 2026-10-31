@@ -57,6 +57,7 @@ Makinenin okuyabileceği tanım: `packages/server/openapi.yaml` (OpenAPI 3). Gö
 | 409 | `CONFLICT` | Bildirim zaten üstlenilmiş |
 | 409 | `INVALID_TRANSITION` | Bildirimin şu anki durumunda bu işlem yapılamaz |
 | 422 | `OUTSIDE_CAMPUS` | Konum kampüs dışında (öneri) |
+| 422 | `BUILDING_NOT_FOUND` | Seçilen bina yok |
 | 429 | `RATE_LIMITED` | İstek sınırı aşıldı: IP başına dakikada 100 istek, girişte dakikada 5 deneme. `Retry-After` başlığı kaç saniye bekleneceğini söyler. Sunucu proxy arkasındaysa IP, yalnızca `TRUSTED_PROXIES`'teki adreslerden gelen isteklerde `X-Forwarded-For`'dan okunur |
 | 500 | `INTERNAL_ERROR` | Beklenmeyen sunucu hatası; ayrıntı yalnızca sunucu günlüğüne yazılır |
 
@@ -101,7 +102,7 @@ curl -X POST "http://localhost:8080/api/reports" \
 
 Konum izni yoksa `locationSource=Building` ve `buildingId=<bina-id>` gönderilir; `latitude` ve `longitude` gönderilmez.
 
-Yanıt `201`: [Domain tasarımındaki örnek veri](03-domain-design.md#örnek-veri-sahte) biçiminde bildirim.
+Yalnızca öğrenci oluşturabilir (görevli `403`). Yanıt `201`: `{ "reportId", "status": "Yeni" }`. Zorunlu alan eksikse, `latitude`/`longitude` sayı değilse, fotoğraf JPEG/PNG değilse ya da 5 MB'ı geçiyorsa `400 VALIDATION_ERROR` (`details` alan adı); açıklama 5-500 karakter değilse de `400`. `Building` kaynağında koordinatlar seçilen binadan alınır; bina yoksa `422 BUILDING_NOT_FOUND` ([Rule 06](03-domain-design.md#kurallar-rules)). İstek reddedilirse kaydedilen fotoğraf silinir.
 
 ### Bildirimi üstlen
 
