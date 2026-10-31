@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:campus_app/mobil/features/reports/data/new_report.dart';
 import 'package:campus_app/mobil/features/reports/data/report_creator.dart';
 import 'package:campus_app/mobil/features/reports/data/report_list_item.dart';
@@ -5,6 +7,7 @@ import 'package:campus_app/mobil/features/reports/data/reports_source.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/report_create_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/reports_list_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/widgets/report_card.dart';
+import 'package:campus_app/mobil/shared/photo/photo_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -30,6 +33,13 @@ class AcceptingReportCreator implements ReportCreator {
       const ReportCreated();
 }
 
+/// Her seferinde aynı küçük PNG'yi veren sahte seçici.
+class SamplePicker implements PhotoPicker {
+  @override
+  Future<PhotoPickResult> pick(PhotoSource source) async =>
+      PhotoPicked(PickedPhoto(bytes: Uint8List(8), contentType: 'image/png'));
+}
+
 ReportListItem report({String place = 'A Blok'}) => ReportListItem(
   id: 'r1',
   category: ReportCategory.ariza,
@@ -44,6 +54,7 @@ Future<void> pumpScreen(WidgetTester tester, ReportsSource source) async {
       home: ReportsListScreen(
         source: source,
         creator: AcceptingReportCreator(),
+        photoPicker: SamplePicker(),
       ),
     ),
   );
@@ -122,6 +133,10 @@ void main() {
 
     await tester.tap(find.text('Temizlik'));
     await tester.enterText(find.byType(TextFormField), 'Kütüphanede ışık yok');
+    await tester.ensureVisible(find.text('Fotoğraf çek'));
+    await tester.tap(find.text('Fotoğraf çek'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Gönder'));
     await tester.tap(find.text('Gönder'));
     await tester.pumpAndSettle();
 
