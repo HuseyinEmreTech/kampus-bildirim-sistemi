@@ -7,6 +7,7 @@ import 'package:shelf_router/shelf_router.dart';
 import '../exception/exception_mapper.dart';
 import '../http/json_http.dart';
 import '../http/multipart.dart';
+import '../http/photo_responses.dart';
 import '../middleware/auth_middleware.dart';
 import '../middleware/role_guard_middleware.dart';
 
@@ -38,7 +39,10 @@ class ReportResolutionEndpoint {
     final reportId = request.params['id']!;
     final boundary = multipartBoundary(request);
     if (boundary == null) {
-      return _invalid('İstek multipart/form-data olmalı.', 'content-type');
+      return validationError(
+        'İstek multipart/form-data olmalı.',
+        'content-type',
+      );
     }
 
     StoredPhoto? photo;
@@ -48,7 +52,7 @@ class ReportResolutionEndpoint {
       if (part.name == noteField && rejected == null) {
         note = await readTextField(part.body, maxNoteBytes);
         if (note == null) {
-          rejected = _invalid(
+          rejected = validationError(
             'Not en fazla $maxNoteBytes bayt olabilir.',
             'note',
           );
@@ -63,7 +67,7 @@ class ReportResolutionEndpoint {
           case PhotoSaved(photo: final stored):
             photo = stored;
           case PhotoRejected(:final reason):
-            rejected = _photoRejected(reason);
+            rejected = photoRejected(reason, photoField);
         }
       } else {
         await part.body.drain<void>();
@@ -100,19 +104,4 @@ class ReportResolutionEndpoint {
   Future<void> _discard(StoredPhoto? photo) async {
     if (photo != null) await _photos.delete(photo.url);
   }
-
-  static Response _photoRejected(PhotoError reason) => switch (reason) {
-    PhotoError.invalidFormat => _invalid(
-      'Fotoğraf yalnızca JPEG veya PNG olabilir.',
-      photoField,
-    ),
-    PhotoError.sizeExceeded => _invalid(
-      'Fotoğraf 5 MB\'ı geçemez.',
-      photoField,
-    ),
-    PhotoError.invalidReportId => _invalid('Bildirim kimliği geçersiz.', 'id'),
-  };
-
-  static Response _invalid(String message, String field) =>
-      errorResponse(400, 'VALIDATION_ERROR', message, details: field);
 }
