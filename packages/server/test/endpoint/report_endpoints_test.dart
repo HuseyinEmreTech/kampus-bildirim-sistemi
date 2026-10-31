@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:campus_application/campus_application.dart';
 import 'package:campus_domain/campus_domain.dart';
-import 'package:campus_server/src/endpoint/report_endpoints.dart';
 import 'package:campus_server/src/middleware/auth_middleware.dart';
 import 'package:campus_server/src/service/token_service.dart';
 import 'package:shelf/shelf.dart';
@@ -26,7 +25,7 @@ void main() {
     // Sunucudaki gibi: adresler auth middleware'in arkasında.
     app = const Pipeline()
         .addMiddleware(authMiddleware(tokens))
-        .addHandler(ReportEndpoints(ListReportsUseCase(reports)).router.call);
+        .addHandler(reportEndpointsWith(reports).router.call);
   });
 
   test('staffList_noParams_returnsPageWithDefaults', () async {
