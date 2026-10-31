@@ -8,6 +8,7 @@ import 'package:campus_server/src/config/jwt_config.dart';
 import 'package:campus_server/src/endpoint/auth_endpoints.dart';
 import 'package:campus_server/src/logging/logger.dart';
 import 'package:campus_server/src/middleware/rate_limit_middleware.dart';
+import 'package:campus_server/src/middleware/request_log_middleware.dart';
 import 'package:campus_server/src/middleware/security_headers_middleware.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
@@ -73,7 +74,7 @@ void main() async {
 
   final clientKey = clientIpBehind(trustedProxiesFrom(env));
   final handler = const Pipeline()
-      .addMiddleware(logRequests())
+      .addMiddleware(requestLog())
       .addMiddleware(corsHeaders())
       .addMiddleware(securityHeaders())
       .addMiddleware(rateLimit(RateLimitRule.general, keyOf: clientKey))
