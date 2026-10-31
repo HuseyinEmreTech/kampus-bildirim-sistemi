@@ -1,7 +1,7 @@
 ---
 title: Skill, Plugin ve Araç Kullanım Günlüğü
 durum: Güncel
-son-guncelleme: 2026-10-24
+son-guncelleme: 2026-10-31
 ---
 
 # Skill, Plugin ve Araç Kullanım Günlüğü
@@ -15,7 +15,7 @@ Her hafta hangi Skill'in **nerede, neden** kullanıldığı ve **sonucu** burada
 | Araç | Model | Ne için |
 | --- | --- | --- |
 | Claude Code (terminal) | Claude (raporlarda Haiku 4.5, Sonnet 5.x, Opus 5.5) | Kod, test, doküman taslakları, inceleme |
-| OpenCode (terminal) | DeepSeek V4.1 Flash | PR inceleme/birleştirme, doküman, Sonar teşhisi, token sayımı |
+| OpenCode (terminal) | DeepSeek V4.1 Flash; 31 Ekim PR incelemesinde GLM-5.3 Flash | PR inceleme/birleştirme, doküman, Sonar teşhisi, token sayımı |
 | Gemini | - | İlk sunucu iskeleti ve SonarCloud kurulumu (#19 öncesi) |
 | GitHub Copilot (VS Code) | gpt-6-luna | Responsive bildirim listesi (#22) |
 | Obsidian | - | Doküman vault'u |
@@ -90,6 +90,14 @@ Not: Bu haftanın günlük raporlarında **skill adı** yazılmamış; tablo ara
 | 2026-10-21 | Claude Code (Claude) | #77/#78'in 2. parçaları, Chrome'da çalıştırma, günlük rapor | Mobil | PR #97, #98 hazırlandı | `lib/ortak/` taşımasından çakışma |
 | 2026-10-21 | OpenCode (DeepSeek V4.1 Flash) | PR inceleme ve birleştirme, issue güncelleme, doküman/ADR, token kaydı | Süreç | Birleşmeler ve dokümanlar; oturum tokenı 10.741.727 | Yok |
 | 2026-10-24 | OpenCode (DeepSeek V4.1 Flash); `systematic-debugging`, `github-code-review`, `using-superpowers` (otomatik) | PR #97-#99 denetimi; SonarCloud kapsam hatasının teşhisi ve düzeltmesi; PR şablonu güncellemesi | Kalite ve süreç | #97-#99 birleşti; #100, #101, #102 PR'ları; eksikler PR yorumlarına yazıldı | Eksik klasör taramayı kırdı; `contracts/test` boş olduğu için CI'da yok |
+
+### Hafta 7 (26 Ekim-1 Kasım 2026)
+
+| Tarih | Skill / araç | Nerede | Neden | Sonuç | Sorun |
+| --- | --- | --- | --- | --- | --- |
+| 2026-10-31 | OpenCode (GLM-5.3 Flash), 4 paralel inceleme temsilcisi (aynı model); `gh` + `python3`, diff/gövde `/tmp` önbelleği | 32 açık PR'ın tek tek incelemesi (110-129, 132, 134-144); ölçüt: AGENTS.md + 11-kod-mimarisi + 05-api-design | PR bekçesi birikmişti; her PR için diff tam okunup Türkçe review yorumu hazırlanırken GitHub'a temsilcinin kendisi yazmadı (gönderi sahibi yaptı) | 23 approve, 8 yorum, 1 değişiklik iste; yorumlar PR'larda | Yorum metninde 2 kelimelik bozuk yazım sonradan görüldü; düzeltme yorumu yazılmadı |
+| 2026-10-31 | OpenCode (GLM-5.3 Flash); `gh api` karşılaştırma (`ffd6d61...d2abbf7`) | #140,#135-144 birleşme sonrası durum taraması; #142 çakışma çözümü | Yeni commit'in onayı düşürmüştü; merge'in PR'ın kendi koduna dokunmadığı dosya düzeyinde doğrulandı | #142 yeniden onaylandı; 135, 141, 143, 144 birleşti | Yok |
+| 2026-10-31 | OpenCode (GLM-5.3 Flash); Obsidian CLI/kasası | PR inceleme turu kaydı (`02 - Proje/PR İnceleme Turu`) | İncelemenin özeti ve durum takibi vault'ta kalsın | Not yazıldı, `Home.md` bağlandı | Obsidian CLI kapalıyken direct dosya yazımı kullanıldı |
 
 ## Planlanan
 
