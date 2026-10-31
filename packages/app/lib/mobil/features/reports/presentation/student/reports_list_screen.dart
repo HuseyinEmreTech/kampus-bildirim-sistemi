@@ -3,16 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../data/report_creator.dart';
-import '../../data/report_list_item.dart';
 import '../../data/reports_source.dart';
+import '../../state/report_pager.dart';
 import '../widgets/report_list_body.dart';
 import 'report_create_screen.dart';
 
-/// Öğrencinin kendi bildirimlerini listeleyen ekran; "+" ile yeni bildirim
-/// açılır.
-///
-/// Şimdilik yalnızca ilk sayfa yüklenir; aşağı kaydırınca devamını yükleme
-/// ayrı PR'da eklenecek.
+/// Öğrencinin kendi bildirimlerini listeleyen ekran; aşağı kaydırdıkça
+/// sonraki sayfa yüklenir, "+" ile yeni bildirim açılır.
 class ReportsListScreen extends StatefulWidget {
   const ReportsListScreen({
     super.key,
@@ -30,40 +27,26 @@ class ReportsListScreen extends StatefulWidget {
 }
 
 class _ReportsListScreenState extends State<ReportsListScreen> {
-  final _items = <ReportListItem>[];
-  bool _isLoading = true;
-  bool _loadFailed = false;
+  late final _pager = ReportPager(widget.source.fetchPage);
+  final _scroll = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    unawaited(_loadFirstPage());
+    _scroll.addListener(_onScroll);
+    unawaited(_pager.reload());
   }
 
-  /// İlk sayfayı baştan yükler; açılışta, yenilemede ve "Tekrar dene"de.
-  Future<void> _loadFirstPage() async {
-    final result = await widget.source.fetchPage(
-      offset: 0,
-      limit: reportsPageSize,
-    );
-    if (!mounted) return;
-    setState(() {
-      _isLoading = false;
-      switch (result) {
-        case ReportsPageLoaded(:final items):
-          _loadFailed = false;
-          _items
-            ..clear()
-            ..addAll(items);
-        case ReportsPageFailed():
-          _loadFailed = true;
-      }
-    });
+  @override
+  void dispose() {
+    _scroll.dispose();
+    _pager.dispose();
+    super.dispose();
   }
 
-  void _retry() {
-    setState(() => _isLoading = true);
-    unawaited(_loadFirstPage());
+  void _onScroll() {
+    if (_scroll.position.extentAfter > loadMoreThreshold) return;
+    unawaited(_pager.loadMore());
   }
 
   /// Oluşturma ekranını açar; bildirim oluşturulduysa listeyi baştan yükler.
@@ -74,20 +57,27 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       ),
     );
     if (created != true) return;
-    await _loadFirstPage();
+    await _pager.reload();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Bildirimlerim')),
-      body: ReportListBody(
-        isLoading: _isLoading,
-        loadFailed: _loadFailed,
-        items: _items,
-        emptyMessage: 'Henüz bildiriminiz yok',
-        onRefresh: _loadFirstPage,
-        onRetry: _retry,
+      body: ListenableBuilder(
+        listenable: _pager,
+        builder: (context, _) => ReportListBody(
+          isLoading: _pager.isLoading,
+          loadFailed: _pager.loadFailed,
+          items: _pager.items,
+          emptyMessage: 'Henüz bildiriminiz yok',
+          onRefresh: _pager.reload,
+          onRetry: () => unawaited(_pager.reset()),
+          controller: _scroll,
+          isLoadingMore: _pager.isLoadingMore,
+          loadMoreFailed: _pager.loadMoreFailed,
+          onRetryMore: () => unawaited(_pager.retryMore()),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _openCreateScreen,
