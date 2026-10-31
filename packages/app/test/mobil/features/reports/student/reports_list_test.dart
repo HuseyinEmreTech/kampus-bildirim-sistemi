@@ -1,7 +1,13 @@
+import 'dart:typed_data';
+
+import 'package:campus_app/mobil/features/reports/data/new_report.dart';
+import 'package:campus_app/mobil/features/reports/data/report_creator.dart';
 import 'package:campus_app/mobil/features/reports/data/report_list_item.dart';
 import 'package:campus_app/mobil/features/reports/data/reports_source.dart';
+import 'package:campus_app/mobil/features/reports/presentation/student/report_create_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/reports_list_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/widgets/report_card.dart';
+import 'package:campus_app/mobil/shared/photo/photo_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -10,14 +16,40 @@ class FakeReportsSource implements ReportsSource {
   FakeReportsSource(this.results);
 
   final List<ReportsPageResult> results;
+  final requestedOffsets = <int>[];
 
   @override
   Future<ReportsPageResult> fetchPage({
     required int offset,
     required int limit,
   }) async {
+    requestedOffsets.add(offset);
     return results.removeAt(0);
   }
+}
+
+/// Her gönderimi kabul eden sahte kaynak.
+class AcceptingReportCreator implements ReportCreator {
+  @override
+  Future<ReportCreateResult> create(NewReport report) async =>
+      const ReportCreated();
+}
+
+/// [count] tane bildirim; yerleri "Yer [from]", "Yer [from]+1", ...
+List<ReportListItem> reports(int count, {int from = 0}) => [
+  for (var i = from; i < from + count; i++) report(place: 'Yer $i'),
+];
+
+Future<void> scrollToEnd(WidgetTester tester) async {
+  await tester.drag(find.byType(ListView), const Offset(0, -5000));
+  await tester.pumpAndSettle();
+}
+
+/// Her seferinde aynı küçük PNG'yi veren sahte seçici.
+class SamplePicker implements PhotoPicker {
+  @override
+  Future<PhotoPickResult> pick(PhotoSource source) async =>
+      PhotoPicked(PickedPhoto(bytes: Uint8List(8), contentType: 'image/png'));
 }
 
 ReportListItem report({String place = 'A Blok'}) => ReportListItem(
@@ -29,7 +61,15 @@ ReportListItem report({String place = 'A Blok'}) => ReportListItem(
 );
 
 Future<void> pumpScreen(WidgetTester tester, ReportsSource source) async {
-  await tester.pumpWidget(MaterialApp(home: ReportsListScreen(source: source)));
+  await tester.pumpWidget(
+    MaterialApp(
+      home: ReportsListScreen(
+        source: source,
+        creator: AcceptingReportCreator(),
+        photoPicker: SamplePicker(),
+      ),
+    ),
+  );
   await tester.pumpAndSettle();
 }
 
@@ -83,5 +123,94 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(ReportCard), findsOneWidget);
+  });
+
+  testWidgets('opensCreateScreen_onAddTap', (tester) async {
+    await pumpScreen(tester, FakeReportsSource([const ReportsPageLoaded([])]));
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ReportCreateScreen), findsOneWidget);
+  });
+
+  testWidgets('reloadsList_afterReportCreated', (tester) async {
+    final source = FakeReportsSource([
+      const ReportsPageLoaded([]),
+      ReportsPageLoaded([report(place: 'Kütüphane')]),
+    ]);
+    await pumpScreen(tester, source);
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Temizlik'));
+    await tester.enterText(find.byType(TextFormField), 'Kütüphanede ışık yok');
+    await tester.ensureVisible(find.text('Fotoğraf çek'));
+    await tester.tap(find.text('Fotoğraf çek'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Gönder'));
+    await tester.tap(find.text('Gönder'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ReportCreateScreen), findsNothing);
+    expect(find.textContaining('Kütüphane'), findsOneWidget);
+  });
+
+  testWidgets('keepsList_whenCreateCancelled', (tester) async {
+    final source = FakeReportsSource([
+      ReportsPageLoaded([report()]),
+    ]);
+    await pumpScreen(tester, source);
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    expect(source.results, isEmpty);
+    expect(find.byType(ReportCard), findsOneWidget);
+  });
+
+  testWidgets('loadsMore_onScroll', (tester) async {
+    final source = FakeReportsSource([
+      ReportsPageLoaded(reports(reportsPageSize)),
+      ReportsPageLoaded(reports(5, from: reportsPageSize)),
+    ]);
+    await pumpScreen(tester, source);
+
+    await scrollToEnd(tester);
+    await tester.scrollUntilVisible(find.textContaining('Yer 24'), 300);
+
+    expect(source.requestedOffsets, [0, reportsPageSize]);
+    expect(find.textContaining('Yer 24'), findsOneWidget);
+  });
+
+  testWidgets('stopsLoading_whenLastPageIsShort', (tester) async {
+    final source = FakeReportsSource([ReportsPageLoaded(reports(5))]);
+    await pumpScreen(tester, source);
+
+    await scrollToEnd(tester);
+
+    expect(source.requestedOffsets, [0]);
+  });
+
+  testWidgets('showsLoadMoreRetry_whenNextPageFails', (tester) async {
+    final source = FakeReportsSource([
+      ReportsPageLoaded(reports(reportsPageSize)),
+      const ReportsPageFailed(),
+      ReportsPageLoaded(reports(1, from: reportsPageSize)),
+    ]);
+    await pumpScreen(tester, source);
+    await scrollToEnd(tester);
+    await scrollToEnd(tester);
+
+    expect(find.text('Daha fazlası yüklenemedi'), findsOneWidget);
+
+    await tester.tap(find.text('Tekrar dene'));
+    await tester.pumpAndSettle();
+    await scrollToEnd(tester);
+
+    expect(source.requestedOffsets, [0, reportsPageSize, reportsPageSize]);
+    expect(find.textContaining('Yer 20'), findsOneWidget);
   });
 }

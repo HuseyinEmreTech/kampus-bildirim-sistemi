@@ -37,7 +37,7 @@ final class ListReportsUseCase {
 
     final statusRaw = _parseOptionalStatus(query.status);
     if (statusRaw == _invalid) {
-      return _invalidTransition();
+      return _validation('status', 'status geçersiz');
     }
     final status = statusRaw as ReportStatus?;
 
@@ -130,7 +130,4 @@ final class ListReportsUseCase {
     String field,
     String message,
   ) => Failure(ValidationError(field, message));
-
-  static Result<Paginated<ReportSummary>, AppError> _invalidTransition() =>
-      const Failure(InvalidTransitionError());
 }

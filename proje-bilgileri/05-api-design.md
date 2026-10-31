@@ -10,6 +10,8 @@ son-guncelleme: 2026-10-24
 
 Standartlar: [Mimari genel bakış](02-architecture-overview.md). Modeller: [Domain tasarımı](03-domain-design.md).
 
+Makinenin okuyabileceği tanım: `packages/server/openapi.yaml` (OpenAPI 3). Görüntülemek için içeriği [Swagger Editor](https://editor.swagger.io)'a yapıştırın. Yalnızca çalışan uçları içerir; uç eklenince aynı PR'da güncellenir.
+
 ## Endpoint'ler
 
 | Endpoint | Metot | Rol | Açıklama |
@@ -24,7 +26,9 @@ Standartlar: [Mimari genel bakış](02-architecture-overview.md). Modeller: [Dom
 | `/api/reports/{id}/resolution` | PUT | Üstlenen görevli | Çözüldü işaretle |
 | `/api/me/notifications` | GET | Öğrenci | "Çözüldü" bildirimleri; sayfalı, okunmamış sayısıyla |
 | `/api/me/notifications/{id}/read` | PUT | Öğrenci | Okundu işaretle |
+| `/api/users/me` | GET | Giriş yapmış herkes | Kendi profil bilgisi (`userId`, `fullName`, `email`, `role`); parola özeti yok |
 | `/api/buildings` | GET | Giriş yapmış herkes | Bina listesi (konum izni yokken seçim için) |
+| `/api/buildings/{id}` | GET | Giriş yapmış herkes | Tek binanın adı ve koordinatı |
 | `/health` | GET | Herkes | Sağlık kontrolü |
 
 ## Parametreler
@@ -52,7 +56,12 @@ Standartlar: [Mimari genel bakış](02-architecture-overview.md). Modeller: [Dom
 | 403 | `FORBIDDEN` | Rol yetkisi yok |
 | 404 | `NOT_FOUND` | Kayıt yok |
 | 409 | `CONFLICT` | Bildirim zaten üstlenilmiş |
+| 409 | `INVALID_TRANSITION` | Bildirimin şu anki durumunda bu işlem yapılamaz |
+| 413 | `PAYLOAD_TOO_LARGE` | İstek gövdesi 6 MB'ı geçiyor (5 MB fotoğraf + form alanları); büyük istek okunmadan reddedilir |
 | 422 | `OUTSIDE_CAMPUS` | Konum kampüs dışında (öneri) |
+| 422 | `BUILDING_NOT_FOUND` | Seçilen bina yok |
+| 429 | `RATE_LIMITED` | İstek sınırı aşıldı: IP başına dakikada 100 istek, girişte dakikada 5 deneme. `Retry-After` başlığı kaç saniye bekleneceğini söyler. Sunucu proxy arkasındaysa IP, yalnızca `TRUSTED_PROXIES`'teki adreslerden gelen isteklerde `X-Forwarded-For`'dan okunur |
+| 500 | `INTERNAL_ERROR` | Beklenmeyen sunucu hatası; ayrıntı yalnızca sunucu günlüğüne yazılır |
 
 ## Örnekler
 
@@ -95,7 +104,7 @@ curl -X POST "http://localhost:8080/api/reports" \
 
 Konum izni yoksa `locationSource=Building` ve `buildingId=<bina-id>` gönderilir; `latitude` ve `longitude` gönderilmez.
 
-Yanıt `201`: [Domain tasarımındaki örnek veri](03-domain-design.md#örnek-veri-sahte) biçiminde bildirim.
+Yalnızca öğrenci oluşturabilir (görevli `403`). Yanıt `201`: `{ "reportId", "status": "Yeni" }`. Zorunlu alan eksikse, `latitude`/`longitude` sayı değilse, fotoğraf JPEG/PNG değilse ya da 5 MB'ı geçiyorsa `400 VALIDATION_ERROR` (`details` alan adı); açıklama 5-500 karakter değilse de `400`. `Building` kaynağında koordinatlar seçilen binadan alınır; bina yoksa `422 BUILDING_NOT_FOUND` ([Rule 06](03-domain-design.md#kurallar-rules)). İstek reddedilirse kaydedilen fotoğraf silinir.
 
 ### Bildirimi üstlen
 
@@ -104,10 +113,10 @@ curl -X PUT "http://localhost:8080/api/reports/d4816d0a-cd8e-4442-98c0-65d3ba11b
   -H "Authorization: Bearer <erisim-belirteci>"
 ```
 
-Başarılıysa `200` ve `status: "Ustlenildi"`. Başkası üstlenmişse:
+Başarılıysa `200` ve `{ "reportId", "status": "Ustlenildi", "assigneeId" }`. Yalnızca görevli üstlenebilir (öğrenci `403`); bildirim yoksa `404`, kimlik UUID değilse `400`. Bildirim `Yeni` değilse ya da iki görevli aynı anda basıp başkası önce üstlendiyse ([Rule 02](03-domain-design.md#kurallar-rules)):
 
 ```json
-{ "error": { "code": "CONFLICT", "message": "Bildirim zaten üstlenilmiş.", "details": "" } }
+{ "error": { "code": "CONFLICT", "message": "Bildirim zaten üstlenilmiş.", "details": "Bildirim zaten üstlenilmiş veya çözülmüş" } }
 ```
 
 ### Çözüldü işaretle
@@ -119,7 +128,7 @@ curl -X PUT "http://localhost:8080/api/reports/d4816d0a-cd8e-4442-98c0-65d3ba11b
   -F "resolutionPhoto=@sonuc.jpg;type=image/jpeg"
 ```
 
-Sonuç fotoğrafı zorunludur (`multipart/form-data`); yoksa `400 VALIDATION_ERROR`. Başarılıysa `200`, `status: "Cozuldu"`; öğrenci için `ReportResolved` bildirimi aynı işlemde oluşur ([Rule 04](03-domain-design.md#kurallar-rules)).
+Sonuç fotoğrafı zorunludur (`multipart/form-data`; alanlar `resolutionPhoto` ve isteğe bağlı `note`, en fazla 2000 bayt); yoksa, JPEG/PNG değilse ya da 5 MB'ı geçiyorsa `400 VALIDATION_ERROR` (`details: "resolutionPhoto"`). Yalnızca bildirimi üstlenen görevli çözebilir, başka görevli `403` ([Rule 03](03-domain-design.md#kurallar-rules)); bildirim `Ustlenildi` değilse `409 INVALID_TRANSITION`. Fotoğrafın türü dosyanın ilk baytlarından anlaşılır ve EXIF bilgisi silinerek kaydedilir; istek reddedilirse kaydedilen fotoğraf silinir. Başarılıysa `200`, `{ "reportId", "status": "Cozuldu" }`; öğrenci için `ReportResolved` bildirimi aynı işlemde oluşur ([Rule 04](03-domain-design.md#kurallar-rules)).
 
 ### Bildirimlerim
 
@@ -137,16 +146,33 @@ curl "http://localhost:8080/api/me/notifications?page=1&pageSize=20" \
       "reportId": "d4816d0a-cd8e-4442-98c0-65d3ba11be70",
       "type": "ReportResolved",
       "message": "Bildiriminiz çözüldü: B blok 2. kat koridor lambası",
-      "createdAt": "2026-10-02T11:40:00Z",
+      "createdAt": "2026-10-02T11:40:00.000Z",
       "readAt": null
     }
   ],
   "page": 1,
-  "pageSize": 20,
-  "total": 1
+  "pageSize": 20
 }
 ```
 
-Hiç bildirim yoksa `items` boş dizi, `unreadCount` 0 döner.
+Hiç bildirim yoksa `items` boş dizi, `unreadCount` 0 döner. Yalnızca öğrenci (görevli `403`) ve yalnızca kendi bildirimleri (Rule 01). `page` 1'den küçük ya da `pageSize` 1-100 dışında ise `400`. Toplam sayı (`total`) depoda henüz yok.
+
+`PUT /api/me/notifications/{id}/read`: `200 { "notificationId", "read": true }`. Bildirim yoksa ya da başkasınınsa `404 NOT_FOUND` (var olduğu belli edilmez). İkinci kez okundu yapmak ilk okunma zamanını değiştirmez.
+
+### Bina listesi
+
+`GET /api/buildings` (giriş yapmış herkes): `{ "items": [ { "buildingId", "name", "latitude", "longitude" } ] }`, ada göre sıralı. Bina yoksa `items` boş dizi; belirteç yoksa `401`.
+
+`GET /api/buildings/{id}` (giriş yapmış herkes): `{ "buildingId", "name", "latitude", "longitude" }`. Bina yoksa ya da kimlik UUID değilse `404 NOT_FOUND`.
+
+### Bildirim listesi
+
+`GET /api/reports` (görevli; `assignee=me` ile yalnızca kendi üstlendikleri) ve `GET /api/me/reports` (öğrenci; yalnızca kendi bildirimleri) aynı biçimde döner: `{ "items": [...], "page", "pageSize", "total" }`. Her öğede `reportId`, `category`, `description`, `status`, `place`, `buildingName`, `photoUrl`, `assigneeId`, `createdAt` vardır. Öğrenci `GET /api/reports`'a, görevli `GET /api/me/reports`'a istek atarsa `403 FORBIDDEN`; `page`/`pageSize` sayı değilse ya da aralık dışındaysa `400 VALIDATION_ERROR`.
+
+Her yanıtta güvenlik başlıkları bulunur: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`, `Referrer-Policy: no-referrer`, `Strict-Transport-Security` (yalnızca HTTPS'te etkili; yerelde HTTP ile yok sayılır), `Cache-Control: no-store`.
+
+Her yanıtta `X-Request-Id` başlığı da vardır; sunucu günlüğünde aynı istek bu kimlikle bulunur. Sunucu her isteği tek satır JSON olarak günlüğe yazar (`time`, `level`, `requestId`, `method`, `path`, `status`, `durationMs`); sorgu, başlık ve gövde günlüğe yazılmaz.
+
+Giriş gerektiren adreslerde veriyi değiştiren istekler (`POST`, `PUT`, `PATCH`, `DELETE`) ayrıca denetim kaydına yazılır: `{"audit":true,"userId","method","path","status"}`. Okuma (`GET`) istekleri denetim kaydına girmez.
 
 Yanıt gövdeleri örnektir; gerçek alanlar geliştirme sırasında bu dokümanla birlikte güncellenir.
