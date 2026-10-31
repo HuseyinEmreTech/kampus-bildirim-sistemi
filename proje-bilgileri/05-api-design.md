@@ -125,7 +125,7 @@ curl -X PUT "http://localhost:8080/api/reports/d4816d0a-cd8e-4442-98c0-65d3ba11b
   -F "resolutionPhoto=@sonuc.jpg;type=image/jpeg"
 ```
 
-Sonuç fotoğrafı zorunludur (`multipart/form-data`); yoksa `400 VALIDATION_ERROR`. Başarılıysa `200`, `status: "Cozuldu"`; öğrenci için `ReportResolved` bildirimi aynı işlemde oluşur ([Rule 04](03-domain-design.md#kurallar-rules)).
+Sonuç fotoğrafı zorunludur (`multipart/form-data`; alanlar `resolutionPhoto` ve isteğe bağlı `note`, en fazla 2000 bayt); yoksa, JPEG/PNG değilse ya da 5 MB'ı geçiyorsa `400 VALIDATION_ERROR` (`details: "resolutionPhoto"`). Yalnızca bildirimi üstlenen görevli çözebilir, başka görevli `403` ([Rule 03](03-domain-design.md#kurallar-rules)); bildirim `Ustlenildi` değilse `409 INVALID_TRANSITION`. Fotoğrafın türü dosyanın ilk baytlarından anlaşılır ve EXIF bilgisi silinerek kaydedilir; istek reddedilirse kaydedilen fotoğraf silinir. Başarılıysa `200`, `{ "reportId", "status": "Cozuldu" }`; öğrenci için `ReportResolved` bildirimi aynı işlemde oluşur ([Rule 04](03-domain-design.md#kurallar-rules)).
 
 ### Bildirimlerim
 

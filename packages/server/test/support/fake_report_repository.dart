@@ -32,15 +32,34 @@ class FakeReportRepository implements ReportRepository {
   Future<Result<Unit, AppError>> assign(ReportId reportId, UserId assigneeId) =>
       throw UnimplementedError();
 
+  ({String reportId, String photoUrl, String? note})? lastResolve;
+
   @override
   Future<Result<Unit, AppError>> resolve(
     ReportId reportId,
     UserId assigneeId,
     Photo resolutionPhoto, {
     String? note,
-  }) => throw UnimplementedError();
+  }) async {
+    lastResolve = (
+      reportId: reportId.value,
+      photoUrl: resolutionPhoto.url,
+      note: note,
+    );
+    return const Success(Unit.value);
+  }
 
   @override
   Future<Result<Report?, AppError>> findById(ReportId reportId) =>
       throw UnimplementedError();
+}
+
+/// [staffId] görevlisinin üstlendiği örnek bildirim.
+Report assignedReport(String reporterId, String staffId) {
+  final assigned = newReport(reporterId).assign(
+    assigneeId: (UserId.create(staffId) as Success<UserId, DomainError>).value,
+    role: Role.staff,
+    takenAt: DateTime.utc(2026, 10, 2, 10),
+  );
+  return (assigned as Success<Report, DomainError>).value;
 }
