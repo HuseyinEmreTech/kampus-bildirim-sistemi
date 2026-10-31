@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:campus_app/mobil/features/reports/data/new_report.dart';
 import 'package:campus_app/mobil/features/reports/data/report_creator.dart';
 import 'package:campus_app/mobil/features/reports/data/report_list_item.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/report_create_screen.dart';
+import 'package:campus_app/mobil/shared/photo/photo_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -19,6 +22,19 @@ class FakeReportCreator implements ReportCreator {
   }
 }
 
+final tinyPng = PickedPhoto(
+  bytes: base64Decode(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+  ),
+  contentType: 'image/png',
+);
+
+class FakePicker implements PhotoPicker {
+  @override
+  Future<PhotoPickResult> pick(PhotoSource source) async =>
+      PhotoPicked(tinyPng);
+}
+
 /// Ekranı bir önceki sayfadan açar; böylece kapanınca geri dönüş görülebilir.
 Future<void> openScreen(WidgetTester tester, ReportCreator creator) async {
   await tester.pumpWidget(
@@ -28,7 +44,10 @@ Future<void> openScreen(WidgetTester tester, ReportCreator creator) async {
           builder: (context) => TextButton(
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<bool>(
-                builder: (_) => ReportCreateScreen(creator: creator),
+                builder: (_) => ReportCreateScreen(
+                  creator: creator,
+                  photoPicker: FakePicker(),
+                ),
               ),
             ),
             child: const Text('Aç'),
@@ -43,15 +62,24 @@ Future<void> openScreen(WidgetTester tester, ReportCreator creator) async {
 
 const validDescription = 'Koridor lambası yanmıyor';
 
-Future<void> fillForm(WidgetTester tester, String description) async {
-  await tester.tap(find.text('Temizlik'));
-  await tester.enterText(find.byType(TextFormField), description);
-}
-
-Future<void> submit(WidgetTester tester) async {
-  await tester.tap(find.text('Gönder'));
+/// Ekranın altında kalabilecek bir öğeye kaydırıp dokunur.
+Future<void> tapVisible(WidgetTester tester, String text) async {
+  await tester.ensureVisible(find.text(text));
+  await tester.tap(find.text(text));
   await tester.pumpAndSettle();
 }
+
+Future<void> fillForm(
+  WidgetTester tester,
+  String description, {
+  bool withPhoto = true,
+}) async {
+  await tester.tap(find.text('Temizlik'));
+  await tester.enterText(find.byType(TextFormField), description);
+  if (withPhoto) await tapVisible(tester, 'Fotoğraf çek');
+}
+
+Future<void> submit(WidgetTester tester) => tapVisible(tester, 'Gönder');
 
 void main() {
   testWidgets('showsValidationError_whenCategoryMissing', (tester) async {
@@ -85,6 +113,7 @@ void main() {
 
     expect(creator.received.single.category, ReportCategory.temizlik);
     expect(creator.received.single.description, validDescription);
+    expect(creator.received.single.photo, same(tinyPng));
     expect(find.byType(ReportCreateScreen), findsNothing);
     expect(find.text('Bildirim oluşturuldu'), findsOneWidget);
   });
@@ -100,5 +129,16 @@ void main() {
 
     expect(find.text('Konum kampüs dışında.'), findsOneWidget);
     expect(find.byType(ReportCreateScreen), findsOneWidget);
+  });
+
+  testWidgets('showsValidationError_whenPhotoMissing', (tester) async {
+    final creator = FakeReportCreator(const ReportCreated());
+    await openScreen(tester, creator);
+
+    await fillForm(tester, validDescription, withPhoto: false);
+    await submit(tester);
+
+    expect(find.text('Fotoğraf ekleyin'), findsOneWidget);
+    expect(creator.received, isEmpty);
   });
 }

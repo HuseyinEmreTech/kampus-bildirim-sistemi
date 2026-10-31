@@ -34,12 +34,13 @@ WHERE notification_id = $1 AND user_id = $2
 ''';
 
   // Yeniden eskiye; aynı anda oluşanlar kimliğe göre sıralanır, sayfalar kaymaz.
+  // $4 doğruysa yalnızca okunmamışlar gelir; süzme LIMIT/OFFSET'ten önce olur.
   static const _listSql = r'''
 SELECT n.notification_id::text, n.report_id::text, r.category, r.description,
   n.type, n.message, n.created_at, n.read_at
 FROM notifications n
 JOIN reports r ON r.report_id = n.report_id
-WHERE n.user_id = $1
+WHERE n.user_id = $1 AND (NOT $4::boolean OR n.read_at IS NULL)
 ORDER BY n.created_at DESC, n.notification_id DESC
 LIMIT $2 OFFSET $3
 ''';
@@ -58,15 +59,21 @@ SELECT count(*) FROM notifications WHERE user_id = $1 AND read_at IS NULL
   }
 
   /// [userId] öğrencisinin bildirimleri (Rule 01), yeniden eskiye. [offset] kadarını
-  /// atlar, en çok [limit] tane döner. Sayfa geçersizse boş liste döner,
-  /// veritabanına gidilmez.
+  /// atlar, en çok [limit] tane döner. [unreadOnly] doğruysa okunmuşlar atlanır.
+  /// Sayfa geçersizse boş liste döner, veritabanına gidilmez.
   Future<List<NotificationItem>> list(
     String userId, {
     required int limit,
     required int offset,
+    bool unreadOnly = false,
   }) async {
     if (!isValidPage(limit, offset)) return const [];
-    final rows = await _db.execute(_listSql, [userId, limit, offset]);
+    final rows = await _db.execute(_listSql, [
+      userId,
+      limit,
+      offset,
+      unreadOnly,
+    ]);
     return [
       for (final [
             id,

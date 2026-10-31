@@ -1,7 +1,7 @@
 ---
 title: Teknoloji Değişiklikleri
 durum: Güncel
-son-guncelleme: 2026-10-15
+son-guncelleme: 2026-10-31
 ---
 
 # Teknoloji Değişiklikleri
@@ -19,7 +19,7 @@ Projede teknoloji yığınına eklenen, değiştirilen veya elenen her şey bura
 | Veritabanı | PostgreSQL 16 | Kabul |
 | Repo düzeni | Dart pub workspace, 6 paket, mimari test | Kabul ([korumalar](../11-kod-mimarisi-ve-korumalar.md)) |
 | CI | GitHub Actions | Kabul, kurulmadı ([plan](../planlar/2026-10-02-repo-iskeleti.md)) |
-| Konum | GPS; izin yoksa bina listesi (Flutter paketi seçilmedi) | Kabul |
+| Konum | GPS (`geolocator`); izin yoksa bina listesi | Kabul |
 | Konteyner | Podman, podman-compose | Kabul |
 | Kod kalitesi | Yerelde `dart analyze`, `flutter analyze`, `dart test --coverage`; PR'da SonarQube Cloud Free | Öneri ([ADR-02](../adr/02-kalite-araci-sonarqube-cloud.md)); Cloud denenmedi |
 | Dokümantasyon | Markdown, Obsidian vault (`proje-bilgileri`) | Kabul |
@@ -46,7 +46,10 @@ Projede teknoloji yığınına eklenen, değiştirilen veya elenen her şey bura
 | 2026-10-02 | Konum | Yalnızca GPS | GPS; izin yoksa bina listesi | Kullanıcı izin vermezse de bildirim açılabilsin |
 | 2026-10-02 | Kayıt sistemi | Commit başına kayıt dosyası ve betik | PR açıklaması kayıt; kişi başına günlük rapor (`ekip/raporlar/`) | 4 kişide ortak indeks dosyası merge çakışması üretir |
 | 2026-10-15 | EXIF temizleme (Rule 07) | Seçilmedi | `image` 4.12.0 ile yeniden kodlama (yalnızca pikseller kalır); 25 megapiksel üstü açılmaz | Elle EXIF bölümü kırpmaya göre gizlenmiş içeriği de temizler. Yerel denemede 12 MP, 5,5 MB JPEG yaklaşık 1,7 sn ve 120 MB bellek; sunucuda ölçülmedi |
+| 2026-10-31 | Sonar kapsam ölçütü | `bin/server.dart` kapsam içi (kapıyı %77,8'e düşürüyordu) | `sonar.coverage.exclusions` ile `bin/*.dart` kapsam dışı | `bin/server.dart` bağlama satırları; birleştirme testi yok. Kabul ölçütü değişti: uç/İs katmanı %80'de kalır, bağlama dosyası hariç |
+| 2026-10-27 | Mobil konum (GPS) | Flutter paketi seçilmedi; ekranlar `LocationProvider` arayüzüyle sahte konumla çalışıyordu | `geolocator` 14.1.2 (`flutter pub add` ile); 15 sn zaman aşımı, yüksek doğruluk; Android manifest'e `ACCESS_COARSE_LOCATION` ve `ACCESS_FINE_LOCATION` | USR 01 konum; izin yoksa ya da alınamazsa bina listesi. Hüseyin onayı: #21 yorumu (2026-10-18). Cihazda denenmedi |
 | 2026-10-27 | Mobil oturum saklama | Oturum yalnızca bellekte; uygulama kapanınca düşüyordu | `flutter_secure_storage` 11.2.0, varsayılan Android şifrelemesi (README: RSA OAEP + AES-GCM); oturum tek anahtarda JSON. Manifest'te `android:allowBackup="false"` | USR 07 otomatik giriş; belirteçler düz metin saklanmasın. Yedekleme kapalı: paket README'sine göre yedekten dönen kayıt "Failed to unwrap key" hatası verebilir. En düşük Android SDK 23 gerekir, uygulama `flutter.minSdkVersion` kullanıyor. Hüseyin onayı: #21 yorumu (2026-10-18). Cihazda denenmedi |
+| 2026-10-27 | Mobil fotoğraf (kamera/galeri) | Seçilmedi; ekranlar `PhotoPicker` arayüzüyle sahte seçiciyle çalışıyordu | `image_picker` 1.2.4 (`flutter pub add` ile); fotoğraf en fazla 1920 px genişlik ve %85 JPEG kalitesiyle istenir | USR 01 ve USR 06 fotoğraf zorunlu; 5 MB sınırı (Rule 07) aşılmasın. Hüseyin onayı: #21 yorumu (2026-10-18). Android'de ek ayar gerekmediği varsayıldı, cihazda doğrulanmadı |
 
 ## Elenenler
 

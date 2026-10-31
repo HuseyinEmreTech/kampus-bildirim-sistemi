@@ -114,3 +114,7 @@ son-guncelleme: 2026-10-12
 - [2026-10-18](raporlar/ertrlpkdmr/2026-10-18.md): ReportRepository'nin PostgreSQL karşılığı; HTTPS, günlük sınırı ve kurtarma tatbikatı (yerel)
 - [2026-10-19](raporlar/ertrlpkdmr/2026-10-19.md): #87 ve #88 açıldı; depo arayüzü parçalara bölündü, #81'e güvenlik notu
 - [2026-10-24](raporlar/ertrlpkdmr/2026-10-24.md): Depo çeviri fonksiyonları ve fotoğraf işleme sınırı PR'ları; ekipteki değişiklikler (Murat, ADR-04)
+- [2026-10-25](raporlar/ertrlpkdmr/2026-10-25.md): Görev taraması; depo arayüzü ikiye bölündü (test önce), fotoğraf saklama ve örnek JWT düzeltmesi (yerel)
+- [2026-10-26](raporlar/ertrlpkdmr/2026-10-26.md): ReportRepository arayüzü 1. parça (oluştur, üstlen)
+- [2026-10-27](raporlar/ertrlpkdmr/2026-10-27.md): Yenileme belirtecinin yeniden kullanımında bütün oturumlar kapanıyor (#81); örnek JWT sırları kısaltıldı
+- [2026-10-31](raporlar/ertrlpkdmr/2026-10-31.md): Bildirim listesine okunmamış süzgeci (Çağdaş'ın isteği)

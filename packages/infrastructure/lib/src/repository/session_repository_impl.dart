@@ -24,6 +24,18 @@ WHERE refresh_token_hash = $1 AND revoked_at IS NULL AND expires_at > NOW()
 RETURNING user_id::text
 ''';
 
+  // İptal edilmiş belirtecin yeniden gelmesi çalınma işaretidir: o kullanıcının
+  // açık oturumlarının hepsi kapanır (OWASP, #81). Süresi dolmuş ama iptal
+  // edilmemiş belirteç bu sayılmaz; alt sorgu yalnızca iptal edilmişi bulur.
+  static const _revokeAllAfterReuseSql = r'''
+UPDATE sessions SET revoked_at = NOW()
+WHERE revoked_at IS NULL
+  AND user_id = (
+    SELECT user_id FROM sessions
+    WHERE refresh_token_hash = $1 AND revoked_at IS NOT NULL
+  )
+''';
+
   /// Girişte yeni oturum açar; oturum kimliğini döner.
   Future<String> create(
     String userId,
@@ -40,8 +52,9 @@ RETURNING user_id::text
 
   /// Eski belirteci iptal edip aynı kullanıcıya yeni oturum açar (tek işlemde).
   ///
-  /// Eski belirteç yoksa, iptal edilmişse ya da süresi dolmuşsa `null` döner
-  /// ve hiçbir şey yazılmaz.
+  /// Eski belirteç yoksa ya da süresi dolmuşsa `null` döner ve hiçbir şey
+  /// yazılmaz. Eski belirteç daha önce iptal edilmişse (yeniden kullanım) yine
+  /// `null` döner, ama kullanıcının bütün açık oturumları da kapatılır.
   Future<({String sessionId, String userId})?> rotate(
     String oldTokenHash,
     String newTokenHash,
@@ -52,7 +65,10 @@ RETURNING user_id::text
         _revokeActiveSql,
         parameters: [oldTokenHash],
       );
-      if (revoked.isEmpty) return null;
+      if (revoked.isEmpty) {
+        await tx.execute(_revokeAllAfterReuseSql, parameters: [oldTokenHash]);
+        return null;
+      }
 
       final userId = revoked.single.single! as String;
       final created = await tx.execute(
