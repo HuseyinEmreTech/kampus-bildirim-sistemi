@@ -56,6 +56,7 @@ Makinenin okuyabileceği tanım: `packages/server/openapi.yaml` (OpenAPI 3). Gö
 | 404 | `NOT_FOUND` | Kayıt yok |
 | 409 | `CONFLICT` | Bildirim zaten üstlenilmiş |
 | 409 | `INVALID_TRANSITION` | Bildirimin şu anki durumunda bu işlem yapılamaz |
+| 413 | `PAYLOAD_TOO_LARGE` | İstek gövdesi 6 MB'ı geçiyor (5 MB fotoğraf + form alanları); büyük istek okunmadan reddedilir |
 | 422 | `OUTSIDE_CAMPUS` | Konum kampüs dışında (öneri) |
 | 422 | `BUILDING_NOT_FOUND` | Seçilen bina yok |
 | 429 | `RATE_LIMITED` | İstek sınırı aşıldı: IP başına dakikada 100 istek, girişte dakikada 5 deneme. `Retry-After` başlığı kaç saniye bekleneceğini söyler. Sunucu proxy arkasındaysa IP, yalnızca `TRUSTED_PROXIES`'teki adreslerden gelen isteklerde `X-Forwarded-For`'dan okunur |
