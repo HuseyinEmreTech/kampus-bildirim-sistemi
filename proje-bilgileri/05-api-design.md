@@ -155,6 +155,10 @@ curl "http://localhost:8080/api/me/notifications?page=1&pageSize=20" \
 
 Hiç bildirim yoksa `items` boş dizi, `unreadCount` 0 döner.
 
+### Bildirim listesi
+
+`GET /api/reports` (görevli; `assignee=me` ile yalnızca kendi üstlendikleri) ve `GET /api/me/reports` (öğrenci; yalnızca kendi bildirimleri) aynı biçimde döner: `{ "items": [...], "page", "pageSize", "total" }`. Her öğede `reportId`, `category`, `description`, `status`, `place`, `buildingName`, `photoUrl`, `assigneeId`, `createdAt` vardır. Öğrenci `GET /api/reports`'a, görevli `GET /api/me/reports`'a istek atarsa `403 FORBIDDEN`; `page`/`pageSize` sayı değilse ya da aralık dışındaysa `400 VALIDATION_ERROR`.
+
 Her yanıtta güvenlik başlıkları bulunur: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`, `Referrer-Policy: no-referrer`, `Strict-Transport-Security` (yalnızca HTTPS'te etkili; yerelde HTTP ile yok sayılır), `Cache-Control: no-store`.
 
 Her yanıtta `X-Request-Id` başlığı da vardır; sunucu günlüğünde aynı istek bu kimlikle bulunur. Sunucu her isteği tek satır JSON olarak günlüğe yazar (`time`, `level`, `requestId`, `method`, `path`, `status`, `durationMs`); sorgu, başlık ve gövde günlüğe yazılmaz.
