@@ -106,10 +106,10 @@ curl -X PUT "http://localhost:8080/api/reports/d4816d0a-cd8e-4442-98c0-65d3ba11b
   -H "Authorization: Bearer <erisim-belirteci>"
 ```
 
-Başarılıysa `200` ve `status: "Ustlenildi"`. Başkası üstlenmişse:
+Başarılıysa `200` ve `{ "reportId", "status": "Ustlenildi", "assigneeId" }`. Yalnızca görevli üstlenebilir (öğrenci `403`); bildirim yoksa `404`, kimlik UUID değilse `400`. Bildirim `Yeni` değilse ya da iki görevli aynı anda basıp başkası önce üstlendiyse ([Rule 02](03-domain-design.md#kurallar-rules)):
 
 ```json
-{ "error": { "code": "CONFLICT", "message": "Bildirim zaten üstlenilmiş.", "details": "" } }
+{ "error": { "code": "CONFLICT", "message": "Bildirim zaten üstlenilmiş.", "details": "Bildirim zaten üstlenilmiş veya çözülmüş" } }
 ```
 
 ### Çözüldü işaretle
