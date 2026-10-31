@@ -2,18 +2,28 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../data/report_creator.dart';
 import '../../data/report_list_item.dart';
 import '../../data/reports_source.dart';
-import 'widgets/report_card.dart';
+import '../widgets/report_list_body.dart';
+import 'report_create_screen.dart';
 
-/// Öğrencinin kendi bildirimlerini listeleyen ekran.
+/// Öğrencinin kendi bildirimlerini listeleyen ekran; "+" ile yeni bildirim
+/// açılır.
 ///
 /// Şimdilik yalnızca ilk sayfa yüklenir; aşağı kaydırınca devamını yükleme
 /// ayrı PR'da eklenecek.
 class ReportsListScreen extends StatefulWidget {
-  const ReportsListScreen({super.key, required this.source});
+  const ReportsListScreen({
+    super.key,
+    required this.source,
+    required this.creator,
+  });
 
   final ReportsSource source;
+
+  /// "Bildirim oluştur" ekranına verilen kaynak.
+  final ReportCreator creator;
 
   @override
   State<ReportsListScreen> createState() => _ReportsListScreenState();
@@ -56,52 +66,34 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     unawaited(_loadFirstPage());
   }
 
+  /// Oluşturma ekranını açar; bildirim oluşturulduysa listeyi baştan yükler.
+  Future<void> _openCreateScreen() async {
+    final created = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => ReportCreateScreen(creator: widget.creator),
+      ),
+    );
+    if (created != true) return;
+    await _loadFirstPage();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Bildirimlerim')),
-      body: _buildBody(),
-    );
-  }
-
-  Widget _buildBody() {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_loadFailed && _items.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Bildirimler yüklenemedi'),
-            const SizedBox(height: 8),
-            FilledButton(onPressed: _retry, child: const Text('Tekrar dene')),
-          ],
-        ),
-      );
-    }
-    return RefreshIndicator(
-      onRefresh: _loadFirstPage,
-      child: _items.isEmpty ? _buildEmpty() : _buildList(),
-    );
-  }
-
-  /// Boş durum da kaydırılabilir olmalı ki aşağı çekip yenilenebilsin.
-  Widget _buildEmpty() {
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: const [
-        SizedBox(height: 120),
-        Center(child: Text('Henüz bildiriminiz yok')),
-      ],
-    );
-  }
-
-  Widget _buildList() {
-    return ListView.builder(
-      physics: const AlwaysScrollableScrollPhysics(),
-      itemCount: _items.length,
-      itemBuilder: (context, index) => ReportCard(report: _items[index]),
+      body: ReportListBody(
+        isLoading: _isLoading,
+        loadFailed: _loadFailed,
+        items: _items,
+        emptyMessage: 'Henüz bildiriminiz yok',
+        onRefresh: _loadFirstPage,
+        onRetry: _retry,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openCreateScreen,
+        tooltip: 'Bildirim oluştur',
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
