@@ -10,6 +10,8 @@ son-guncelleme: 2026-10-24
 
 Standartlar: [Mimari genel bakış](02-architecture-overview.md). Modeller: [Domain tasarımı](03-domain-design.md).
 
+Makinenin okuyabileceği tanım: `packages/server/openapi.yaml` (OpenAPI 3). Görüntülemek için içeriği [Swagger Editor](https://editor.swagger.io)'a yapıştırın. Yalnızca çalışan uçları içerir; uç eklenince aynı PR'da güncellenir.
+
 ## Endpoint'ler
 
 | Endpoint | Metot | Rol | Açıklama |
@@ -53,8 +55,10 @@ Standartlar: [Mimari genel bakış](02-architecture-overview.md). Modeller: [Dom
 | 403 | `FORBIDDEN` | Rol yetkisi yok |
 | 404 | `NOT_FOUND` | Kayıt yok |
 | 409 | `CONFLICT` | Bildirim zaten üstlenilmiş |
+| 409 | `INVALID_TRANSITION` | Bildirimin şu anki durumunda bu işlem yapılamaz |
 | 422 | `OUTSIDE_CAMPUS` | Konum kampüs dışında (öneri) |
 | 429 | `RATE_LIMITED` | İstek sınırı aşıldı: IP başına dakikada 100 istek, girişte dakikada 5 deneme. `Retry-After` başlığı kaç saniye bekleneceğini söyler. Sunucu proxy arkasındaysa IP, yalnızca `TRUSTED_PROXIES`'teki adreslerden gelen isteklerde `X-Forwarded-For`'dan okunur |
+| 500 | `INTERNAL_ERROR` | Beklenmeyen sunucu hatası; ayrıntı yalnızca sunucu günlüğüne yazılır |
 
 ## Örnekler
 
@@ -150,6 +154,10 @@ curl "http://localhost:8080/api/me/notifications?page=1&pageSize=20" \
 ```
 
 Hiç bildirim yoksa `items` boş dizi, `unreadCount` 0 döner.
+
+### Bildirim listesi
+
+`GET /api/reports` (görevli; `assignee=me` ile yalnızca kendi üstlendikleri) ve `GET /api/me/reports` (öğrenci; yalnızca kendi bildirimleri) aynı biçimde döner: `{ "items": [...], "page", "pageSize", "total" }`. Her öğede `reportId`, `category`, `description`, `status`, `place`, `buildingName`, `photoUrl`, `assigneeId`, `createdAt` vardır. Öğrenci `GET /api/reports`'a, görevli `GET /api/me/reports`'a istek atarsa `403 FORBIDDEN`; `page`/`pageSize` sayı değilse ya da aralık dışındaysa `400 VALIDATION_ERROR`.
 
 Her yanıtta güvenlik başlıkları bulunur: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`, `Referrer-Policy: no-referrer`, `Strict-Transport-Security` (yalnızca HTTPS'te etkili; yerelde HTTP ile yok sayılır), `Cache-Control: no-store`.
 
