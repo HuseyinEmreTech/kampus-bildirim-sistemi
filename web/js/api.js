@@ -4,6 +4,22 @@
 const NETWORK_ERROR = { status: 0, code: 'NETWORK_ERROR', message: 'Sunucuya ulaşılamadı.' };
 const UNAUTHORIZED = { status: 401, code: 'UNAUTHORIZED', message: 'Oturumun sona erdi, yeniden giriş yap.' };
 
+/** Gönderim sonucunu { ok, data } ya da { ok: false, error } biçimine çevirir. */
+async function toResult({ response, networkError }) {
+  if (networkError) return { ok: false, error: NETWORK_ERROR };
+  const json = await response.json().catch(() => null);
+  if (response.ok) return { ok: true, data: json };
+  const error = json?.error ?? {};
+  return {
+    ok: false,
+    error: {
+      status: response.status,
+      code: error.code ?? 'UNKNOWN',
+      message: error.message || `Beklenmeyen hata (${response.status}).`,
+    },
+  };
+}
+
 export function createApiClient({ baseUrl, store, fetchFn = window.fetch.bind(window), onUnauthorized }) {
   async function send(path, { method = 'GET', body, auth = true } = {}) {
     const headers = {};
@@ -19,21 +35,6 @@ export function createApiClient({ baseUrl, store, fetchFn = window.fetch.bind(wi
     } catch {
       return { networkError: true };
     }
-  }
-
-  async function toResult({ response, networkError }) {
-    if (networkError) return { ok: false, error: NETWORK_ERROR };
-    const json = await response.json().catch(() => null);
-    if (response.ok) return { ok: true, data: json };
-    const error = json?.error ?? {};
-    return {
-      ok: false,
-      error: {
-        status: response.status,
-        code: error.code ?? 'UNKNOWN',
-        message: error.message || `Beklenmeyen hata (${response.status}).`,
-      },
-    };
   }
 
   async function refreshSession() {
