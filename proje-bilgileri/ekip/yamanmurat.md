@@ -35,3 +35,7 @@ son-guncelleme: 2026-10-24
 
 - Her çalışılan gün [günlük rapor şablonu](../Templates/gunluk-rapor.md) ile `ekip/raporlar/yamanmurat/YYYY-AA-GG.md` yaz.
 - Raporda **harcanan token** da yazılır ([09 Yapay zeka](../09-ai-usage.md#token-kullanımı)).
+
+## Raporlar
+
+- [2026-10-24](raporlar/yamanmurat/2026-10-24.md): Web istemcisi (#90, #99), #99 yapay zeka kaydı, Sonar `javascript:S7721` düzeltmesi

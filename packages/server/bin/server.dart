@@ -7,6 +7,8 @@ import 'package:campus_server/src/service/token_service.dart';
 import 'package:campus_server/src/config/jwt_config.dart';
 import 'package:campus_server/src/endpoint/auth_endpoints.dart';
 import 'package:campus_server/src/logging/logger.dart';
+import 'package:campus_server/src/middleware/rate_limit_middleware.dart';
+import 'package:campus_server/src/middleware/security_headers_middleware.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
@@ -69,11 +71,20 @@ void main() async {
   final health = Router()
     ..get('/health', (Request request) => Response.ok('OK'));
 
+  final clientKey = clientIpBehind(trustedProxiesFrom(env));
   final handler = const Pipeline()
       .addMiddleware(logRequests())
       .addMiddleware(corsHeaders())
+      .addMiddleware(securityHeaders())
+      .addMiddleware(rateLimit(RateLimitRule.general, keyOf: clientKey))
+      .addMiddleware(
+        rateLimit(RateLimitRule.login, appliesTo: _isLogin, keyOf: clientKey),
+      )
       .addHandler(Cascade().add(health.call).add(auth.router.call).handler);
 
   final server = await io.serve(handler, InternetAddress.anyIPv4, 8080);
   serverLog('Server listening on port ${server.port}');
 }
+
+bool _isLogin(Request request) =>
+    request.method == 'POST' && request.url.path == 'api/auth/login';
