@@ -11,6 +11,7 @@ import 'package:campus_server/src/endpoint/notification_endpoints.dart';
 import 'package:campus_server/src/endpoint/user_endpoints.dart';
 import 'package:campus_server/src/logging/logger.dart';
 import 'package:campus_server/src/middleware/audit_log_middleware.dart';
+import 'package:campus_server/src/middleware/body_limit_middleware.dart';
 import 'package:campus_server/src/middleware/auth_middleware.dart';
 import 'package:campus_server/src/middleware/rate_limit_middleware.dart';
 import 'package:campus_server/src/middleware/request_log_middleware.dart';
@@ -95,6 +96,7 @@ void main() async {
       .addMiddleware(requestLog())
       .addMiddleware(corsHeaders())
       .addMiddleware(securityHeaders())
+      .addMiddleware(bodyLimit())
       .addMiddleware(rateLimit(RateLimitRule.general, keyOf: clientKey))
       .addMiddleware(
         rateLimit(RateLimitRule.login, appliesTo: _isLogin, keyOf: clientKey),
