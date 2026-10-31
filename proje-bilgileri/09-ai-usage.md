@@ -1,7 +1,7 @@
 ---
 title: Yapay Zeka Kullanımı
 durum: Güncel
-son-guncelleme: 2026-10-24
+son-guncelleme: 2026-10-31
 ---
 
 # Yapay Zeka Kullanımı
@@ -53,4 +53,5 @@ Yapay zekanın ürettiği işin okunup doğrulanması süre alır. Her Pull Requ
 
 | Tarih | Prompt (kısa) | Bağlam | Sonuç ve yorum |
 | --- | --- | --- | --- |
-| | | | |
+| 2026-10-31 (PR incelemesi) | "Kampüs bildirim sistemindeki belirli PR'ları incele; AGENTS.md + 11-kod-mimarisi + 05-api-design ölçütleriyle diff'i tam oku; TÜRKÇE review yorumu hazırla ama GitHub'a _hiçbir şey gönderme_; sonucu her PR için ayrı dosyaya yaz (karar: onaylar/yorum/değişiklik iste + uygunluk maddeleri). Yeni dış paket ekleme, paket bağımlılık ihlali, parametresiz SQL, `default` dalı, `print`, test yokluğu, sır sızıntısı bulgularını ayrı ayrı işle." | 32 açık PR / 4 paralel temsilci; temsilciye verilen bağlam: diff'in tamamı, PR gövdesi, ölçüt dokümanları | 32 review yorumu hazırlandı; gönderiden önce insan kontrolü yapıldı; 23 approve / 8 yorum / 1 değişiklik iste. Araca güvenilen: dosya okuma + kural eşleme; gönderim elle |
+| 2026-10-31 (karar doğrulama) | "Yeni commit onayı düşürünce PR'ın kendi koduna değişti mi bak: iki commit SHA arasındaki dosya farkı, PR'ın kendi dosya yolları ile compare'da değişen yolların kesişimi" | #142 conflict-merge sonrası | Kod değişmediği gözlendi, PR yeniden onaylandı; `gh api compare` ile dosya düzeyde kanıt |
