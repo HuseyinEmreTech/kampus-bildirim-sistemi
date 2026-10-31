@@ -28,6 +28,7 @@ Makinenin okuyabileceği tanım: `packages/server/openapi.yaml` (OpenAPI 3). Gö
 | `/api/me/notifications/{id}/read` | PUT | Öğrenci | Okundu işaretle |
 | `/api/users/me` | GET | Giriş yapmış herkes | Kendi profil bilgisi (`userId`, `fullName`, `email`, `role`); parola özeti yok |
 | `/api/buildings` | GET | Giriş yapmış herkes | Bina listesi (konum izni yokken seçim için) |
+| `/api/buildings/{id}` | GET | Giriş yapmış herkes | Tek binanın adı ve koordinatı |
 | `/health` | GET | Herkes | Sağlık kontrolü |
 
 ## Parametreler
@@ -162,6 +163,8 @@ Hiç bildirim yoksa `items` boş dizi, `unreadCount` 0 döner. Yalnızca öğren
 ### Bina listesi
 
 `GET /api/buildings` (giriş yapmış herkes): `{ "items": [ { "buildingId", "name", "latitude", "longitude" } ] }`, ada göre sıralı. Bina yoksa `items` boş dizi; belirteç yoksa `401`.
+
+`GET /api/buildings/{id}` (giriş yapmış herkes): `{ "buildingId", "name", "latitude", "longitude" }`. Bina yoksa ya da kimlik UUID değilse `404 NOT_FOUND`.
 
 ### Bildirim listesi
 
