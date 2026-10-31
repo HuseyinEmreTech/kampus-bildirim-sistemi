@@ -130,8 +130,14 @@ void main() {
       String userId, {
       int limit = 20,
       int offset = 0,
+      bool unreadOnly = false,
     }) async {
-      final page = await repository.list(userId, limit: limit, offset: offset);
+      final page = await repository.list(
+        userId,
+        limit: limit,
+        offset: offset,
+        unreadOnly: unreadOnly,
+      );
       return [for (final item in page) item.notificationId];
     }
 
@@ -152,6 +158,24 @@ void main() {
       expect(await idsOf(_owner, limit: maxPageSize + 1), isEmpty);
       expect(await idsOf(_owner, offset: -1), isEmpty);
       expect(await idsOf(_owner, limit: maxPageSize), hasLength(2));
+    });
+
+    test('list_unreadOnly_skipsReadOnes', () async {
+      await repository.markRead(_second, _owner);
+
+      expect(await idsOf(_owner, unreadOnly: true), [_first]);
+      expect(await idsOf(_owner), [_second, _first]);
+    });
+
+    // Süzme sayfalamadan önce yapılır: sunucuda süzülse sayfalar eksik gelirdi.
+    test('list_unreadOnly_pagesOverUnreadOnly', () async {
+      await repository.markRead(_second, _owner);
+
+      expect(await idsOf(_owner, limit: 1, unreadOnly: true), [_first]);
+      expect(
+        await idsOf(_owner, limit: 1, offset: 1, unreadOnly: true),
+        isEmpty,
+      );
     });
 
     test('list_returnsFieldsAndReadTime', () async {
