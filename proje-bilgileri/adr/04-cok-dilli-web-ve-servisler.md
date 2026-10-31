@@ -1,7 +1,7 @@
 ---
 title: "ADR-04: Çok Dilli Yüzeyler (Web, Python ve C# Servisleri)"
-durum: Önerildi
-son-guncelleme: 2026-10-21
+durum: Önerildi (C# ayağı uygulandı)
+son-guncelleme: 2026-11-01
 ---
 
 # ADR-04: Çok Dilli Yüzeyler (Web, Python ve C# Servisleri)
@@ -10,7 +10,7 @@ son-guncelleme: 2026-10-21
 
 ## Durum
 
-**Önerildi.** Hocanın "farklı bir mimari deneyin, nerede zorlandığınızı görün" beklentisi ve ekip üyelerinin kendi dillerinde çalışma isteği üzerine ADR-03'ün yerini kısmen alır. Uygulanmadan önce hocanın beklentisinin "deneme" mi yoksa "zorunlu çok dilli ürün" mü olduğu netleşmeli.
+**Önerildi; kısmen uygulandı (2026-10-31).** C# istatistik servisi `services/rapor-istatistik/` olarak birleşti; Python rapor servisi incelemede. Hocanın beklentisinin "deneme" mi yoksa "zorunlu çok dilli ürün" mü oldüğü hâlâ netleşmedi; bu yüzden ADR "Önerildi"den "Kabul edildi"ye taşınmadı. Uygulanan kısım geri alınabilir olacak şekilde ayrı `services/` klasöründe duruyor.
 
 ## Bağlam
 
