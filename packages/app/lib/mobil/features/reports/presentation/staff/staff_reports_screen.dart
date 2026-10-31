@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 
 import '../../data/report_assigner.dart';
 import '../../data/report_list_item.dart';
-import '../../data/reports_source.dart';
 import '../../data/staff_reports_source.dart';
+import '../../state/report_pager.dart';
 import '../student/widgets/report_card.dart';
 import '../widgets/report_list_body.dart';
 
 /// Görevlinin bildirim listesi: "Gelen" ve "Benimkiler" sekmeleri ve kategori
 /// filtresi (USR 04); "Gelen"deki bildirimler buradan üstlenilir (USR 05).
+/// Aşağı kaydırdıkça sonraki sayfa yüklenir.
 class StaffReportsScreen extends StatefulWidget {
   const StaffReportsScreen({
     super.key,
@@ -26,13 +27,22 @@ class StaffReportsScreen extends StatefulWidget {
 }
 
 class _StaffReportsScreenState extends State<StaffReportsScreen> {
-  final _items = <ReportListItem>[];
   StaffReportsView _view = StaffReportsView.incoming;
 
   /// Seçili kategori; `null` ise tüm kategoriler.
   ReportCategory? _category;
-  bool _isLoading = true;
-  bool _loadFailed = false;
+
+  /// Sekme ya da kategori değişince `reset` ile baştan yüklenir; eski
+  /// seçimin geç gelen cevabı yok sayılır.
+  late final _pager = ReportPager(
+    ({required offset, required limit}) => widget.source.fetchPage(
+      _view,
+      category: _category,
+      offset: offset,
+      limit: limit,
+    ),
+  );
+  final _scroll = ScrollController();
 
   /// Üstlenme isteği süren bildirim; o kartın düğmesi kilitlenir.
   String? _assigningId;
@@ -40,28 +50,20 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
   @override
   void initState() {
     super.initState();
-    unawaited(_load());
+    _scroll.addListener(_onScroll);
+    unawaited(_pager.reload());
   }
 
-  /// Seçili sekme ve kategorinin ilk sayfasını yükler.
-  Future<void> _load() async {
-    final view = _view;
-    final category = _category;
-    final result = await widget.source.fetchFirstPage(view, category: category);
-    // Cevap gelene kadar ekran kapanmış ya da seçim değişmiş olabilir.
-    if (!mounted || view != _view || category != _category) return;
-    setState(() {
-      _isLoading = false;
-      switch (result) {
-        case ReportsPageLoaded(:final items):
-          _loadFailed = false;
-          _items
-            ..clear()
-            ..addAll(items);
-        case ReportsPageFailed():
-          _loadFailed = true;
-      }
-    });
+  @override
+  void dispose() {
+    _scroll.dispose();
+    _pager.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scroll.position.extentAfter > loadMoreThreshold) return;
+    unawaited(_pager.loadMore());
   }
 
   /// [reportId] kimlikli bildirimi üstlenir, sonucu söyler ve listeyi
@@ -80,7 +82,7 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
     if (result is ReportAssignFailed) return;
-    await _load();
+    await _pager.reload();
   }
 
   /// Kimliği olmayan bildirim üstlenilemez; düğme gösterilmez.
@@ -95,16 +97,12 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
 
   void _selectCategory(ReportCategory? category) {
     _category = category;
-    _showLoadingAndReload();
+    unawaited(_pager.reset());
   }
 
-  void _showLoadingAndReload({StaffReportsView? view}) {
-    setState(() {
-      _view = view ?? _view;
-      _isLoading = true;
-      _items.clear();
-    });
-    unawaited(_load());
+  void _selectView(StaffReportsView view) {
+    setState(() => _view = view);
+    unawaited(_pager.reset());
   }
 
   @override
@@ -128,8 +126,7 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
               ],
               selected: {_view},
               showSelectedIcon: false,
-              onSelectionChanged: (selection) =>
-                  _showLoadingAndReload(view: selection.first),
+              onSelectionChanged: (selection) => _selectView(selection.first),
             ),
           ),
           DropdownButton<ReportCategory?>(
@@ -145,19 +142,26 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
             ],
           ),
           Expanded(
-            child: ReportListBody(
-              isLoading: _isLoading,
-              loadFailed: _loadFailed,
-              items: _items,
-              emptyMessage: switch (_view) {
-                StaffReportsView.incoming => 'Bekleyen bildirim yok',
-                StaffReportsView.mine => 'Üstlendiğiniz bildirim yok',
-              },
-              onRefresh: _load,
-              onRetry: _showLoadingAndReload,
-              actionBuilder: _view == StaffReportsView.incoming
-                  ? _buildAssignButton
-                  : null,
+            child: ListenableBuilder(
+              listenable: _pager,
+              builder: (context, _) => ReportListBody(
+                isLoading: _pager.isLoading,
+                loadFailed: _pager.loadFailed,
+                items: _pager.items,
+                emptyMessage: switch (_view) {
+                  StaffReportsView.incoming => 'Bekleyen bildirim yok',
+                  StaffReportsView.mine => 'Üstlendiğiniz bildirim yok',
+                },
+                onRefresh: _pager.reload,
+                onRetry: () => unawaited(_pager.reset()),
+                actionBuilder: _view == StaffReportsView.incoming
+                    ? _buildAssignButton
+                    : null,
+                controller: _scroll,
+                isLoadingMore: _pager.isLoadingMore,
+                loadMoreFailed: _pager.loadMoreFailed,
+                onRetryMore: () => unawaited(_pager.retryMore()),
+              ),
             ),
           ),
         ],
