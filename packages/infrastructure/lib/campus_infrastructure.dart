@@ -1,5 +1,6 @@
 library;
 
+export 'src/config/campus_bounds_config.dart';
 export 'src/database/database.dart';
 export 'src/database/paging.dart';
 export 'src/repository/building_repository_impl.dart';
