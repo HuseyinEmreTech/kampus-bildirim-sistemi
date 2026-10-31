@@ -147,8 +147,9 @@ Bulgular toplu değil tek tek çözülür. Her bulgu için hangi yolun seçildi�
 | Tarih | Commit | Kural | Dosya | Yol | Süre | Ne öğrendim |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-24 | PR #103 | `javascript:S9383` (3 adet) | `web/js/reports-page.js` | Yapay zeka çözdü, CI ile doğrulandı | ~10 dk | Olay dinleyicilerinde "beklenmeyen" (fire-and-forget) promise niyeti `void` ile açıkça işaretlenir; aksi hâlde güvenilirlik puanı düşer |
+| 2026-10-24 | `web/js/api.js` dalı `docs/90-yapay-zeka-kaydi` | `javascript:S7721` | `web/js/api.js` | Yapay zeka çözdü ve inceledim; 16 tarayıcı testi geçti, Sonar doğrulaması PR taramasında | ~5 dk | Dış kapsamı kullanmayan iç fonksiyon (`toResult`) modül düzeyine taşınır; her `createApiClient` çağrısında yeniden oluşturulmaz |
 
-**Açık bulgular (2026-10-24):** 3 × `dart:S107` (çok parametreli kurucular, `packages/domain/lib/src/report/report.dart`) ve 1 × `javascript:S7721` (`web/js/api.js`, `toResult` dış kapsama taşınmalı). Kalite kapısını düşürmüyorlar (bakım notu); tek tek ele alınacak.
+**Açık bulgular (2026-10-24):** 3 × `dart:S107` (çok parametreli kurucular, `packages/domain/lib/src/report/report.dart`) ve 1 × `javascript:S7721` (`web/js/api.js`, `toResult` dış kapsama taşınmalı). Kalite kapısını düşürmüyorlar (bakım notu); tek tek ele alınacak. `javascript:S7721` için düzeltme `docs/90-yapay-zeka-kaydi` dalında; birleşince kalan 3 × `dart:S107` olur (Sonar ile doğrulanmadı).
 
 ## Özet (her hafta güncellenir)
 

@@ -1,7 +1,7 @@
 ---
 title: Çağdaş Kemal Ağca - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-10-19
+son-guncelleme: 2026-10-24
 ---
 
 # Çağdaş Kemal Ağca (@Cagdas3307) - Kişisel Plan
@@ -16,7 +16,7 @@ son-guncelleme: 2026-10-19
 - [x] Shelf router kurulumu: `Router`, `Pipeline`, middleware zinciri
 - [x] Health check: `GET /health` → 200 OK
 - [x] CORS middleware (Flutter Web için)
-- [x] Request logging middleware (structured JSON) — `feature/hafta03-json-log`, PR sırada
+- [x] Request logging middleware (structured JSON) — #111
 - [x] PR: Sunucu ayağa kalkıyor, `/health` yanıtı veriyor (#33)
 
 ### Hafta 4 (5 - 11 Eki): Kimlik Doğrulama
@@ -29,42 +29,42 @@ son-guncelleme: 2026-10-19
 - [x] PR: Auth endpoints + middleware testleri — 4 PR'a bölündü: #67 (birleşti), #80, #81, #82 (review bekliyor)
 
 ### Hafta 5 (12 - 18 Eki): Bildirim Endpoint'leri - Öğrenci
-> Durum (19 Eki): #15 birleşti, #20'ye başlandı. Hata eşleme, listeleme ve üstlenme dalları hazır; sunucuya bağlamak için #17 bekleniyor.
+> Durum (24 Eki): #20'nin uçları PR olarak açıldı (#115-#121). Bildirim uçlarını `server.dart`'a bağlamak için #17 (`ReportRepositoryImpl` arayüzü), detay için application'da use case bekleniyor.
 
-- [ ] `POST /reports`: Bildirim oluşturma (multipart/form-data: photo, location, category, description, buildingId?)
-- [ ] Request validation: Contract DTO → Domain/Application'e geçiş
-- [x] `GET /reports`: Listeleme (query: status, category, page, limit) - Student: sadece kendi — `feature/hafta05-report-list`, PR sırada
-- [ ] `GET /reports/:id`: Detay (foto URL, konum, durum geçmişi)
-- [x] Hata eşleme: Domain/Application hataları → HTTP 400/404/409/422 — `feature/hafta05-hata-esleme`, PR sırada
-- [ ] PR: Her endpoint ayrı PR, contract testleri ile
+- [x] `POST /reports`: Bildirim oluşturma (multipart/form-data: photo, location, category, description, buildingId?) — #121
+- [ ] Request validation: Contract DTO → Domain/Application'e geçiş — alanlar sunucuda okunup application komutuna çevriliyor; `campus_contracts` DTO'ları (#94) gelince uyarlanacak
+- [x] `GET /reports`: Listeleme (query: status, category, page, limit) - Student: sadece kendi — #116
+- [ ] `GET /reports/:id`: Detay (foto URL, konum, durum geçmişi) — öğrencinin yalnızca kendi bildirimini görmesi kuralı için application'da use case gerekiyor
+- [x] Hata eşleme: Domain/Application hataları → HTTP 400/404/409/422 — #115
+- [x] PR: Her endpoint ayrı PR (#115-#121); contract testleri contracts gelince
 
 ### Hafta 6 (19 - 25 Eki): Bildirim Endpoint'leri - Görevli
-- [x] `POST /reports/:id/assign`: Üstlenme (Rule 02: 409 eğer dolu) — API tasarımına göre `PUT /api/reports/{id}/assignment`, `feature/hafta05-report-assign`, PR sırada
-- [ ] `POST /reports/:id/resolve`: Çözme (multipart: resolutionPhoto, resolutionNote?)
-- [ ] Rule 03: Sadece assignee çözebilir → 403
-- [ ] Rule 04: Resolution photo zorunlu → 422
-- [ ] Transaction: Resolve + Notification + StatusHistory (Application katmanında)
-- [ ] `GET /reports?assignee=me`: Görevlinin üstlendiği bildirimler
-- [ ] PR: Görevli endpoint'leri + yetki testleri
+- [x] `POST /reports/:id/assign`: Üstlenme (Rule 02: 409 eğer dolu) — API tasarımına göre `PUT /api/reports/{id}/assignment`, #117
+- [x] `POST /reports/:id/resolve`: Çözme (multipart: resolutionPhoto, resolutionNote?) — `PUT /api/reports/{id}/resolution`, #118, #119
+- [x] Rule 03: Sadece assignee çözebilir → 403 — #119
+- [x] Rule 04: Resolution photo zorunlu → 422 — API tasarımına göre `400 VALIDATION_ERROR`, #119
+- [x] Transaction: Resolve + Notification + StatusHistory (Application katmanında) — `ReportRepositoryImpl.resolve` aynı işlemde yazıyor; sunucuda iş yok
+- [x] `GET /reports?assignee=me`: Görevlinin üstlendiği bildirimler — #116
+- [x] PR: Görevli endpoint'leri + yetki testleri — #117, #119
 
 ### Hafta 7 (26 Eki - 1 Kas): Bildirim ve Bina Endpoint'leri
-- [ ] `GET /notifications`: Öğrenci bildirimleri (query: unreadOnly, page)
-- [ ] `POST /notifications/:id/read`: Okundu işaretle
-- [ ] `GET /buildings`: Bina listesi (konum izni yoksa fallback)
-- [ ] `GET /buildings/:id`: Bina detayı (koordinat, ad)
-- [x] Rate limiting middleware: IP/bazlı, 100 req/dk; girişte 5/dk — `feature/hafta07-rate-limit`, PR sırada
-- [ ] PR: Bildirim + Bina endpoint'leri
+- [x] `GET /notifications`: Öğrenci bildirimleri (query: unreadOnly, page) — `GET /api/me/notifications` (page, pageSize; `unreadOnly` yok), #123
+- [x] `POST /notifications/:id/read`: Okundu işaretle — `PUT /api/me/notifications/{id}/read`, #123
+- [x] `GET /buildings`: Bina listesi (konum izni yoksa fallback) — #122
+- [ ] `GET /buildings/:id`: Bina detayı (koordinat, ad) — API tasarımında yok; liste koordinatları da veriyor, gerekirse eklenecek
+- [x] Rate limiting middleware: IP/bazlı, 100 req/dk; girişte 5/dk — #110
+- [x] PR: Bildirim + Bina endpoint'leri — #122, #123
 
 ### Hafta 8 (2 - 8 Kas): Güvenlik ve Validasyon
-- [ ] Input sanitization: XSS önleme, SQL injection (parametreli query zaten var)
-- [x] Security headers: `Helmet` equivalent (CSP, HSTS, X-Frame-Options) — `feature/hafta07-rate-limit`, PR sırada
-- [ ] File upload validation: Magic bytes, size limit (stream), EXIF strip (infrastructure'a delegasyon)
-- [x] Audit log: Her mutating request log (userId, endpoint, timestamp, result) — `feature/hafta08-audit-log`, PR sırada
-- [ ] PR: Güvenlik middleware + testleri
+- [x] Input sanitization: XSS önleme, SQL injection (parametreli query zaten var) — istek boyutu sınırı #124; metin kırpma/uzunluk domain'de, yanıtlar JSON + `nosniff`
+- [x] Security headers: `Helmet` equivalent (CSP, HSTS, X-Frame-Options) — #110
+- [x] File upload validation: Magic bytes, size limit (stream), EXIF strip (infrastructure'a delegasyon) — `LocalFileStorage` ile, #119, #121
+- [x] Audit log: Her mutating request log (userId, endpoint, timestamp, result) — #113
+- [x] PR: Güvenlik middleware + testleri — #110, #113, #124
 
 ### Hafta 9 (9 - 15 Kas): 1. Sunum ve API Dokümantasyonu
 - [ ] **1. Sunum** (varsayım): API demo
-- [x] OpenAPI/Swagger spec: `package:shelf_openapi` veya manuel YAML — manuel YAML (health, login, refresh, users/me), `feature/hafta09-openapi`, PR sırada
+- [x] OpenAPI/Swagger spec: `package:shelf_openapi` veya manuel YAML — manuel YAML (health, login, refresh, users/me), #114
 - [ ] API dokümantasyonu: `/docs` endpoint (Scalar/Swagger UI)
 - [ ] Request/Response örnekleri her endpoint için
 - [ ] PR: API docs + contract testleri
@@ -77,7 +77,7 @@ son-guncelleme: 2026-10-19
 - [ ] PR: Gelişmiş listeleme + benchmark
 
 ### Hafta 11 (23 - 29 Kas): Kalan Endpoint'ler ve Loglama
-- [x] `GET /users/me`: Profil bilgisi — `feature/hafta11-users-me`, PR sırada
+- [x] `GET /users/me`: Profil bilgisi — #112
 - [ ] `PATCH /users/me`: Profil güncelleme (ad, şifre değiştirme)
 - [ ] Structured logging: `requestId` correlation, latency, DB query log (slow query)
 - [ ] Error tracking: Sentry entegrasyonu (opsiyonel, ücretsiz plan)
