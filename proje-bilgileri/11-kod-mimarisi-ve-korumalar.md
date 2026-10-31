@@ -1,7 +1,7 @@
 ---
 title: Kod Mimarisi ve Korumalar
 durum: Onaylandı
-son-guncelleme: 2026-10-15
+son-guncelleme: 2026-11-01
 ---
 
 # Kod Mimarisi ve Korumalar
@@ -32,6 +32,9 @@ kampus-bildirim-sistemi/
 │   ├── infrastructure/          # campus_infrastructure
 │   ├── server/                  # campus_server
 │   └── app/                     # campus_app (Flutter, Android)
+├── services/                    # Dart dışı yan servisler (ADR-04); çekirdeğe yalnızca HTTP ile bağlanır
+│   ├── rapor-istatistik/        # C# .NET 10: salt okunur istatistik + CSV dışa aktarma
+│   └── python-report-service/   # Python FastAPI: rapor dışa aktarma (incelemede)
 └── proje-bilgileri/             # dokümantasyon
 ```
 
@@ -45,6 +48,8 @@ kampus-bildirim-sistemi/
 | `campus_infrastructure` | `packages/infrastructure` | PostgreSQL repository'leri, dosya depolama, EXIF temizleme, parola hash | `campus_domain`, `campus_application`, dış paketler | Ertuğrul Pekdemir |
 | `campus_server` | `packages/server` | Shelf endpoint'leri, kimlik doğrulama ara katmanı, hata eşleme, `bin/main.dart` (tek bağlama noktası) | Hepsi | Çağdaş Kemal Ağca |
 | `campus_app` | `packages/app` | Flutter ekranları, API istemcisi | **Yalnızca** `campus_contracts` ve Flutter paketleri | Yusuf Ekenel (mobil), Fatma Müberra Yener (web) |
+
+> Dart dışı yan servisler `packages/` altına girmez; `services/` altında kendi diliyle durur ve çekirdeğe **yalnızca HTTP** ile bağlanır (ADR-04). Bu servislerde Dart paket kuralları geçerli değildir; kural: veritabanına yalnızca okuma, giriş doğrulaması çekirdekte (`JWT_ACCESS_SECRET`), kişisel veri taşımama.
 
 ```mermaid
 flowchart LR
