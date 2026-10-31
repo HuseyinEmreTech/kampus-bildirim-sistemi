@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Uygulamanın renkleri (lib/mobil/shared/app_theme.dart ile aynı): ikon ve açılış ekranı. -->
+<resources>
+    <color name="campus_bordo">#800020</color>
+    <color name="campus_black">#000000</color>
+</resources>
