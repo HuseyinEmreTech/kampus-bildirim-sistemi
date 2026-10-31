@@ -72,10 +72,55 @@ void main() {
 
     expect(res.statusCode, 401);
   });
+
+  test('detail_existingBuilding_returnsIt', () async {
+    buildings.buildings.add((
+      buildingId: 'c0000000-0000-4000-8000-000000000001',
+      name: 'A Blok',
+      latitude: 36.5871,
+      longitude: 36.1742,
+    ));
+
+    final res = await app(
+      _get(
+        tokens.createAccessToken(studentId, 'Student'),
+        path: 'api/buildings/c0000000-0000-4000-8000-000000000001',
+      ),
+    );
+
+    expect(res.statusCode, 200);
+    expect(jsonDecode(await res.readAsString()), {
+      'buildingId': 'c0000000-0000-4000-8000-000000000001',
+      'name': 'A Blok',
+      'latitude': 36.5871,
+      'longitude': 36.1742,
+    });
+  });
+
+  test('detail_unknownBuilding_returns404', () async {
+    final res = await app(
+      _get(
+        tokens.createAccessToken(studentId, 'Student'),
+        path: 'api/buildings/c0000000-0000-4000-8000-000000000099',
+      ),
+    );
+
+    expect(res.statusCode, 404);
+    final body = jsonDecode(await res.readAsString()) as Map<String, Object?>;
+    expect((body['error']! as Map<String, Object?>)['code'], 'NOT_FOUND');
+  });
+
+  test('detail_withoutToken_returns401', () async {
+    final res = await app(
+      _get(null, path: 'api/buildings/c0000000-0000-4000-8000-000000000001'),
+    );
+
+    expect(res.statusCode, 401);
+  });
 }
 
-Request _get(String? token) => Request(
+Request _get(String? token, {String path = 'api/buildings'}) => Request(
   'GET',
-  Uri.parse('http://localhost/api/buildings'),
+  Uri.parse('http://localhost/$path'),
   headers: {if (token != null) 'authorization': 'Bearer $token'},
 );
