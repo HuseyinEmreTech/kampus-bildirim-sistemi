@@ -6,6 +6,7 @@ import 'package:campus_server/src/service/password_hasher.dart';
 import 'package:campus_server/src/service/token_service.dart';
 import 'package:campus_server/src/config/jwt_config.dart';
 import 'package:campus_server/src/endpoint/auth_endpoints.dart';
+import 'package:campus_server/src/endpoint/building_endpoints.dart';
 import 'package:campus_server/src/endpoint/user_endpoints.dart';
 import 'package:campus_server/src/logging/logger.dart';
 import 'package:campus_server/src/middleware/audit_log_middleware.dart';
@@ -72,10 +73,13 @@ void main() async {
     ),
   );
   final users = UserEndpoints(UserRepositoryImpl(db));
+  final buildings = BuildingEndpoints(BuildingRepositoryImpl(db));
   final protected = const Pipeline()
       .addMiddleware(authMiddleware(tokens))
       .addMiddleware(auditLog())
-      .addHandler(users.router.call);
+      .addHandler(
+        Cascade().add(users.router.call).add(buildings.router.call).handler,
+      );
 
   final health = Router()
     ..get('/health', (Request request) => Response.ok('OK'));
