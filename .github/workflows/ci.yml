@@ -28,6 +28,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Orphan/stacked dal kontrolü için tam geçmiş gerekir.
+          fetch-depth: 0
+      - name: Dal geçmişi (orphan kontrolü)
+        run: |
+          if ! git merge-base origin/main HEAD >/dev/null 2>&1; then
+            echo "::error::Bu dal main ile ortak geçmişe sahip değil (orphan)."
+            echo "Dalı main'den yeniden oluşturun; eski bir anlık görüntüyü PR'a taşımayın."
+            exit 1
+          fi
+          echo "Dal main ile ortak geçmişe sahip."
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
