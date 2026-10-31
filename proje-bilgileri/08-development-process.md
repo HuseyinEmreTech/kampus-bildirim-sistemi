@@ -35,8 +35,14 @@ Büyük bir iş, küçük PR'lara bölünmek için üst üste base'li zincir hâ
 
 `main` koruması **yalnızca squash** birleşmeye izin verdiği için yığın PR'larda iki kural zorunludur (ayrıntı: [yığın PR birleşme süreci](kayitlar/2026-10-17-yigin-pr-birlesme-sureci.md)):
 
-1. **Çocuğu önce `main`'e retarget et, sonra alt PR'ı birleştir.** Base dalı silinince GitHub çocuk PR'ı otomatik kapatır.
+1. **Çocuğu önce `main`'e retarget et, sonra alt PR'ı birleştir.** Base dalı silinince GitHub çocuk PR'ı otomatik kapatır. Birleştirmeden hemen önce `scripts/pr-birlesme-kontrolu.sh <PR>` çalıştır; "güvenli" demeden `--delete-branch` kullanma.
 2. **Alt PR squash'landıktan sonra üst dalı `main`'in üzerine getir** (`git rebase --onto origin/main <eski-base-tip>` ya da `merge --squash`). Aksi hâlde PR diff'i alt PR'ı tekrar gösterir.
+
+> [!warning] Dal silme
+> `gh pr merge --delete-branch` yalnızca **hiçbir açık PR o dalı base almıyorsa** kullanılır. Aksi hâlde GitHub bağımlı PR'ları kapatır ve yeniden açmaya izin vermez (2026-10-17 #60, 2026-11-01 #112/#114). Şüphedeysen dalı silmeden birleştir; temizliği sonra yap.
+
+> [!note] Orphan dal
+> Bir PR'ın dalı `main` ile ortak geçmişe sahip değilse GitHub diff'i yanıltıcı olur ve merge "çakışma" verir. CI'daki **Dal geçmişi (orphan kontrolü)** adımı bunu yakalar; dalı `main`'den yeniden oluşturup yalnızca PR'ın dosyalarını taşıyın (2026-11-01 #132).
 
 Force-push onayı düşürdüğü için rebase sonrası **yeniden onay** gerekir; birleştirmeden önce zorunlu kontrol (`SonarCloud Code Analysis`) beklenir.
 
