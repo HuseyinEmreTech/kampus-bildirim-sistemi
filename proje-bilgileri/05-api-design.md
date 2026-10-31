@@ -156,6 +156,10 @@ curl "http://localhost:8080/api/me/notifications?page=1&pageSize=20" \
 
 Hiç bildirim yoksa `items` boş dizi, `unreadCount` 0 döner.
 
+### Bina listesi
+
+`GET /api/buildings` (giriş yapmış herkes): `{ "items": [ { "buildingId", "name", "latitude", "longitude" } ] }`, ada göre sıralı. Bina yoksa `items` boş dizi; belirteç yoksa `401`.
+
 ### Bildirim listesi
 
 `GET /api/reports` (görevli; `assignee=me` ile yalnızca kendi üstlendikleri) ve `GET /api/me/reports` (öğrenci; yalnızca kendi bildirimleri) aynı biçimde döner: `{ "items": [...], "page", "pageSize", "total" }`. Her öğede `reportId`, `category`, `description`, `status`, `place`, `buildingName`, `photoUrl`, `assigneeId`, `createdAt` vardır. Öğrenci `GET /api/reports`'a, görevli `GET /api/me/reports`'a istek atarsa `403 FORBIDDEN`; `page`/`pageSize` sayı değilse ya da aralık dışındaysa `400 VALIDATION_ERROR`.
