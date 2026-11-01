@@ -2,6 +2,7 @@ import 'package:campus_application/campus_application.dart';
 import 'package:campus_domain/campus_domain.dart';
 
 import '../database/database.dart';
+import '../database/paging.dart';
 import 'report_repository_impl.dart';
 import 'report_row_mapping.dart';
 
@@ -69,8 +70,10 @@ final class PostgresReportRepository implements ReportRepository {
     };
   });
 
-  /// Sayfa ve toplam aynı süzgeçle iki sorguda alınır. [limit] ve [offset]'i
-  /// use case denetler; geçersizse depo boş sayfa döner.
+  /// Sayfa ve toplam aynı süzgeçle iki sorguda alınır; iki sorgu arasında yeni
+  /// bildirim eklenirse toplam bir an önceki durumu gösterebilir (bu ölçekte
+  /// kabul edilebilir, toplam bir anlık görüntüdür). [limit] ve [offset]'i use
+  /// case denetler; geçersizse depo boş sayfa ve 0 toplam döner.
   @override
   Future<Result<Paginated<ReportSummary>, AppError>> list({
     required ReportListFilter filter,
@@ -79,7 +82,9 @@ final class PostgresReportRepository implements ReportRepository {
   }) => _guard(() async {
     final rowFilter = filterRow(filter);
     final rows = await _reports.list(rowFilter, limit: limit, offset: offset);
-    final total = await _reports.count(rowFilter);
+    final total = isValidPage(limit, offset)
+        ? await _reports.count(rowFilter)
+        : 0;
     return Success(
       Paginated(
         items: [for (final row in rows) summaryOf(row)],
