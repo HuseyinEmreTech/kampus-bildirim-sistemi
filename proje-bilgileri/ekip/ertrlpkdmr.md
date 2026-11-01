@@ -118,3 +118,4 @@ son-guncelleme: 2026-10-12
 - [2026-10-26](raporlar/ertrlpkdmr/2026-10-26.md): ReportRepository arayüzü 1. parça (oluştur, üstlen)
 - [2026-10-27](raporlar/ertrlpkdmr/2026-10-27.md): Yenileme belirtecinin yeniden kullanımında bütün oturumlar kapanıyor (#81); örnek JWT sırları kısaltıldı
 - [2026-10-31](raporlar/ertrlpkdmr/2026-10-31.md): Bildirim listesine okunmamış süzgeci (Çağdaş'ın isteği)
+- [2026-11-01](raporlar/ertrlpkdmr/2026-11-01.md): ReportRepository arayüzü 2. parça (çöz, liste, detay)
