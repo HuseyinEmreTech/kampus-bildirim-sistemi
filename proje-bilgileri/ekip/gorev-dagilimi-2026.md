@@ -1,12 +1,14 @@
 ---
 title: Bordo Takım - Görev Dağılımı ve Rol Tanımları
 durum: Taslak
-son-guncelleme: 2026-10-12
+son-guncelleme: 2026-11-01
 ---
 
 # Bordo Takım - Görev Dağılımı ve Rol Tanımları
 
 ← [İndeks](../00-index.md)
+
+> **1 Kasım 2026:** Bu dağılım ilk plandır. Güncel görevler: [Kalan işler planı](../planlar/2026-11-01-kalan-isler.md).
 
 Bu doküman 6 kişilik Bordo Takımı için proje rollerini, sorumlulukları ve 15 haftalık süreç içindeki görev dağılımını tanımlar.
 

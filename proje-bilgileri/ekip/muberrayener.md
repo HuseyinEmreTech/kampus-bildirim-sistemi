@@ -1,10 +1,13 @@
 ---
 title: Fatma Müberra Yener - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-10-12
+son-guncelleme: 2026-11-01
 ---
 
 # Fatma Müberra Yener (@muberrayener) - Kişisel Plan
+
+> **Güncel görevler (1 Kasım 2026):** [Kalan işler planı](../planlar/2026-11-01-kalan-isler.md) ve `gh issue list --assignee muberrayener`. Son tarih yok; sıra bağımlılığa göre. Bu dosyadaki haftalık hedefler geçmiş kayıttır.
+
 
 **Rol:** Web Arayüzü (Flutter Web) / Test & QA
 **Ana Sorumluluk:** `campus_app` web hedefi, test stratejisi, otomasyon, SonarQube kalite
