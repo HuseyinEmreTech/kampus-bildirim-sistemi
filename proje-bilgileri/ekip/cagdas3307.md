@@ -1,10 +1,13 @@
 ---
 title: Çağdaş Kemal Ağca - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-10-24
+son-guncelleme: 2026-11-01
 ---
 
 # Çağdaş Kemal Ağca (@Cagdas3307) - Kişisel Plan
+
+> **Güncel görevler (1 Kasım 2026):** [Kalan işler planı](../planlar/2026-11-01-kalan-isler.md) ve `gh issue list --assignee Cagdas3307`. Son tarih yok; sıra bağımlılığa göre. Bu dosyadaki haftalık hedefler geçmiş kayıttır.
+
 
 **Rol:** Backend API / Sunucu Geliştirici
 **Ana Sorumluluk:** `campus_server` - Shelf router, endpoint'ler, kimlik doğrulama, hata eşleme, middleware

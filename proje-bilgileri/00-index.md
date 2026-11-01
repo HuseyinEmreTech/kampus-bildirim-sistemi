@@ -1,7 +1,7 @@
 ---
 title: Campus Report - Proje Dokümantasyonu
 durum: Taslak
-son-guncelleme: 2026-10-17
+son-guncelleme: 2026-11-01
 ---
 
 # Campus Report: Proje Dokümantasyonu
@@ -16,7 +16,7 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 1. Proje ne ve neden: [Proje kapsamı ve amacı](01-project-scope.md)
 2. Bu hafta ne oldu: [Haftalık kayıtlar](haftalik/00-haftalik-index.md)
 3. Ekibe yeni katıldıysan: [Başlangıç rehberi](ekip/00-baslangic-rehberi.md)
-4. Kim ne yapıyor: [Ekip ve yol haritası](10-ekip-ve-yol-haritasi.md)
+4. Kim ne yapıyor: [Kalan işler planı](planlar/2026-11-01-kalan-isler.md), [Ekip ve yol haritası](10-ekip-ve-yol-haritasi.md)
 
 ## Tasarım dokümanları
 
@@ -34,6 +34,7 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 | 10 | [Ekip ve yol haritası](10-ekip-ve-yol-haritasi.md) | Ekip, roller, GitHub kullanımı, 15 haftalık plan | Onaylandı (12.10.2026: 6 kişiye güncellendi) |
 | 11 | [Kod mimarisi ve korumalar](11-kod-mimarisi-ve-korumalar.md) | Paketler, izinli bağımlılıklar, hatayı önleyen korumalar | Onaylandı |
 | - | [Başlangıç kuralları](ekip/BASLANGIC_KURALLARI.md) | Her üye için roller, kurallar, onay tablosu | Onaylandı |
+| - | [Uygulama planı: kalan işler](planlar/2026-11-01-kalan-isler.md) | Durum tespiti, kim ne yapıyor, bağımlılık sırası; son tarih yok | Onay bekliyor |
 | - | [Uygulama planı: repo iskeleti](planlar/2026-10-02-repo-iskeleti.md) | Hafta 4'ün ilk işi, adım adım | Onay bekliyor |
 | - | [ADR-01: Dart backend ve PostgreSQL](adr/01-dart-backend-postgresql.md) | Geri dönülmesi zor karar | Önerildi |
 | - | [ADR-02: Kod kalitesi aracı](adr/02-kalite-araci-sonarqube-cloud.md) | SonarQube Cloud ve yerel analiz kararı, karşılaştırma matrisi | Önerildi |
@@ -58,6 +59,7 @@ Projede olan biten her şey bu kayıtlarda tutulur.
 | [18 Ekim 2026 - PR birleşme ve issue notları](kayitlar/2026-10-18-pr-birlesme-ve-issue-notlari.md) | Günün PR/issue özeti, kararlar ve açık sorular |
 | [25-26 Ekim 2026 - PR inceleme notları](kayitlar/2026-10-26-pr-inceleme-notlari.md) | 21 açık PR'ın inceleme sonucu, kime ne yazıldığı ve gerekçeleri |
 | [1 Kasım 2026 - PR inceleme ve birleştirme turu](kayitlar/2026-11-01-pr-inceleme-ve-birlesme.md) | 40+ PR'ın tek tek incelenmesi, zincir rebase'leri, kurtarma PR'ları ve süreç önlemleri |
+| [1 Kasım 2026 - Görev dağılımı ve dokümantasyon denetimi](kayitlar/2026-11-01-gorev-dagilimi-ve-dokumantasyon-denetimi.md) | Durum tespiti, kararlar, ekip genelinde dokümantasyon denetimi ve herkesten istenenler |
 
 ## Dokümantasyon kuralları
 
@@ -97,4 +99,5 @@ Bu dokümanların güncel kalması projenin bir parçasıdır.
 | Fotoğraf saklama | Sunucu diski, veritabanında yol | Öneri |
 | Hesap oluşturma | İlk sürümde seed veri, kayıt ekranı yok | Öneri |
 | Dart için kalite aracı | SonarQube Cloud Free ve yerel `dart analyze` ([ADR-02](adr/02-kalite-araci-sonarqube-cloud.md)) | Hoca görüşü bekleniyor |
+| Web yüzeyi | HTML/JS istemcisi (`web/`); `lib/web/` Flutter Web dondurulur | Öneri ([plan](planlar/2026-11-01-kalan-isler.md)) |
 | Bilgi grafiği aracı (Graphify) | Kod oluşunca ayrı branch'te denenecek | Değerlendiriliyor |
