@@ -184,6 +184,8 @@ void main() {
         (await db.execute(_notificationCount, [id.value])).single.single,
         1,
       );
+      // Rule 04: durumla birlikte geçmiş satırı da yazılır (oluşturma, üstlenme, çözme).
+      expect((await db.execute(_historyCount, [id.value])).single.single, 3);
     });
 
     // Rule 03: yalnızca üstlenen görevli çözebilir.
@@ -237,6 +239,19 @@ void main() {
           (second as Success<Paginated<ReportSummary>, AppError>).value;
       expect(secondPage.items, hasLength(1));
       expect(secondPage.page, 2);
+    });
+
+    // Yorumdaki söz: geçersiz sayfada depo boş sayfa döner, toplam da 0 olur.
+    test('list_invalidPage_returnsEmptyPageWithZeroTotal', () async {
+      await createReport(description: 'Arayüz geçersiz sayfa');
+      final filter = ReportListFilter(reporterId: _userId(_student));
+
+      final result = await repository.list(filter: filter, limit: 0, offset: 0);
+
+      final page =
+          (result as Success<Paginated<ReportSummary>, AppError>).value;
+      expect(page.items, isEmpty);
+      expect(page.total, 0);
     });
 
     test('list_statusAndCategoryFilter_usesDatabaseSpelling', () async {
