@@ -67,6 +67,22 @@ Son tarih yoktur, ama **çalışılan her gün kaydı olur**; kayıt sonradan ha
 
 **PR'ı inceleyen** bu listeyi de denetler; eksikse birleştirmeden önce ister. Bu denetim yeni issue ve PR'lar için tekrar edilir.
 
+## Neden böyle yaptık
+
+| Ne yaptık | Neden |
+| --- | --- |
+| Görevlere son tarih koymadık, sırayı bağımlılıkla belirledik | Vize dönemi geliyor; tarih tutmayacak bir plan yerine, kimin neyi beklediği belli bir plan daha gerçekçi |
+| Son tarihi kaldırdık ama düzenli katkı ve kayıt kuralını tuttuk | Süreç GitHub geçmişinden izleniyor; toplu son gece işi kabul edilmiyor ve kayıt sonradan hatırlanarak yazılmıyor |
+| Yeni özellik yerine önce bağlama işlerini öne aldık (#163, #170) | Parçaların çoğu hazır ama ürün uçtan uca çalışmıyor; kalan en büyük risk bu |
+| Görevleri tek PR'lık kestik, her birine dokunulacak dosya ve test yazdık | Küçük PR kuralı; herkes yazdığını anlatabilmeli, vize döneminde de bir görev kısa sürede ele alınabilmeli |
+| Mobil işleri Yusuf ve Müberra arasında böldük, Murat ve Kerem'e ayrı görev zinciri verdik | PR'lar birkaç kişide toplanmıştı; hem darboğazı azaltmak hem de katkıyı dengelemek için |
+| Milestone'ları sildik yerine kapattık | Geri alınabilir ve geçmiş kaydı korunur |
+| Fotoğraf yetkisini #166'da use case'e bağladık | Rule 01 kesilmez; kural tek yerde kalır, uçta yeniden yazılmaz. Bu yüzden #166, #159'u bekler |
+| `11-kod-mimarisi`ni contracts kararına göre değiştirdik | Sunucuyu DTO'lara yeniden bağlamak büyük iş ve kazancı az; doküman ile kod aynı şeyi söylemeli |
+| Denetimi kişi adı vermeden, ekip toplamı olarak yazdık | Amaç suçlamak değil, herkesin uyacağı ölçütü göstermek; eksikler kişilere doğrudan iletilir |
+| Plan ve şablon değişikliğini iki ayrı PR yaptık (#184, #185) | `.github/` yolunun tek sahibi teknik lider ve kendi PR'ını onaylayamıyor. Şablon ayrı kalınca yönetici birleştirmesi yalnızca o tek satırlık değişiklikte gerekir, plan normal onayla ilerler |
+| Onay ve birleştirmeyi teknik lidere bıraktık | Yapay zeka aracının onay ve birleştirme komutları izin denetimine takıldı; `main`'e girişte son karar insanda kalıyor |
+
 ## Yapay zeka kullanımı
 
 | Alan | Değer |
