@@ -51,7 +51,7 @@ son-guncelleme: 2026-11-02
 - [x] `GET /notifications`: Öğrenci bildirimleri (query: unreadOnly, page) — `GET /api/me/notifications` (page, pageSize, unreadOnly), #123; `unreadOnly` 2 Kasım'da eklendi
 - [x] `POST /notifications/:id/read`: Okundu işaretle — `PUT /api/me/notifications/{id}/read`, #123
 - [x] `GET /buildings`: Bina listesi (konum izni yoksa fallback) — #122
-- [ ] `GET /buildings/:id`: Bina detayı (koordinat, ad) — API tasarımında yok; liste koordinatları da veriyor, gerekirse eklenecek
+- [x] `GET /buildings/:id`: Bina detayı (koordinat, ad) — `GET /api/buildings/{id}`, #138
 - [x] Rate limiting middleware: IP/bazlı, 100 req/dk; girişte 5/dk — #110
 - [x] PR: Bildirim + Bina endpoint'leri — #122, #123
 
