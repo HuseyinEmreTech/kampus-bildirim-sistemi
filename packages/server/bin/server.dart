@@ -59,9 +59,14 @@ void main() async {
   final env = Platform.environment;
   final jwtConfig = JwtConfig.fromEnvironment(env);
   final databaseUrl = env['DATABASE_URL'];
-  if (jwtConfig == null || databaseUrl == null || databaseUrl.isEmpty) {
+  final filesDir = env['FILES_DIR'];
+  if (jwtConfig == null ||
+      databaseUrl == null ||
+      databaseUrl.isEmpty ||
+      filesDir == null ||
+      filesDir.isEmpty) {
     serverLog(
-      'Sunucu açılamadı: DATABASE_URL, JWT_ACCESS_SECRET ve '
+      'Sunucu açılamadı: DATABASE_URL, FILES_DIR, JWT_ACCESS_SECRET ve '
       'JWT_REFRESH_SECRET tanımlı olmalı (sırlar en az '
       '${JwtConfig.minSecretLength} karakter ve birbirinden farklı).',
     );
@@ -83,7 +88,7 @@ void main() async {
   final buildings = BuildingEndpoints(BuildingRepositoryImpl(db));
   final notifications = NotificationEndpoints(NotificationRepositoryImpl(db));
   final reports = PostgresReportRepository(db);
-  final photos = LocalFileStorage(Directory(env['UPLOAD_DIR'] ?? 'uploads'));
+  final photos = LocalFileStorage(Directory(filesDir));
   final reportEndpoints = ReportEndpoints(
     listReports: ListReportsUseCase(reports),
     assignReport: ReportAssignUseCase(reports),

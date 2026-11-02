@@ -275,6 +275,8 @@ dart run bin/server.dart
 # http://localhost:8080/health
 ```
 
+Sunucu `DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` ve `FILES_DIR` tanımlı değilse günlüğe yazıp açılmaz (`.env.example`).
+
 **Python rapor dışa aktarma servisi**
 
 Servis çekirdek API'den görevli rapor listesini okur; authorization belirtecini
@@ -335,7 +337,7 @@ Mobil ekranlar `lib/mobil/`, web ekranlar `lib/web/` altında geliştiriliyor. P
 | `DATABASE_URL` | (yok) | PostgreSQL bağlantı adresi; havuz boyutu ve zaman aşımları adresin sonundaki ayarlarla verilir (`.env.example`) |
 | `PORT` | `8080` | Sunucu portu |
 | `CAMPUS_BOUNDS` | (yok) | Kampüs sınırı (dikdörtgen koordinatları) |
-| `PHOTO_DIR` | (yok) | Fotoğrafların saklanacağı klasör |
+| `FILES_DIR` | (yok) | Fotoğrafların saklanacağı klasör; tanımlı değilse sunucu açılmaz (canlıda `/data/files`) |
 
 Ortam ayrıntısı: [geliştirme ortamı](proje-bilgileri/07-development-environment.md).
 
