@@ -6,6 +6,8 @@
 BEGIN;
 
 -- Rule 07: fotoğraf en fazla 5 MB (5 * 1024 * 1024 bayt). V1 yalnızca > 0 diyordu.
+-- 5242880, Dart'taki maxPhotoSizeBytes (packages/infrastructure, local_file_storage.dart)
+-- ile aynı olmalı; biri değişirse diğeri de değişir (SQL tarafı yeni bir migration ile).
 ALTER TABLE reports
   ADD CONSTRAINT reports_photo_size_max CHECK (photo_size_bytes <= 5242880),
   ADD CONSTRAINT reports_resolution_photo_size_max
