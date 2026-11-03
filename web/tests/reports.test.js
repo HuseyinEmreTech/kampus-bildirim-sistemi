@@ -11,7 +11,7 @@ const REPORT = {
   reportId: 'r1',
   category: 'Ariza',
   description: 'B blok 2. kat koridor lambası yanmıyor',
-  location: { place: 'B Blok 2. kat' },
+  place: 'B Blok 2. kat',
   status: 'Yeni',
   createdAt: '2026-10-02T09:15:00Z',
 };
@@ -46,6 +46,33 @@ test('bildirimler kart olarak çizilir, etiketler Türkçedir', () => {
   assertTrue(cards[0].textContent.includes('Arıza'), 'kategori etiketi');
   assertTrue(cards[0].textContent.includes('Yeni'), 'durum etiketi');
   assertTrue(cards[0].textContent.includes('B Blok 2. kat'), 'konum');
+});
+
+// Sunucunun gerçek yanıtı (report_mapper.dart): konum düz `place` ve `buildingName` alanlarıyla gelir.
+const SERVER_REPORT = {
+  reportId: 'r2',
+  category: 'Temizlik',
+  description: 'Kütüphane girişinde çöp kutusu taşmış',
+  status: 'Ustlenildi',
+  place: 'Kütüphane girişi',
+  buildingName: 'Kütüphane',
+  photoUrl: '/files/abc.jpg',
+  assigneeId: 'u9',
+  createdAt: '2026-11-02T10:00:00.000Z',
+};
+
+test('sunucu biçiminde konum place alanından okunur', () => {
+  const container = document.createElement('div');
+  renderReportList(container, [SERVER_REPORT]);
+  const meta = container.querySelector('.report-card__meta').textContent;
+  assertTrue(meta.startsWith('Kütüphane girişi'), `konum: ${meta}`);
+});
+
+test('place yoksa bina adı gösterilir', () => {
+  const container = document.createElement('div');
+  renderReportList(container, [{ ...SERVER_REPORT, place: null }]);
+  const meta = container.querySelector('.report-card__meta').textContent;
+  assertTrue(meta.startsWith('Kütüphane ·'), `konum: ${meta}`);
 });
 
 test('açıklama HTML olarak yorumlanmaz', () => {

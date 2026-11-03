@@ -47,12 +47,12 @@ function element(tag, className, text) {
   return node;
 }
 
-function placeOf(report, buildingNames) {
-  const location = report.location ?? {};
-  return location.place || buildingNames.get(location.buildingId) || 'Konum belirtilmemiş';
+/** Sunucu konumu düz `place` ve `buildingName` alanlarıyla gönderir (report_mapper.dart). */
+function placeOf(report) {
+  return report.place || report.buildingName || 'Konum belirtilmemiş';
 }
 
-function reportCard(report, buildingNames) {
+function reportCard(report) {
   const card = element('article', 'report-card');
   const header = element('header', 'report-card__header');
   header.append(
@@ -60,19 +60,18 @@ function reportCard(report, buildingNames) {
     element('span', `badge badge--status badge--${report.status}`, STATUS_LABELS[report.status] ?? report.status),
   );
   const meta = element('p', 'report-card__meta');
-  meta.textContent = `${placeOf(report, buildingNames)} · ${DATE_FORMAT.format(new Date(report.createdAt))}`;
+  meta.textContent = `${placeOf(report)} · ${DATE_FORMAT.format(new Date(report.createdAt))}`;
   card.append(header, element('p', 'report-card__text', report.description), meta);
   return card;
 }
 
 /** Bildirim kartlarını çizer; liste boşsa boş durum mesajı gösterir. */
-export function renderReportList(container, reports, buildings = []) {
+export function renderReportList(container, reports) {
   if (reports.length === 0) {
     renderState(container, 'empty', 'Bu filtrelere uyan bildirim yok.');
     return;
   }
-  const buildingNames = new Map(buildings.map((b) => [b.buildingId, b.name]));
-  container.replaceChildren(...reports.map((r) => reportCard(r, buildingNames)));
+  container.replaceChildren(...reports.map(reportCard));
 }
 
 /** Yükleniyor, boş ve hata durumları için tek mesaj kutusu. */
