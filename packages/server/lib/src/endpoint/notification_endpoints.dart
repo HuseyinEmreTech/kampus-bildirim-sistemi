@@ -43,12 +43,22 @@ class NotificationEndpoints {
         details: 'pageSize',
       );
     }
+    final unreadOnly = params['unreadOnly'] ?? 'false';
+    if (unreadOnly != 'true' && unreadOnly != 'false') {
+      return errorResponse(
+        400,
+        'VALIDATION_ERROR',
+        'unreadOnly true veya false olmalı.',
+        details: 'unreadOnly',
+      );
+    }
 
     final userId = currentUser(request).userId;
     final items = await _notifications.list(
       userId,
       limit: pageSize,
       offset: (page - 1) * pageSize,
+      unreadOnly: unreadOnly == 'true',
     );
     final unread = await _notifications.unreadCount(userId);
     return jsonResponse(200, {

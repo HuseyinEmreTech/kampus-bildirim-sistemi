@@ -1,7 +1,7 @@
 ---
 title: Çağdaş Kemal Ağca - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-10-24
+son-guncelleme: 2026-11-02
 ---
 
 # Çağdaş Kemal Ağca (@Cagdas3307) - Kişisel Plan
@@ -48,10 +48,10 @@ son-guncelleme: 2026-10-24
 - [x] PR: Görevli endpoint'leri + yetki testleri — #117, #119
 
 ### Hafta 7 (26 Eki - 1 Kas): Bildirim ve Bina Endpoint'leri
-- [x] `GET /notifications`: Öğrenci bildirimleri (query: unreadOnly, page) — `GET /api/me/notifications` (page, pageSize; `unreadOnly` yok), #123
+- [x] `GET /notifications`: Öğrenci bildirimleri (query: unreadOnly, page) — `GET /api/me/notifications` (page, pageSize, unreadOnly), #123; `unreadOnly` 2 Kasım'da eklendi
 - [x] `POST /notifications/:id/read`: Okundu işaretle — `PUT /api/me/notifications/{id}/read`, #123
 - [x] `GET /buildings`: Bina listesi (konum izni yoksa fallback) — #122
-- [ ] `GET /buildings/:id`: Bina detayı (koordinat, ad) — API tasarımında yok; liste koordinatları da veriyor, gerekirse eklenecek
+- [x] `GET /buildings/:id`: Bina detayı (koordinat, ad) — `GET /api/buildings/{id}`, #138
 - [x] Rate limiting middleware: IP/bazlı, 100 req/dk; girişte 5/dk — #110
 - [x] PR: Bildirim + Bina endpoint'leri — #122, #123
 
