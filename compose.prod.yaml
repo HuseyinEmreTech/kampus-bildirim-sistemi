@@ -41,6 +41,8 @@ services:
       # Oturum belirteçlerinin sırları (#19); sunucu bunlar olmadan açılmaz.
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET .env dosyasinda tanimli olmali}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET .env dosyasinda tanimli olmali}
+      # Fotoğraf klasörü; aşağıdaki files diskine bağlı.
+      FILES_DIR: /data/files
     volumes:
       # Yüklenen fotoğraflar; konteyner silinse de kalır.
       - files:/data/files
