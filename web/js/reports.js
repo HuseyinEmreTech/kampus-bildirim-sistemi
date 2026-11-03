@@ -34,7 +34,7 @@ export function totalPages(total, pageSize) {
   return Math.max(1, Math.ceil(total / pageSize));
 }
 
-/** /api/buildings yanıtı dizi ya da { items } olabilir (gövde henüz kesinleşmedi). */
+/** /api/buildings yanıtı { items } biçimindedir; düz dizi de kabul edilir. */
 export function normalizeBuildings(data) {
   if (Array.isArray(data)) return data;
   return Array.isArray(data?.items) ? data.items : [];

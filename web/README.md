@@ -19,17 +19,21 @@ Bağımlılık, derleme adımı veya paket yöneticisi yok: düz HTML, CSS ve ES
 
 ## Çalıştırma
 
-ES modülleri `file://` üzerinden yüklenmez; klasörü herhangi bir statik sunucuyla aç (ör. VS Code "Live Server" eklentisi veya `python -m http.server 5500` komutu `web/` içinde). Sunucu adresi `js/config.js` içindeki `API_BASE_URL` değeridir (varsayılan `http://localhost:8080`).
+1. Veritabanını ve çekirdek sunucuyu ana [README](../README.md) adımlarıyla çalıştır; sunucu `http://localhost:8080` adresinde açılır.
+2. `web/` klasörünü herhangi bir statik sunucuyla aç (ör. VS Code "Live Server" eklentisi veya `web/` içinde `python -m http.server 5500`). ES modülleri `file://` üzerinden yüklenmez.
+3. Seed hesaplarıyla giriş yap (parolalar `db/seed/001_ornek.sql` başında). Liste yalnızca görevli rolüne açıktır.
 
-Web istemcisi çekirdekten farklı bir adresten (port) açıldığında tarayıcı CORS kuralı uygular. Çekirdekte şu an CORS başlığı yok; bu yüzden gerçek sunucuya bağlanmak için çekirdeğe CORS ara katmanı eklenmeli (sunucu sahibine iş, bu PR kapsamı dışında). **Doğrulanmadı.**
+Sunucu adresi `js/config.js` içindeki `API_BASE_URL` değeridir. Çekirdek CORS başlığı gönderdiği için web istemcisi farklı bir porttan açılabilir.
+
+**Gerçek sunucuda denendi (3 Kasım 2026, yerel PostgreSQL 16.15 + seed):** görevli girişi, liste, durum ve kategori filtresi, boş sonuç, sayfalama, 401'de belirteç yenileme, iki belirteç de geçersizken girişe yönlendirme, yanlış parola ve öğrencinin `403` mesajı.
 
 ## Testler
 
 Statik sunucu açıkken tarayıcıda `tests/index.html` sayfasını aç. Sonuç sayfada listelenir; `body` öğesinin `data-result` alanı `pass` ya da `fail` olur.
 
-## Varsayımlar
+## Sunucuyla sözleşme
 
-- `GET /api/reports` yanıtı `{ items, page, pageSize, total }` biçimindedir (bildirimlerim örneğiyle aynı). Endpoint çekirdekte henüz yok.
-- Bina filtresi için `buildingId` sorgu parametresi gönderilir; API dokümanında **öneri** olarak eklendi.
-- `GET /api/buildings` yanıtı `[{ buildingId, name }]` ya da `{ items: [...] }` olabilir; ikisi de kabul edilir.
+- `GET /api/reports` yanıtı `{ items, page, pageSize, total }`; her bildirimde konum düz `place` ve `buildingName` alanlarıyla gelir (`packages/server/lib/src/mapper/report_mapper.dart`). Kartta önce `place`, yoksa bina adı gösterilir.
+- `GET /api/buildings` yanıtı `{ items: [{ buildingId, name, ... }] }`.
 - Liste yalnızca görevli rolüne açıktır; öğrenci girerse `403` için "yalnızca görevliler" mesajı gösterilir.
+- **Bina filtresi sunucuda yok:** istemci `buildingId` gönderir, ama çekirdek bu parametreyi henüz tanımadığı için bütün bildirimler gelir. Sunucu tarafı #160'ta.
