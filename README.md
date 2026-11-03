@@ -135,7 +135,7 @@ Bağımlılıklar arayüzle verilir; bağlama `main.dart` içinde yapılır. Zen
 | Python rapor servisi | FastAPI; çekirdek REST API'sinden raporları CSV dışa aktarır | Eklendi |
 | Veritabanı | PostgreSQL 16 | Kabul |
 | Veritabanı erişimi | `postgres` paketi, parametreli sorgu | Öneri |
-| Şema yönetimi | Elle SQL dosyaları (`db/migrations/`); V1-V4 migration'ları yazıldı | Kabul |
+| Şema yönetimi | Elle SQL dosyaları (`db/migrations/`); V1-V5 migration'ları yazıldı | Kabul |
 | Test | Dart `test`, `mocktail`; entegrasyon testi gerçek PostgreSQL konteyneriyle | Öneri |
 | Konteyner | Podman + podman-compose **veya** Docker + Docker Compose | Kabul |
 | Kod kalitesi | Yerelde `dart analyze`, `flutter analyze`, kapsam; PR'da SonarQube Cloud (ücretsiz plan) | Kabul, [ADR-02](proje-bilgileri/adr/02-kalite-araci-sonarqube-cloud.md); yerel Community'de Dart yok (doğrulandı); Cloud kuruldu ve tarama yeşil (12 Ekim 2026) |
@@ -227,6 +227,7 @@ Not: Migration'lar yalnızca veri klasörü **boşken** (ilk açılışta) otoma
 podman compose exec -T db psql -U campus -d campus < db/migrations/V2__status_history_ilk_durum.sql
 podman compose exec -T db psql -U campus -d campus < db/migrations/V3__email_buyuk_kucuk_harf_tekil.sql
 podman compose exec -T db psql -U campus -d campus < db/migrations/V4__bildirim_tarih_indeksi.sql
+podman compose exec -T db psql -U campus -d campus < db/migrations/V5__kural_kisitlari.sql
 ```
 
 Sahte örnek veri (5 bina, 2 öğrenci, 2 görevli, 3 bildirim; parola `Demo.1234`):
@@ -274,6 +275,8 @@ cd packages/server
 dart run bin/server.dart
 # http://localhost:8080/health
 ```
+
+Sunucu `DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` ve `FILES_DIR` tanımlı değilse günlüğe yazıp açılmaz (`.env.example`).
 
 **Python rapor dışa aktarma servisi**
 
@@ -335,7 +338,7 @@ Mobil ekranlar `lib/mobil/`, web ekranlar `lib/web/` altında geliştiriliyor. P
 | `DATABASE_URL` | (yok) | PostgreSQL bağlantı adresi; havuz boyutu ve zaman aşımları adresin sonundaki ayarlarla verilir (`.env.example`) |
 | `PORT` | `8080` | Sunucu portu |
 | `CAMPUS_BOUNDS` | (yok) | Kampüs sınırı (dikdörtgen koordinatları) |
-| `PHOTO_DIR` | (yok) | Fotoğrafların saklanacağı klasör |
+| `FILES_DIR` | (yok) | Fotoğrafların saklanacağı klasör; tanımlı değilse sunucu açılmaz (canlıda `/data/files`) |
 
 Ortam ayrıntısı: [geliştirme ortamı](proje-bilgileri/07-development-environment.md).
 

@@ -13,6 +13,7 @@ import '../support/test_values.dart';
 const otherStudentId = 'a0000000-0000-4000-8000-000000000002';
 const ownId = 'd0000000-0000-4000-8000-000000000001';
 const othersId = 'd0000000-0000-4000-8000-000000000002';
+const readId = 'd0000000-0000-4000-8000-000000000003';
 
 final tokens = TokenService(testJwtConfig);
 final studentToken = tokens.createAccessToken(studentId, 'Student');
@@ -84,6 +85,40 @@ void main() {
     expect((await _errorOf(res))['details'], 'page');
   });
 
+  test('list_unreadOnlyTrue_returnsOnlyUnread', () async {
+    notifications.items.add((
+      userId: studentId,
+      item: _item(readId, readAt: DateTime.utc(2026, 10, 3)),
+    ));
+
+    final res = await app(
+      _request('GET', 'api/me/notifications?unreadOnly=true'),
+    );
+
+    expect(res.statusCode, 200);
+    expect(await _idsOf(res), [ownId]);
+  });
+
+  test('list_withoutUnreadOnly_returnsReadToo', () async {
+    notifications.items.add((
+      userId: studentId,
+      item: _item(readId, readAt: DateTime.utc(2026, 10, 3)),
+    ));
+
+    final res = await app(_request('GET', 'api/me/notifications'));
+
+    expect(await _idsOf(res), [ownId, readId]);
+  });
+
+  test('list_unreadOnlyNotBoolean_returns400', () async {
+    final res = await app(
+      _request('GET', 'api/me/notifications?unreadOnly=evet'),
+    );
+
+    expect(res.statusCode, 400);
+    expect((await _errorOf(res))['details'], 'unreadOnly');
+  });
+
   test('markRead_own_returns200AndDecreasesUnread', () async {
     final res = await app(_request('PUT', 'api/me/notifications/$ownId/read'));
 
@@ -133,4 +168,12 @@ Request _request(String method, String path, {String? token}) {
 Future<Map<String, Object?>> _errorOf(Response res) async {
   final body = jsonDecode(await res.readAsString()) as Map<String, Object?>;
   return body['error']! as Map<String, Object?>;
+}
+
+Future<List<Object?>> _idsOf(Response res) async {
+  final body = jsonDecode(await res.readAsString()) as Map<String, Object?>;
+  return [
+    for (final item in body['items']! as List<Object?>)
+      (item! as Map<String, Object?>)['notificationId'],
+  ];
 }

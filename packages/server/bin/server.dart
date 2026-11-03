@@ -1,6 +1,11 @@
 import 'dart:io';
 
 import 'package:campus_infrastructure/campus_infrastructure.dart';
+import 'package:campus_application/campus_application.dart';
+import 'package:campus_domain/campus_domain.dart' show Clock;
+import 'package:campus_server/src/endpoint/report_creation_endpoint.dart';
+import 'package:campus_server/src/endpoint/report_endpoints.dart';
+import 'package:campus_server/src/endpoint/report_resolution_endpoint.dart';
 import 'package:campus_server/src/service/auth_service.dart';
 import 'package:campus_server/src/service/password_hasher.dart';
 import 'package:campus_server/src/service/token_service.dart';
@@ -54,9 +59,14 @@ void main() async {
   final env = Platform.environment;
   final jwtConfig = JwtConfig.fromEnvironment(env);
   final databaseUrl = env['DATABASE_URL'];
-  if (jwtConfig == null || databaseUrl == null || databaseUrl.isEmpty) {
+  final filesDir = env['FILES_DIR'];
+  if (jwtConfig == null ||
+      databaseUrl == null ||
+      databaseUrl.isEmpty ||
+      filesDir == null ||
+      filesDir.isEmpty) {
     serverLog(
-      'Sunucu açılamadı: DATABASE_URL, JWT_ACCESS_SECRET ve '
+      'Sunucu açılamadı: DATABASE_URL, FILES_DIR, JWT_ACCESS_SECRET ve '
       'JWT_REFRESH_SECRET tanımlı olmalı (sırlar en az '
       '${JwtConfig.minSecretLength} karakter ve birbirinden farklı).',
     );
@@ -77,6 +87,21 @@ void main() async {
   final users = UserEndpoints(UserRepositoryImpl(db));
   final buildings = BuildingEndpoints(BuildingRepositoryImpl(db));
   final notifications = NotificationEndpoints(NotificationRepositoryImpl(db));
+  final reports = PostgresReportRepository(db);
+  final photos = LocalFileStorage(Directory(filesDir));
+  final reportEndpoints = ReportEndpoints(
+    listReports: ListReportsUseCase(reports),
+    assignReport: ReportAssignUseCase(reports),
+  );
+  final reportCreation = ReportCreationEndpoint(
+    createReport: ReportCreateUseCase(reports, const SystemClock()),
+    photos: photos,
+    buildings: BuildingRepositoryImpl(db),
+  );
+  final reportResolution = ReportResolutionEndpoint(
+    resolveReport: ReportResolveUseCase(reports),
+    photos: photos,
+  );
   final protected = const Pipeline()
       .addMiddleware(authMiddleware(tokens))
       .addMiddleware(auditLog())
@@ -85,6 +110,9 @@ void main() async {
             .add(users.router.call)
             .add(buildings.router.call)
             .add(notifications.router.call)
+            .add(reportEndpoints.router.call)
+            .add(reportCreation.router.call)
+            .add(reportResolution.router.call)
             .handler,
       );
 
@@ -111,3 +139,12 @@ void main() async {
 
 bool _isLogin(Request request) =>
     request.method == 'POST' && request.url.path == 'api/auth/login';
+
+/// Gerçek saat (UTC). Bildirimin oluşturulma zamanı buradan alınır;
+/// testlerde yerine sabit saat verilir.
+class SystemClock implements Clock {
+  const SystemClock();
+
+  @override
+  DateTime now() => DateTime.now().toUtc();
+}

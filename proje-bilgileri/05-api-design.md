@@ -1,7 +1,7 @@
 ---
 title: API Tasarımı
 durum: Taslak
-son-guncelleme: 2026-10-24
+son-guncelleme: 2026-11-02
 ---
 
 # API Tasarımı
@@ -155,7 +155,7 @@ curl "http://localhost:8080/api/me/notifications?page=1&pageSize=20" \
 }
 ```
 
-Hiç bildirim yoksa `items` boş dizi, `unreadCount` 0 döner. Yalnızca öğrenci (görevli `403`) ve yalnızca kendi bildirimleri (Rule 01). `page` 1'den küçük ya da `pageSize` 1-100 dışında ise `400`. Toplam sayı (`total`) depoda henüz yok.
+Hiç bildirim yoksa `items` boş dizi, `unreadCount` 0 döner. Yalnızca öğrenci (görevli `403`) ve yalnızca kendi bildirimleri (Rule 01). `unreadOnly=true` verilirse yalnızca okunmamış bildirimler döner (varsayılan `false`). `page` 1'den küçük, `pageSize` 1-100 dışında ya da `unreadOnly` `true`/`false` dışında ise `400`. Toplam sayı (`total`) depoda henüz yok.
 
 `PUT /api/me/notifications/{id}/read`: `200 { "notificationId", "read": true }`. Bildirim yoksa ya da başkasınınsa `404 NOT_FOUND` (var olduğu belli edilmez). İkinci kez okundu yapmak ilk okunma zamanını değiştirmez.
 

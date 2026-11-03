@@ -1,6 +1,5 @@
 name: Görev
 description: Bir kişiye atanacak, tek PR'lık iş
-title: "[Hafta NN] "
 body:
   - type: textarea
     id: amac
