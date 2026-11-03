@@ -1,10 +1,13 @@
 ---
 title: Emir Kerem Çakıcı - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-10-12
+son-guncelleme: 2026-11-01
 ---
 
 # Emir Kerem Çakıcı - Kişisel Plan
+
+> **Güncel görevler (1 Kasım 2026):** [Kalan işler planı](../planlar/2026-11-01-kalan-isler.md) ve `gh issue list --assignee KeremC23`. Son tarih yok; sıra bağımlılığa göre. Bu dosyadaki haftalık hedefler geçmiş kayıttır.
+
 
 **Rol:** Esnek Destek / Test & Kalite / Yardımcı Geliştirici
 **Ana Sorumluluk:** Takıma göre esnek - Test yazımı, hata düzeltme, dokümantasyon, küçük feature'lar

@@ -1,10 +1,13 @@
 ---
 title: Yusuf Ekenel - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-10-22
+son-guncelleme: 2026-11-01
 ---
 
 # Yusuf Ekenel (@yusufekenel) - Kişisel Plan
+
+> **Güncel görevler (1 Kasım 2026):** [Kalan işler planı](../planlar/2026-11-01-kalan-isler.md) ve `gh issue list --assignee yusufekenel`. Son tarih yok; sıra bağımlılığa göre. Bu dosyadaki haftalık hedefler geçmiş kayıttır.
+
 
 **Rol:** Flutter Mobil Uygulama Geliştirici (Android, iOS, Web)
 **Ana Sorumluluk:** `campus_app` paketi - Öğrenci ve Görevli mobil ekranları

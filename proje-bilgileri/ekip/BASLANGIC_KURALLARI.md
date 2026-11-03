@@ -1,7 +1,7 @@
 ---
 title: Başlangıç Kuralları - Her Üye İçin
 durum: Onaylandı
-son-guncelleme: 2026-10-12
+son-guncelleme: 2026-11-01
 ---
 
 # Başlangıç Kuralları - Her Üye İçin
@@ -185,7 +185,7 @@ chore: ci workflow guncellendi
 | **Perşembe** | PR açma, review isteği, CI bekleme |
 | **Cuma** | **Ders**: 1 dk/kişi demo (ne merge edildi, ne bloklandı) |
 | **Cumartesi-Pazar** | Review yanıtlama, merge, sonraki hafta hazırlığı |
-| **Pazar 23:59** | Milestone kapanır, tüm PR'lar birleşmiş olmalı |
+| **Not (1 Kasım 2026)** | Bu haftalık akış ve Pazar kapanışı kaldırıldı; güncel düzen: [Kalan işler planı](../planlar/2026-11-01-kalan-isler.md) |
 
 ---
 

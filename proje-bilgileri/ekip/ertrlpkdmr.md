@@ -1,10 +1,13 @@
 ---
 title: Ertuğrul Pekdemir - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-10-12
+son-guncelleme: 2026-11-01
 ---
 
 # Ertuğrul Pekdemir (@ertrlpkdmr) - Kişisel Plan
+
+> **Güncel görevler (1 Kasım 2026):** [Kalan işler planı](../planlar/2026-11-01-kalan-isler.md) ve `gh issue list --assignee ertrlpkdmr`. Son tarih yok; sıra bağımlılığa göre. Bu dosyadaki haftalık hedefler geçmiş kayıttır.
+
 
 **Rol:** Backend Infrastructure / Veri ve Altyapı Uzmanı
 **Ana Sorumluluk:** `campus_infrastructure` - PostgreSQL repository implementasyonları, dosya depolama, Docker, migration

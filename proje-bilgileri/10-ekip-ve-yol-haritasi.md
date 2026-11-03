@@ -1,7 +1,7 @@
 ---
 title: Ekip ve 15 Haftalık Yol Haritası
 durum: Onaylandı
-son-guncelleme: 2026-10-21
+son-guncelleme: 2026-11-01
 ---
 
 # Ekip ve 15 Haftalık Yol Haritası
@@ -28,6 +28,8 @@ Görevler, her iş bağımsız ilerleyebilecek ve tek PR'a sığacak büyüklük
 
 ## 2. Takvim
 
+> **1 Kasım 2026'dan itibaren haftalık hedef ve son tarih yok.** Vize dönemi nedeniyle kalan işler haftaya bağlanmadı; sıra yalnızca bağımlılığa göre: [Kalan işler planı](planlar/2026-11-01-kalan-isler.md). Aşağıdaki tablo ilk planın kaydıdır; ders ve sunum takvimi hâlâ doğrulanmadı.
+
 - Dönem 15 ders haftası; ders **cuma** günü. 16. haftada ders yok, plana girmez.
 - Sprint **Pazartesi-Pazar**. Kapanış **Pazar 23:59**: o haftanın PR'ları birleşmiş, günlük raporlar girmiş olur.
 - **Cuma dersi:** herkes bir önceki sprintte ne yaptığını 1 dakikada anlatır; hafta ortası durum konuşulur.
@@ -50,7 +52,7 @@ Görevler, her iş bağımsız ilerleyebilecek ve tek PR'a sığacak büyüklük
 | 14 | 14 - 20 Ara | 18 Ara | **Test haftası:** kod donuk, yalnızca hata düzeltme |
 | 15 | 21 - 27 Ara | 25 Ara | **Teslim ve 2. sunum (varsayım)**; katkı raporları |
 
-Kişi kişi haftalık görevler kişisel plan dosyalarındadır.
+Kişi kişi güncel görevler [Kalan işler planında](planlar/2026-11-01-kalan-isler.md).
 
 ## 3. Öncelik
 
@@ -69,7 +71,7 @@ Kural ve test hiçbir zaman kesilmez; önce "olursa" satırı kesilir. Dağıtı
 | Araç | Ne için | Kural |
 | --- | --- | --- |
 | **Issue** | Her görev bir kart | Şablonla açılır: kabul ölçütü, dokunulacak ve dokunulmayacak dosyalar, bağlı testler. Bir kişiye atanır |
-| **Milestone** | Her hafta bir milestone (`Hafta 04` ...) | Issue haftasına bağlanır; Pazar günü kapanır |
+| **Milestone** | Kullanılmıyor (1 Kasım 2026'dan itibaren) | Yeni issue milestone'a bağlanmaz; issue'lar `Bağımlı:` satırıyla sıralanır |
 | **Etiketler** | Katman ve tür | Katman: `domain`, `application`, `contracts`, `infrastructure`, `server`, `app`, `docs`, `ci`. Tür: `feat`, `fix`, `test`, `docs`. Öncelik: `sart`, `olmali`, `olursa` |
 | **Projects (Kanban)** | Haftanın durumu tek bakışta | Sütunlar: Yapılacak, Yapılıyor, İncelemede, Bitti |
 | **Branch** | Her issue kendi branch'inde | Ad: `feature/<issue-no>-<kisa-ad>`, `fix/...`, `docs/...`, `test/...` |
@@ -84,7 +86,7 @@ Yapılmayanlar: Wiki (dokümanlar repoda), Discussions (konuşma issue'larda ve 
 
 1. **Bir issue, bir branch, bir PR.** PR küçük tutulur (ideal 300 satırın altı, test dahil).
 2. **Başkasının adına commit yok.** Herkes kendi hesabıyla commit atar; hoca GitHub geçmişinden kimin ne yaptığını görür.
-3. **Her hafta en az bir birleşmiş PR**, herkes için.
+3. **Düzenli katkı:** herkes payına düşen issue'ları kendi hesabından, küçük PR'larla ve dönem boyunca düzenli olarak birleştirir; iş son geceye bırakılmaz. Görevlerde son tarih yok; yapamayacak olan issue'ya yazar, görev başkasına geçer.
 4. **Yapay zeka ile kodlama serbest, anlamadan almak yasak.** Kural seti: [AGENTS.md](../AGENTS.md); nasıl çalışılacağı: [Başlangıç rehberi](ekip/00-baslangic-rehberi.md#5-yapay-zeka-ile-nasıl-çalışıyoruz).
 5. **Anlatabilme kontrolü.** İnceleyen her PR'da en az bir "bu satır neden böyle?" sorusu sorar; yazar kendi cümlesiyle cevaplar. Hoca sorduğunda herkes kendi kodunu anlatabilmelidir.
 6. **Kabul testi önce.** Kural içeren görevlerde test Hüseyin Emre tarafından önceden yazılır (`bekliyor` etiketi); görev testi yeşile çevirmektir. Test değiştirilmez; değişmesi gerekiyorsa issue'da konuşulur.

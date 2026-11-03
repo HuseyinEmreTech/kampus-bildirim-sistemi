@@ -1,7 +1,7 @@
 ---
 title: Proje Bilgileri Vault'u
 durum: Güncel
-son-guncelleme: 2026-10-21
+son-guncelleme: 2026-11-01
 ---
 
 # Campus Report: Proje Bilgileri
@@ -29,7 +29,7 @@ Bu klasör **Campus Report** projesinin bütün dokümantasyonudur: ne yaptığ�
 | Yapılan hatalar ve dersler | [Hata kayıtları](kayitlar/hata-kayitlari.md) |
 | Kod kalitesi puanları | [SonarQube puanları](kayitlar/sonarqube-puanlari.md) |
 
-Kimin ne yaptığı GitHub'da da izlenebilir: her iş bir issue, her issue bir kişiye atanmış ve bir haftaya (milestone) bağlı, her değişiklik o kişinin açtığı Pull Request ile gelir.
+Kimin ne yaptığı GitHub'da da izlenebilir: her iş bir issue, her issue bir kişiye atanmış, her değişiklik o kişinin açtığı Pull Request ile gelir.
 
 ### Ekip arkadaşları için
 
