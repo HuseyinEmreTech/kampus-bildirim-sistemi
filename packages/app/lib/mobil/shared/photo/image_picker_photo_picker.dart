@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -24,12 +25,31 @@ typedef PickImage = Future<XFile?> Function({
 /// Kameradan ya da galeriden gerçek fotoğraf alan kaynak (`image_picker`).
 ///
 /// Eklentinin hatası (izin yok, kamera yok) burada yakalanıp sonuç tipine
-/// çevrilir; ekran istisna görmez.
-class ImagePickerPhotoPicker implements PhotoPicker {
-  ImagePickerPhotoPicker({PickImage? pickImage})
-    : _pickImage = pickImage ?? ImagePicker().pickImage;
+/// çevrilir; ekran istisna görmez. Testte eklenti çağrılarının sahtesi
+/// verilir.
+class ImagePickerPhotoPicker implements PhotoPicker, LostPhotoRecovery {
+  ImagePickerPhotoPicker({
+    PickImage? pickImage,
+    Future<LostDataResponse> Function()? retrieveLostData,
+  }) : _pickImage = pickImage ?? ImagePicker().pickImage,
+       _retrieveLostData = retrieveLostData ?? _androidLostData;
 
   final PickImage _pickImage;
+  final Future<LostDataResponse> Function() _retrieveLostData;
+
+  @override
+  Future<PickedPhoto?> recoverLostPhoto() async {
+    try {
+      final file = (await _retrieveLostData()).file;
+      if (file == null) return null;
+      return PickedPhoto(
+        bytes: await file.readAsBytes(),
+        contentType: _contentTypeOf(file),
+      );
+    } on PlatformException {
+      return null;
+    }
+  }
 
   @override
   Future<PhotoPickResult> pick(PhotoSource source) async {
@@ -52,6 +72,15 @@ class ImagePickerPhotoPicker implements PhotoPicker {
       return const PhotoPickFailed();
     }
   }
+}
+
+/// Kaybolan fotoğraf yalnızca Android'de olur; eklenti başka platformda
+/// hata verdiği için orada hiç sorulmaz.
+Future<LostDataResponse> _androidLostData() async {
+  if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
+    return LostDataResponse.empty();
+  }
+  return ImagePicker().retrieveLostData();
 }
 
 /// Platform türü verdiyse o; vermediyse dosya uzantısından. Bilinmeyen tür

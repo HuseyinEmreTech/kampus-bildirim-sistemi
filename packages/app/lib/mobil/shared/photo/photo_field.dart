@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'photo_picker.dart';
@@ -32,6 +34,24 @@ class _PhotoFieldView extends StatefulWidget {
 class _PhotoFieldViewState extends State<_PhotoFieldView> {
   /// Son alma denemesinin sorunu (çok büyük, izin yok...).
   String? _pickProblem;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.picker case final LostPhotoRecovery recovery) {
+      unawaited(_recoverLost(recovery));
+    }
+  }
+
+  /// Android uygulamayı kamera açıkken kapattıysa çekilen fotoğrafı geri
+  /// koyar; kurallara uymuyorsa nedenini gösterir.
+  Future<void> _recoverLost(LostPhotoRecovery recovery) async {
+    final photo = await recovery.recoverLostPhoto();
+    if (!mounted || photo == null || widget.field.value != null) return;
+    final problem = photoProblem(photo);
+    setState(() => _pickProblem = problem);
+    if (problem == null) widget.field.didChange(photo);
+  }
 
   Future<void> _pick(PhotoSource source) async {
     final result = await widget.picker.pick(source);

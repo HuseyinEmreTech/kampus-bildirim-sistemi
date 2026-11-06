@@ -1,5 +1,6 @@
 import 'package:campus_app/mobil/shared/photo/image_picker_photo_picker.dart';
 import 'package:campus_app/mobil/shared/photo/photo_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
@@ -98,5 +99,42 @@ void main() {
         .pick(PhotoSource.camera);
 
     expect(result, isA<PhotoPickFailed>());
+  });
+
+  test('recoverLostPhoto_returnsPhoto_whenAndroidKilledApp', () async {
+    final picker = ImagePickerPhotoPicker(
+      retrieveLostData: () async =>
+          LostDataResponse(file: XFile.fromData(bytes, path: 'kayip.jpg')),
+    );
+
+    final photo = await picker.recoverLostPhoto();
+
+    expect(photo?.bytes, bytes);
+    expect(photo?.contentType, 'image/jpeg');
+  });
+
+  test('recoverLostPhoto_returnsNull_whenNothingLost', () async {
+    final picker = ImagePickerPhotoPicker(
+      retrieveLostData: () async => LostDataResponse.empty(),
+    );
+
+    expect(await picker.recoverLostPhoto(), isNull);
+  });
+
+  test('recoverLostPhoto_doesNotAskPlugin_whenNotAndroid', () async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+    final photo = await ImagePickerPhotoPicker().recoverLostPhoto();
+
+    expect(photo, isNull);
+  });
+
+  test('recoverLostPhoto_returnsNull_whenRecoveryFails', () async {
+    final picker = ImagePickerPhotoPicker(
+      retrieveLostData: () async => throw PlatformException(code: 'hata'),
+    );
+
+    expect(await picker.recoverLostPhoto(), isNull);
   });
 }
