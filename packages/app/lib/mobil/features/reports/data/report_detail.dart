@@ -1,7 +1,23 @@
 import 'report_list_item.dart';
 
-/// Bildirim detayı (`GET /api/reports/{id}`). Durum geçmişi ve görevlinin
-/// sonuç fotoğrafı/notu 2. parçada eklenecek.
+/// Bir durum değişimi (03-domain-design: StatusHistory).
+class StatusChange {
+  const StatusChange({required this.to, required this.changedAt, this.note});
+
+  final ReportStatus to;
+  final DateTime changedAt;
+  final String? note;
+}
+
+/// Görevlinin çözüm kaydı: sonuç fotoğrafı zorunlu, not isteğe bağlı (Rule 04).
+class Resolution {
+  const Resolution({required this.photoUrl, this.note});
+
+  final String photoUrl;
+  final String? note;
+}
+
+/// Bildirim detayı ve durum geçmişi (`GET /api/reports/{id}`).
 ///
 /// Fotoğraf adresleri tam adrestir; sunucunun verdiği yolu tam adrese
 /// çevirmek gerçek kaynağın işidir.
@@ -14,6 +30,8 @@ class ReportDetail {
     required this.place,
     required this.createdAt,
     required this.photoUrl,
+    required this.history,
+    this.resolution,
   });
 
   final String id;
@@ -23,4 +41,10 @@ class ReportDetail {
   final String place;
   final DateTime createdAt;
   final String photoUrl;
+
+  /// Eskiden yeniye durum değişimleri.
+  final List<StatusChange> history;
+
+  /// Yalnızca çözülen bildirimde dolu.
+  final Resolution? resolution;
 }
