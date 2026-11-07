@@ -27,6 +27,10 @@ class ReportCreateScreen extends StatefulWidget {
 
 class _ReportCreateScreenState extends State<ReportCreateScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  /// İlk başarısız gönderimden sonra alanlar her değişiklikte yeniden
+  /// denetlenir: düzeltilen alanın uyarısı hemen kalkar.
+  AutovalidateMode _autovalidate = AutovalidateMode.disabled;
   final _photoKey = GlobalKey<FormFieldState<PickedPhoto>>();
   final _descriptionController = TextEditingController();
   ReportCategory? _category;
@@ -42,7 +46,10 @@ class _ReportCreateScreenState extends State<ReportCreateScreen> {
   Future<void> _submit() async {
     final category = _category;
     final photo = _photoKey.currentState?.value;
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      setState(() => _autovalidate = AutovalidateMode.always);
+      return;
+    }
     if (category == null || photo == null) return;
 
     setState(() {
@@ -84,6 +91,7 @@ class _ReportCreateScreenState extends State<ReportCreateScreen> {
       appBar: AppBar(title: const Text('Yeni bildirim')),
       body: Form(
         key: _formKey,
+        autovalidateMode: _autovalidate,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [

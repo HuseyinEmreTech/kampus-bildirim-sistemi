@@ -28,6 +28,10 @@ class ResolveScreen extends StatefulWidget {
 
 class _ResolveScreenState extends State<ResolveScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  /// İlk başarısız gönderimden sonra alanlar her değişiklikte yeniden
+  /// denetlenir: düzeltilen alanın uyarısı hemen kalkar.
+  AutovalidateMode _autovalidate = AutovalidateMode.disabled;
   final _photoKey = GlobalKey<FormFieldState<PickedPhoto>>();
   final _noteController = TextEditingController();
   bool _isSubmitting = false;
@@ -41,7 +45,10 @@ class _ResolveScreenState extends State<ResolveScreen> {
 
   Future<void> _submit() async {
     final photo = _photoKey.currentState?.value;
-    if (!_formKey.currentState!.validate() || photo == null) return;
+    if (!_formKey.currentState!.validate() || photo == null) {
+      setState(() => _autovalidate = AutovalidateMode.always);
+      return;
+    }
 
     setState(() {
       _isSubmitting = true;
@@ -80,6 +87,7 @@ class _ResolveScreenState extends State<ResolveScreen> {
       appBar: AppBar(title: const Text('Çözüldü işaretle')),
       body: Form(
         key: _formKey,
+        autovalidateMode: _autovalidate,
         // Bütün alanlar her zaman oluşturulsun ki ekran dışında kalanların
         // doğrulaması da çalışsın (ListView görünmeyeni oluşturmaz).
         child: SingleChildScrollView(

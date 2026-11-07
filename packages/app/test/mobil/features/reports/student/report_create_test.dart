@@ -141,4 +141,20 @@ void main() {
     expect(find.text('Fotoğraf ekleyin'), findsOneWidget);
     expect(creator.received, isEmpty);
   });
+
+  testWidgets('errors_clear_whenFieldsFixed_afterFailedSubmit', (tester) async {
+    // Arrange: boş formla gönderilince uyarılar çıkar.
+    await openScreen(tester, FakeReportCreator(const ReportCreated()));
+    await submit(tester);
+    expect(find.text('Açıklama en az 5 karakter olmalı'), findsOneWidget);
+    expect(find.text('Fotoğraf ekleyin'), findsOneWidget);
+
+    // Act: alanlar düzeltilir, yeniden gönderilmez.
+    await tester.enterText(find.byType(TextFormField), validDescription);
+    await tapVisible(tester, 'Fotoğraf çek');
+
+    // Assert: uyarılar hemen kalkar.
+    expect(find.text('Açıklama en az 5 karakter olmalı'), findsNothing);
+    expect(find.text('Fotoğraf ekleyin'), findsNothing);
+  });
 }
