@@ -320,7 +320,35 @@ docker compose -f compose.prod.yaml up -d --build
 - Sonradan eklenen bir migration yönetici hesabıyla elle uygulanır; yeni tablolara sunucu hesabının izni kendiliğinden verilir:
   `docker compose -f compose.prod.yaml exec -T db psql -U campus -d campus < db/migrations/V5__ornek.sql` (PowerShell'de `cmd /c "..."` içinde).
 
-Fotoğraflar `files` adlı kalıcı diskte (`/data/files`) durur. HTTPS (Caddy) dağıtım kararından sonra eklenecek.
+Fotoğraflar `files` adlı kalıcı diskte (`/data/files`) durur.
+
+**HTTPS (isteğe bağlı, `https` profili)**
+
+Sunucunun önüne Caddy konur: dışarıdan gelen istekleri şifreli (HTTPS) karşılar, içeride sunucuya iletir. Ayarlar `Caddyfile`'dadır.
+
+```bash
+# .env: ALAN_ADI=kampus.example.com (alan adı bu bilgisayarın IP'sini göstermeli)
+# .env: SUNUCU_ADRESI=127.0.0.1 (sunucunun 8080'i dışarıya kapanır, istekler yalnızca HTTPS'ten gelir)
+docker compose -f compose.prod.yaml --profile https up -d --build
+# https://kampus.example.com/health
+```
+
+- Gerçek bir alan adında Caddy, Let's Encrypt sertifikasını kendisi alır ve yeniler; 80 ve 443 portlarının dışarıya açık olması gerekir. `ALAN_ADI=localhost` ise Caddy kendi yerel sertifikasını kullanır; tarayıcı uyarı verir, yalnızca deneme içindir.
+- HTTP'ye gelen istek HTTPS'e yönlendirilir. 6 MB'tan büyük istek (Rule 07: fotoğraf en fazla 5 MB) sunucuya ulaşmadan reddedilir (413).
+- Profil verilmezse Caddy açılmaz; sunucu eskisi gibi `8080`'den HTTP ile çalışır. Hangi yolun kullanılacağı dağıtım kararına bağlı (hafta 11).
+
+**Canlıda hesap açmak**
+
+Kayıt ekranı yok ve demo seed'i (`Demo.1234`) canlıya yüklenmez; hesaplar `db/hesap/hesap-ekle.sql` ile tek tek açılır. Parola komut satırına yazılmaz, `PAROLA` ortam değişkeninden okunur (en az 10 karakter). Rol `Student` ya da `Staff`.
+
+```bash
+read -rs PAROLA && export PAROLA
+docker compose -f compose.prod.yaml exec -T -e PAROLA db psql -U campus -d campus \
+  -v ad="Zeynep Demir" -v eposta=zeynep@kampus.edu.tr -v rol=Staff < db/hesap/hesap-ekle.sql
+unset PAROLA
+```
+
+PowerShell'de (5.1 dahil): `$p = Read-Host -AsSecureString "Parola"; $env:PAROLA = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($p))`, sonra `Get-Content db\hesap\hesap-ekle.sql | docker compose -f compose.prod.yaml exec -T -e PAROLA db psql -U campus -d campus -v ad="Zeynep Demir" -v eposta=zeynep@kampus.edu.tr -v rol=Staff`, en sonda `Remove-Item Env:PAROLA`.
 
 **Mobil / Web istemci**
 
