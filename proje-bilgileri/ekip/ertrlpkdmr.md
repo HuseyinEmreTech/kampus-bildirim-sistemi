@@ -120,3 +120,4 @@ son-guncelleme: 2026-10-12
 - [2026-10-31](raporlar/ertrlpkdmr/2026-10-31.md): Bildirim listesine okunmamış süzgeci (Çağdaş'ın isteği)
 - [2026-11-01](raporlar/ertrlpkdmr/2026-11-01.md): ReportRepository arayüzü 2. parça (çöz, liste, detay)
 - [2026-11-02](raporlar/ertrlpkdmr/2026-11-02.md): V5 kural kısıtları (5 MB, zaman sırası, durum geçişleri, e-posta)
+- [2026-11-09](raporlar/ertrlpkdmr/2026-11-09.md): demo verisi, canlı ortam (HTTPS, hesap açma betiği, imaj düzeltmesi)
