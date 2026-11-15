@@ -1,12 +1,14 @@
 ---
 title: E2E Test ve Demo Rehberi
-durum: Taslak
-son-guncelleme: 2026-10-25
+durum: Güncel
+son-guncelleme: 2026-11-15
 ---
 
 # E2E Test ve Demo Rehberi
 
-Çalışan sunucuya HTTP isteği atan uçtan uca (E2E) testlerin kurulumu ve çalıştırılması. Sorumlu: Emir Kerem Çakıcı (#93). Bu doküman taslaktır; test dili ve CI kararı netleşince güncellenecek.
+← [İndeks](../00-index.md)
+
+Çalışan sunucuya HTTP isteği atan uçtan uca (E2E) testlerin kurulumu ve çalıştırılması. Sorumlu: Emir Kerem Çakıcı (#93).
 
 ## 1. Gereksinimler
 
@@ -30,6 +32,7 @@ python -m pip install pytest requests
 
 ```
 copy .env.example .env
+# .env içindeki yerel DB parolalarını ve iki farklı JWT sırrını ayarla.
 docker compose -f compose.prod.yaml up -d --build
 python test/veri/seed_yukle.py
 ```
@@ -44,25 +47,20 @@ Demo hesaplar (parola hepsinde `Demo.1234`): `ayse@ornek.edu`, `mehmet@ornek.edu
 python -m pytest test/e2e -v
 ```
 
+Varsayılan adres `http://localhost:8080`. Farklı port için `E2E_BASE_URL` değerini ayarla. Temiz, izole bir test sunucusu kullan. Giriş sınırı nedeniyle tekrar çalıştırmadan önce bir dakika bekle veya test sunucusunu yeniden başlat. Testler test veritabanına yeni bildirimler yazar.
+
 Test fotoğrafı 1x1 piksellik sahte PNG'dir; gerçek veri kullanılmaz.
 
-## 5. Mevcut durum
+## 5. Beklenen sonuç
 
-| Test | Durum |
-| --- | --- |
-| Yanlış parola `401 INVALID_CREDENTIALS` | Geçiyor |
-| Girişsiz liste isteği `401` | `xfail` |
-| Öğrenci görevli listesini göremez `403` | `xfail` |
-| Aç, üstlen, `409`, çöz, öğrenciye haber | `xfail` |
+Sekiz test çalışır. Sunucu kapalıysa yerel çalıştırma atlanır. Kabul doğrulamasında atlanan test olmamalı.
 
-`xfail` sebebi: `main` (a6112fd) üzerinde `GET/POST /api/reports` `404 Route not found` dönüyor. Endpoint birleşince testler `XPASS` olur ve `test_bildirim_akisi.py` içindeki `@ENDPOINT_YOK` işaretleri silinir.
+- Yanlış parola ve girişsiz istek reddedilir. Öğrenci görevli listesini göremez.
+- Bildirim açılır, tek görevli üstlenir. Yalnızca üstlenen görevli sonuç fotoğrafıyla çözer ve öğrenciye haber gider.
+- Bildirim detayı sahibine açılır, diğer öğrenciye `404 NOT_FOUND` döner. Bu senaryo [#159](https://github.com/HuseyinEmreTech/kampus-bildirim-sistemi/issues/159) ile gelen detay ucunu gerektirir.
+- İkinci çözme isteği `409` döner. Sonuç fotoğrafı olmayan çözüm ve 5 MB üstündeki bildirim fotoğrafı reddedilir.
 
-## 6. Henüz yapılmayanlar
-
-- Web ve mobil E2E
-- CI'a test işi eklenmesi (onay bekliyor)
-
-## 7. Sık hatalar
+## 6. Sık hatalar
 
 | Belirti | Çözüm |
 | --- | --- |
