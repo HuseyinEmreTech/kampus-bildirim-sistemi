@@ -1,7 +1,7 @@
 ---
 title: Campus Report - Proje Dokümantasyonu
 durum: Taslak
-son-guncelleme: 2026-10-17
+son-guncelleme: 2026-11-15
 ---
 
 # Campus Report: Proje Dokümantasyonu
@@ -26,6 +26,7 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 | 02 | [Mimari genel bakış](02-architecture-overview.md) | Teknolojiler, katmanlar, ilkeler | Taslak |
 | 03 | [Domain tasarımı](03-domain-design.md) | Varlıklar, kurallar, durum akışı | Taslak |
 | 04 | [Kullanıcı hikayeleri](04-user-stories.md) | USR 01-07 ve kabul ölçütleri | Taslak |
+| - | [Demo senaryosu ve elle kabul turu](ekip/demo-senaryosu.md) | 10 dakikalık akış ve USR 01–07 doğrulaması | Prova bekliyor |
 | 05 | [API tasarımı](05-api-design.md) | Endpoint'ler, örnek istek ve yanıtlar | Taslak |
 | 06 | [Güvenlik ve gizlilik](06-security-and-privacy.md) | Riskler ve kararlar | Taslak |
 | 07 | [Geliştirme ortamı](07-development-environment.md) | Makine, araçlar, kurulum | Güncel |
