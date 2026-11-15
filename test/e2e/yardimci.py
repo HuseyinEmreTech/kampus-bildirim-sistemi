@@ -2,7 +2,7 @@ import base64
 
 import requests
 
-BASE_URL = "http://localhost:8080"
+from conftest import BASE_URL
 PAROLA = "Demo.1234"
 
 # 1x1 piksellik geçerli PNG (sahte test fotoğrafı)
@@ -27,8 +27,8 @@ def yetki_basligi(giris: dict) -> dict:
     return {"Authorization": f"Bearer {giris['accessToken']}"}
 
 
-def bildirim_ac(ogrenci_giris: dict, aciklama: str) -> dict:
-    yanit = requests.post(
+def bildirim_istegi(ogrenci_giris: dict, aciklama: str, foto: bytes):
+    return requests.post(
         f"{BASE_URL}/api/reports",
         headers=yetki_basligi(ogrenci_giris),
         data={
@@ -39,8 +39,12 @@ def bildirim_ac(ogrenci_giris: dict, aciklama: str) -> dict:
             "longitude": "36.1742",
             "place": "B Blok 2. kat",
         },
-        files={"photo": ("test.png", SAHTE_PNG, "image/png")},
+        files={"photo": ("test.png", foto, "image/png")},
         timeout=15,
     )
+
+
+def bildirim_ac(ogrenci_giris: dict, aciklama: str) -> dict:
+    yanit = bildirim_istegi(ogrenci_giris, aciklama, SAHTE_PNG)
     assert yanit.status_code == 201, yanit.text
     return yanit.json()
