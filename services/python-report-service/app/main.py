@@ -62,6 +62,7 @@ def _report_query_params(
     status: ReportStatus | None,
     category: ReportCategory | None,
     assignee: str | None,
+    building_id: str | None,
 ) -> dict[str, str | int]:
     params: dict[str, str | int] = {"page": page, "pageSize": page_size}
     if status is not None:
@@ -70,6 +71,8 @@ def _report_query_params(
         params["category"] = category.value
     if assignee is not None:
         params["assignee"] = assignee
+    if building_id is not None:
+        params["buildingId"] = building_id
     return params
 
 
@@ -91,8 +94,16 @@ async def _fetch_report_page(
     status: ReportStatus | None,
     category: ReportCategory | None,
     assignee: str | None,
+    building_id: str | None,
 ) -> tuple[list[dict[str, Any]], int]:
-    params = _report_query_params(page, page_size, status, category, assignee)
+    params = _report_query_params(
+        page,
+        page_size,
+        status,
+        category,
+        assignee,
+        building_id,
+    )
     try:
         upstream = await core_client.get(
             "/api/reports",
@@ -122,6 +133,7 @@ async def _fetch_reports(
     status: ReportStatus | None,
     category: ReportCategory | None,
     assignee: str | None,
+    building_id: str | None,
 ) -> list[dict[str, Any]]:
     reports: list[dict[str, Any]] = []
     page = 1
@@ -135,6 +147,7 @@ async def _fetch_reports(
             status,
             category,
             assignee,
+            building_id,
         )
         reports.extend(items)
         if len(reports) >= total:
@@ -168,9 +181,11 @@ def _report_csv(reports: list[dict[str, Any]]) -> str:
             raise HTTPException(status_code=502, detail=INVALID_REPORT_DETAIL)
 
         location = report.get("location")
-        if not isinstance(location, dict):
+        place = report.get("place")
+        if isinstance(location, dict):
+            place = location.get("place")
+        elif location is not None:
             raise HTTPException(status_code=502, detail=INVALID_REPORT_DETAIL)
-        place = location.get("place")
         if place is not None and not isinstance(place, str):
             raise HTTPException(status_code=502, detail=INVALID_REPORT_DETAIL)
 
@@ -214,6 +229,13 @@ async def export_reports(
         str | None,
         Query(description="Atanan görevliye göre rapor filtresi."),
     ] = None,
+    building_id: Annotated[
+        str | None,
+        Query(
+            alias="buildingId",
+            description="Bina kimliğine göre rapor filtresi.",
+        ),
+    ] = None,
     authorization: Annotated[str | None, Header()] = None,
 ) -> Response:
     token = _require_bearer_token(authorization)
@@ -224,6 +246,7 @@ async def export_reports(
         status,
         category,
         assignee,
+        building_id,
     )
     return Response(
         content=_report_csv(reports),
