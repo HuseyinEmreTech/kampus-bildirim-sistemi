@@ -142,6 +142,82 @@ def test_export_forwards_token_filters_and_returns_csv():
     ]
 
 
+def test_export_accepts_real_core_place_field():
+    def handler(request):
+        return httpx.Response(
+            200,
+            json={
+                "items": [
+                    {
+                        "reportId": "report-1",
+                        "category": "Ariza",
+                        "description": "Lamba bozuk",
+                        "status": "Yeni",
+                        "createdAt": "2026-10-24T10:00:00Z",
+                        "place": "B Blok",
+                    }
+                ],
+                "total": 1,
+            },
+        )
+
+    async def override_core_client():
+        async with make_core_client(handler) as core_client:
+            yield core_client
+
+    app.dependency_overrides[get_core_client] = override_core_client
+    try:
+        with TestClient(app) as client:
+            response = client.get(
+                "/api/reports/export",
+                headers={"Authorization": "Bearer staff-token"},
+            )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 200
+    rows = list(csv.DictReader(io.StringIO(response.text)))
+    assert rows[0]["place"] == "B Blok"
+
+
+def test_export_forwards_building_id():
+    requested_params = []
+
+    def handler(request):
+        requested_params.append(dict(request.url.params))
+        return httpx.Response(
+            200,
+            json={
+                "items": [],
+                "total": 0,
+            },
+        )
+
+    async def override_core_client():
+        async with make_core_client(handler) as core_client:
+            yield core_client
+
+    app.dependency_overrides[get_core_client] = override_core_client
+    try:
+        with TestClient(app) as client:
+            response = client.get(
+                "/api/reports/export",
+                params={"buildingId": "building-a"},
+                headers={"Authorization": "Bearer staff-token"},
+            )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 200
+    assert requested_params == [
+        {
+            "page": "1",
+            "pageSize": "50",
+            "buildingId": "building-a",
+        }
+    ]
+
+
 def test_export_fetches_all_pages():
     requested_pages = []
 
