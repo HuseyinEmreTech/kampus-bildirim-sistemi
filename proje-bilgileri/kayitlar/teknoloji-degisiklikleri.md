@@ -1,7 +1,7 @@
 ---
 title: Teknoloji Değişiklikleri
 durum: Güncel
-son-guncelleme: 2026-11-01
+son-guncelleme: 2026-11-15
 ---
 
 # Teknoloji Değişiklikleri
@@ -18,7 +18,7 @@ Projede teknoloji yığınına eklenen, değiştirilen veya elenen her şey bura
 | Sunucu | Dart (Shelf) | Kabul ([ADR-01](../adr/01-dart-backend-postgresql.md)) |
 | Veritabanı | PostgreSQL 16 | Kabul |
 | Repo düzeni | Dart pub workspace, 6 paket, mimari test | Kabul ([korumalar](../11-kod-mimarisi-ve-korumalar.md)) |
-| CI | GitHub Actions | Kabul, kurulmadı ([plan](../planlar/2026-10-02-repo-iskeleti.md)) |
+| CI | GitHub Actions | Kabul, kullanımda ([plan](../planlar/2026-10-02-repo-iskeleti.md)) |
 | Konum | GPS (`geolocator`); izin yoksa bina listesi | Kabul |
 | Konteyner | Podman, podman-compose | Kabul |
 | Kod kalitesi | Yerelde `dart analyze`, `flutter analyze`, `dart test --coverage`; PR'da SonarQube Cloud Free | Öneri ([ADR-02](../adr/02-kalite-araci-sonarqube-cloud.md)); Cloud denenmedi |
@@ -62,3 +62,7 @@ Projede teknoloji yığınına eklenen, değiştirilen veya elenen her şey bura
 | .NET / C# | Kurulu değil; hâkim olunan dil değil |
 | Mikroservis, mesaj kuyruğu, önbellek | Ölçek küçük; gereksiz karmaşıklık borcu |
 | Firebase, Serverpod | Yukarıda |
+
+## 15 Kasım 2026
+
+- [#180](https://github.com/HuseyinEmreTech/kampus-bildirim-sistemi/issues/180): CI işine PostgreSQL 16, seed ve gerçek HTTP sunucusuyla çalışan E2E eklendi. Sunucu erişilemiyorsa iş hata verir. Adımlar [E2E test rehberinde](../ekip/test-rehberi.md#6-github-actions).

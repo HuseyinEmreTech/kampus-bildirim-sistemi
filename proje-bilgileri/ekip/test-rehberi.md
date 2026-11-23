@@ -60,7 +60,13 @@ Sekiz test çalışır. Sunucu kapalıysa yerel çalıştırma atlanır. Kabul d
 - Bildirim detayı sahibine açılır, diğer öğrenciye `404 NOT_FOUND` döner. Bu senaryo [#159](https://github.com/HuseyinEmreTech/kampus-bildirim-sistemi/issues/159) ile gelen detay ucunu gerektirir.
 - İkinci çözme isteği `409` döner. Sonuç fotoğrafı olmayan çözüm ve 5 MB üstündeki bildirim fotoğrafı reddedilir.
 
-## 6. Sık hatalar
+## 6. GitHub Actions
+
+`E2E (PostgreSQL 16)` işi boş veritabanına migration'ları sürüm sırasıyla uygular, demo seed'ini yükler, depodaki Dockerfile ile sunucuyu başlatır ve `/health` hazır olunca sekiz testi çalıştırır.
+
+`E2E_ZORUNLU=1` yerel atlamayı hataya çevirir. CI önce kapalı bir portta bu davranışı dener. Sunucu olmadan pytest'in 1 koduyla ve sunucu adresini içeren hata mesajıyla çıkması gerekir.
+
+## 7. Sık hatalar
 
 | Belirti | Çözüm |
 | --- | --- |

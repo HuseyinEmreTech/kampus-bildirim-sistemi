@@ -6,6 +6,86 @@ on:
     branches: [main]
 
 jobs:
+  e2e:
+    name: E2E (PostgreSQL 16)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      E2E_ZORUNLU: "1"
+      E2E_BASE_URL: http://127.0.0.1:8080
+      PGPASSWORD: campus_ci
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: campus
+          POSTGRES_USER: campus
+          POSTGRES_PASSWORD: campus_ci
+        ports:
+          - 5432/tcp
+        options: >-
+          --health-cmd "pg_isready -U campus -d campus"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: E2E bağımlılıkları
+        run: python -m pip install pytest requests
+      - name: Zorunlu modda kapalı sunucuyu doğrula
+        run: |
+          set +e
+          E2E_BASE_URL=http://127.0.0.1:1 python -m pytest test/e2e -q > e2e-kapali.log 2>&1
+          sonuc=$?
+          set -e
+          cat e2e-kapali.log
+          test "$sonuc" -eq 1
+          grep -F "E2E sunucusu çalışmıyor: http://127.0.0.1:1" e2e-kapali.log
+      - name: PostgreSQL migration ve seed
+        env:
+          PGPORT: ${{ job.services.postgres.ports[5432] }}
+        run: |
+          psql_komutu=(psql -h 127.0.0.1 -U campus -d campus -v ON_ERROR_STOP=1)
+          for migration in $(find db/migrations -maxdepth 1 -name 'V*__*.sql' | sort -V); do
+            "${psql_komutu[@]}" -f "$migration"
+          done
+          "${psql_komutu[@]}" -f db/seed/001_ornek.sql
+      - name: Sunucuyu derle ve başlat
+        env:
+          PGPORT: ${{ job.services.postgres.ports[5432] }}
+        run: |
+          docker build --tag campus-e2e .
+          export DATABASE_URL="postgres://campus:$PGPASSWORD@127.0.0.1:$PGPORT/campus?sslmode=disable"
+          export FILES_DIR=/data/files
+          export JWT_ACCESS_SECRET="$(openssl rand -hex 32)"
+          export JWT_REFRESH_SECRET="$(openssl rand -hex 32)"
+          docker run --detach --name campus-e2e --network host \
+            -e DATABASE_URL -e FILES_DIR -e JWT_ACCESS_SECRET -e JWT_REFRESH_SECRET campus-e2e
+          for deneme in {1..30}; do
+            if test "$(curl --silent --fail --max-time 2 "$E2E_BASE_URL/health")" = OK; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1
+      - name: HTTP kabul testleri
+        run: python -m pytest test/e2e -v
+      - name: Sunucu günlüğü
+        if: failure()
+        run: |
+          if docker container inspect campus-e2e >/dev/null 2>&1; then
+            docker logs campus-e2e
+          fi
+      - name: Test konteynerini temizle
+        if: always()
+        run: |
+          if docker container inspect campus-e2e >/dev/null 2>&1; then
+            docker rm -f campus-e2e
+          fi
+
   python-report-service:
     name: Python report service
     runs-on: ubuntu-latest
