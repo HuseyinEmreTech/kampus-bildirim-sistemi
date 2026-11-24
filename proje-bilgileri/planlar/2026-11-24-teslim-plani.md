@@ -28,6 +28,26 @@ son-guncelleme: 2026-11-24
 - **Özellik dondurma: Pazar 6 Aralık.** Bu tarihten sonra yalnızca `fix:`, `test:` ve `docs:` birleşir.
 - **Son teslim: 23 Aralık 00:00** (hoca duyurusu, 24 Kasım). Teslim adayı Pazar 20 Aralık, adres 22 Aralık Salı gönderilir.
 
+## Hocanın değerlendirme ölçütleri (8 Kasım duyurusu)
+
+Ders notunun **%60'ı** projeden geliyor. Her ölçütün bugünkü durumu ve onu karşılayan iş aşağıda.
+
+| Ölçüt (duyurudan) | Bugün (24 Kasım) | Karşılayan iş |
+| --- | --- | --- |
+| Takım üyeleri projeye **birbirine yakın ağırlıkta** katkı sağlar | Dengesiz: `main`'de commit sayıları Hüseyin 46, Ertuğrul 36, Çağdaş 27, Yusuf 22, Murat 3, Müberra 2, Kerem 1 | Dağılım tablosu (yeni işler önce az commit'i olanlara verildi), haftalık ritim, #224 katkı raporu |
+| En az bir yapay zeka aracı kullanılır, **kullanım şekli dokümantasyonda açıkça yazılır** | Kullanılıyor, PR'larda beyan var; README'deki bilgi eskimiş | #226 (README §14, `09-ai-usage.md`), her PR'da yapay zeka beyanı (global kural) |
+| GitHub, gerçekçi commit geçmişi, anlamlı commit mesajları, **en az 3 PR** | Squash-only ve önekli commit kuralı var; 150'den fazla PR. 3 Kasım-24 Kasım arasında `main` boş kaldı | Haftalık ritim; PR başlığı = commit mesajı kuralı; boşluğun nedeni #228'de yazılır |
+| **Teknik borç: kodun A kalite olduğunun bir ölçüm aracıyla gösterilmesi ve raporlanması** | SonarCloud (`main`, 24 Kasım 14:54): Maintainability **A**, Reliability **A**, Security **A**, Security Review **A**; kapsam %87,5; tekrar %0; 0 bug, 0 açık, 5 kod kokusu, 72 dk teknik borç; kalite kapısı OK | #182: değerler `kayitlar/sonarqube-puanlari.md`'ye, rozet ve özet README'ye; teslim adayında (20 Aralık) yeniden ölçülür |
+| Güvenlik açığı değerlendirmesi | Canlı test: JWT, SQL enjeksiyonu, IDOR, EXIF ve dosya türü sağlam; Sonar 0 açık | #203 (parola günlüğe sızıyor), #231, #232, #221 |
+| Mimari uyum | Paket sınırları mimari testle korunuyor; dokümanlarda çelişkiler var (01/02 ↔ ADR-04) | #229 (ADR'ler), #227 (diyagram), #222 (ölü Flutter Web kodu) |
+| Okunabilirlik ve bakım kolaylığı | Sonar A; AGENTS.md kod kuralları | PR incelemeleri |
+| Test edilebilirlik: **birim ve entegrasyon** testleri | ~600 test; gerçek PostgreSQL ile entegrasyon ve E2E; ama veritabanı testleri CI'da `-x db` ile atlanıyor ve E2E CI'da yok | #204/#206 (E2E CI), #211 (paralel test). CI'da veritabanı testlerinin koşması #204'e eklenir |
+| README: mimari, yapay zeka araçları, zorluklar ve çözümler | Var ama eskimiş | #226, #227, #183 |
+| En az bir veritabanı | PostgreSQL 16 | — |
+| **Teslimden önce sunum, en fazla 25 dakika**: amaç, teknolojiler, zorluklar, çözümler. **Koda hakimiyet sorgulanacak** | Sunum planı yok | #225: 25 dakikalık akış, her üye kendi modülünü anlatır; her PR'daki "hocanın sorabileceği sorular" ve kişinin kendi cevabı hazırlık malzemesi |
+
+**Takım büyüklüğü:** duyuruya göre en fazla 4 kişi, ama ekip 7 kişi ve bu dağılımı hoca yaptı ("sınıf mevcuduna göre değişir"). README'de ve #224'te bu açıkça yazılır.
+
 ## Teslim için "bitti" tanımı
 
 1. Sunucu, PostgreSQL ve seed tek komutla açılır. HTTPS "olursa" kapsamında; VPS yoksa demo yerel ağda yapılır ve README'de adım adım yazılır.
@@ -90,7 +110,7 @@ Takvim geriye doğru kuruldu. Son iki gün tampon olarak ayrıldı; neden: son g
 | 15 | 21-22 Ara | **21 Aralık Pazartesi:** son kontrol listesi (#183), temiz bir makinede README'yi izleyerek kurulum, `v1.0.0` etiketi ve GitHub Release (APK ekli). **22 Aralık Salı:** GitHub adresi hocaya gönderilir, iç hedef 20:00 | Adres gönderilmiş, gönderim kaydı #183'te |
 | — | 23 Ara 00:00 | Son teslim (hoca) | — |
 
-2. sunumun tarihi ve biçimi hâlâ belli değil; hocaya sorulacak (#225).
+**Sunum teslimden önce yapılır** (8 Kasım duyurusu), en fazla 25 dakika sürer; tarihi belli değil ve hocaya sorulacak (#225). Prova haftası 14 Aralık'ta başladığı için sunum 14 Aralık'tan önce istenirse prova 13. haftaya çekilir.
 
 ## Review Focus
 
@@ -295,6 +315,8 @@ Spec'in açıkça söylemediği ama demoda bir kullanıcıyı ilk vuracak duruml
 
 - Sunum tarihleri ve biçimi; 1. sunum yapıldı mı, yapılmadıysa ne zaman.
 - ~~Teslim dersi 25 Aralık mı~~ → Yanıtlandı (24 Kasım duyurusu): son teslim 23 Aralık 00:00, GitHub adresi paylaşılarak.
+- **Teslim tarihi teyidi:** 8 Kasım duyurusunda "Teslim: 31.12.2026", 24 Kasım duyurusunda "23 Aralık 00:00" yazıyor. Plan daha erken olan ve daha sonra yayımlanan 23 Aralık'a göre kuruldu.
+- Sunum tarihi (teslimden önce, en fazla 25 dk) ve her üyenin konuşması bekleniyor mu.
 - Katkı raporu repoda mı yoksa ayrı mı isteniyor; hoca sorulmazsa repoda `proje-bilgileri/ekip/katki-raporu.md` (#224).
 
 ## Issue numaraları
