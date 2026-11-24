@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:campus_app/mobil/features/reports/data/report_assigner.dart';
 import 'package:campus_app/mobil/features/reports/data/report_list_item.dart';
 import 'package:campus_app/mobil/features/reports/data/report_resolver.dart';
@@ -52,6 +54,29 @@ class UnusedResolver implements ReportResolver {
   }) async => const ReportResolveFailed();
 }
 
+/// Her çözme isteğini kabul eden sahte kaynak.
+class AcceptingResolver implements ReportResolver {
+  @override
+  Future<ReportResolveResult> resolve({
+    required String reportId,
+    required PickedPhoto photo,
+    String? note,
+  }) async => const ReportResolved();
+}
+
+/// Her seferinde 1x1 PNG veren sahte seçici.
+class PngPicker implements PhotoPicker {
+  @override
+  Future<PhotoPickResult> pick(PhotoSource source) async => PhotoPicked(
+    PickedPhoto(
+      bytes: base64Decode(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      ),
+      contentType: 'image/png',
+    ),
+  );
+}
+
 class UnusedPicker implements PhotoPicker {
   @override
   Future<PhotoPickResult> pick(PhotoSource source) async =>
@@ -74,14 +99,16 @@ Future<void> pumpScreen(
   WidgetTester tester,
   StaffReportsSource source, {
   ReportAssigner? assigner,
+  ReportResolver? resolver,
+  PhotoPicker? photoPicker,
 }) async {
   await tester.pumpWidget(
     MaterialApp(
       home: StaffReportsScreen(
         source: source,
         assigner: assigner ?? FakeReportAssigner(),
-        resolver: UnusedResolver(),
-        photoPicker: UnusedPicker(),
+        resolver: resolver ?? UnusedResolver(),
+        photoPicker: photoPicker ?? UnusedPicker(),
       ),
     ),
   );
@@ -283,5 +310,44 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(ResolveScreen), findsOneWidget);
+  });
+
+  testWidgets('resolve_reloadsMine_whenResolved', (tester) async {
+    // Arrange: Benimkiler önce üstlenilmiş bildirimi, çözüldükten sonra
+    // boş listeyi döndürür.
+    final source = FakeStaffReportsSource({
+      StaffReportsView.incoming: [const ReportsPageLoaded([])],
+      StaffReportsView.mine: [
+        ReportsPageLoaded([
+          report('A Blok', id: 'r7', status: ReportStatus.ustlenildi),
+        ]),
+        const ReportsPageLoaded([]),
+      ],
+    });
+    await pumpScreen(
+      tester,
+      source,
+      resolver: AcceptingResolver(),
+      photoPicker: PngPicker(),
+    );
+    await tester.tap(find.text('Benimkiler'));
+    await tester.pumpAndSettle();
+
+    // Act: Çöz → fotoğraf → işaretle; ekran pop(true) ile kapanır.
+    await tester.tap(find.text('Çöz'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Fotoğraf çek'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Çözüldü olarak işaretle'));
+    await tester.tap(find.text('Çözüldü olarak işaretle'));
+    await tester.pumpAndSettle();
+
+    // Assert: liste yeniden istendi ve çözülen kart kalktı.
+    expect(find.byType(ResolveScreen), findsNothing);
+    expect(
+      source.requested.where((r) => r.$1 == StaffReportsView.mine),
+      hasLength(2),
+    );
+    expect(find.textContaining('A Blok'), findsNothing);
   });
 }
