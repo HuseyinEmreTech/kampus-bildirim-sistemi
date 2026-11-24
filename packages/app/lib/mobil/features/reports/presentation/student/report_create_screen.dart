@@ -69,7 +69,7 @@ class _ReportCreateScreenState extends State<ReportCreateScreen> {
         description: _descriptionController.text.trim(),
         photo: photo,
         location: location,
-        place: _placeController.text.trim(),
+        place: _placeOrNull(),
       ),
     );
     if (!mounted) return;
@@ -92,6 +92,12 @@ class _ReportCreateScreenState extends State<ReportCreateScreen> {
       _isSubmitting = false;
       _errorMessage = message;
     });
+  }
+
+  /// Yazılan yer tarifi; boşsa `null` (yer tarifi isteğe bağlı).
+  String? _placeOrNull() {
+    final place = _placeController.text.trim();
+    return place.isEmpty ? null : place;
   }
 
   @override
@@ -122,12 +128,11 @@ class _ReportCreateScreenState extends State<ReportCreateScreen> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: _placeController,
+                maxLength: reportPlaceMaxLength,
                 decoration: const InputDecoration(
                   labelText: 'Yer tarifi',
-                  hintText: 'ör. B Blok 2. kat',
+                  hintText: 'ör. B Blok 2. kat (isteğe bağlı)',
                 ),
-                validator: (value) =>
-                    (value ?? '').trim().isEmpty ? 'Yer tarifi yazın' : null,
               ),
               const SizedBox(height: 8),
               PhotoField(

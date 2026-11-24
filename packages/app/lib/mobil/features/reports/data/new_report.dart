@@ -6,6 +6,10 @@ import 'report_list_item.dart';
 const reportDescriptionMinLength = 5;
 const reportDescriptionMaxLength = 500;
 
+/// Yer tarifinin en çok karakter sayısı (03-domain-design: `place`, veritabanında
+/// `VARCHAR(100)`).
+const reportPlaceMaxLength = 100;
+
 /// Öğrencinin oluşturma ekranında doldurduğu bildirim (USR 01).
 class NewReport {
   const NewReport({
@@ -13,7 +17,7 @@ class NewReport {
     required this.description,
     required this.photo,
     required this.location,
-    required this.place,
+    this.place,
   });
 
   final ReportCategory category;
@@ -25,6 +29,7 @@ class NewReport {
   /// GPS noktası ya da bina; kampüs sınırını sunucu denetler (Rule 06).
   final LocationChoice location;
 
-  /// Yer tarifi, ör. "B Blok 2. kat" (05-api-design: `place`).
-  final String place;
+  /// Yer tarifi, ör. "B Blok 2. kat" (05-api-design: `place`); isteğe bağlı,
+  /// domain'de `Location.place` boş olabilir. Yazılmadıysa `null`.
+  final String? place;
 }

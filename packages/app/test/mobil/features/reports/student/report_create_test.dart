@@ -125,6 +125,40 @@ void main() {
     expect(creator.received, isEmpty);
   });
 
+  testWidgets('submits_withoutPlace_becausePlaceIsOptional', (tester) async {
+    // Arrange
+    final creator = FakeReportCreator(const ReportCreated());
+    await openScreen(tester, creator);
+    await fillForm(tester, validDescription);
+    await tester.enterText(field('Yer tarifi'), '');
+
+    // Act
+    await submit(tester);
+
+    // Assert: domain'de place isteğe bağlı; boşsa null gönderilir.
+    expect(creator.received.single.place, isNull);
+  });
+
+  testWidgets('placeField_limitsTo100Characters', (tester) async {
+    // Arrange
+    await openScreen(tester, FakeReportCreator(const ReportCreated()));
+
+    // Act
+    await tester.enterText(
+      field('Yer tarifi'),
+      'a' * (reportPlaceMaxLength + 20),
+    );
+
+    // Assert
+    final input = tester.widget<TextField>(
+      find.descendant(
+        of: field('Yer tarifi'),
+        matching: find.byType(TextField),
+      ),
+    );
+    expect(input.controller!.text.length, reportPlaceMaxLength);
+  });
+
   testWidgets('submitsSuccessfully_withValidData', (tester) async {
     final creator = FakeReportCreator(const ReportCreated());
     await openScreen(tester, creator);
