@@ -1,7 +1,7 @@
 ---
 title: Ekip ve 15 Haftalık Yol Haritası
 durum: Onaylandı
-son-guncelleme: 2026-11-01
+son-guncelleme: 2026-11-24
 ---
 
 # Ekip ve 15 Haftalık Yol Haritası
@@ -49,8 +49,8 @@ Görevler, her iş bağımsız ilerleyebilecek ve tek PR'a sığacak büyüklük
 | 11 | 23 - 29 Kas | 27 Kas | Rate limit, kalan işler, bulgular tek tek; dağıtım kararı |
 | 12 | 30 Kas - 6 Ara | 4 Ara | **Özellik dondurma (Pazar 6 Ara)**; dağıtım denemesi, APK |
 | 13 | 7 - 13 Ara | 11 Ara | Kapsam, ADR'lar, README, dağıtım düzeltmeleri |
-| 14 | 14 - 20 Ara | 18 Ara | **Test haftası:** kod donuk, yalnızca hata düzeltme |
-| 15 | 21 - 27 Ara | 25 Ara | **Teslim ve 2. sunum (varsayım)**; katkı raporları |
+| 14 | 14 - 20 Ara | 18 Ara | **Test ve prova haftası:** kod donuk, yalnızca hata düzeltme; **Pazar 20 Ara teslim adayı** |
+| 15 | 21 - 27 Ara | 25 Ara | **Son teslim 23 Ara 00:00** (hoca duyurusu, 24 Kas): GitHub adresi 22 Ara Salı gönderilir; 2. sunum tarihi sorulacak |
 
 Kişi kişi güncel görevler [Kalan işler planında](planlar/2026-11-01-kalan-isler.md).
 
@@ -111,7 +111,7 @@ Herkes yalnızca kendi dosyasına yazdığı için kayıtlarda merge çakışmas
 | Soru | Kime | Durum |
 | --- | --- | --- |
 | Sunum tarihleri ve biçimi | Hoca | Açık |
-| Teslim dersi 25 Aralık mı | Hoca | Açık |
+| Teslim tarihi | Hoca | Yanıtlandı (24 Kasım): son teslim 23 Aralık 2026 00:00, erişilebilir GitHub adresi paylaşılarak |
 | Dart için SonarQube Cloud kabul mü ([ADR-02](adr/02-kalite-araci-sonarqube-cloud.md)) | Hoca | Açık |
 | VPS var mı | Ekip | Hafta 11'de karar |
 | Emir Kerem (KeremC23) beceri seti netleşmesi | Hüseyin Emre | Hafta 5'te belirlenecek |

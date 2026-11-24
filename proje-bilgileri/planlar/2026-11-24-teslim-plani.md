@@ -26,6 +26,7 @@ son-guncelleme: 2026-11-24
 - **Her PR açıklamasında yapay zeka beyanı olur:** araç, model, kullanılan skill'ler, çalıştırılan araçlar, geliştirme ortamı, AI çıktısında neyi değiştirdiğin. "Neyi değiştirdim: yok" yazılmaz; gerçek bir müdahale ya da öğrenilen nokta yazılır.
 - **Haftalık ritim:** her üyenin **her hafta en az bir PR'ı birleşir.** Neden: hoca GitHub geçmişine bakıyor ve squash yüzünden `main`'deki commit sayısı birleşen PR sayısına eşit. 3 Kasım'dan 24 Kasım'a kadar `main` boş kaldı.
 - **Özellik dondurma: Pazar 6 Aralık.** Bu tarihten sonra yalnızca `fix:`, `test:` ve `docs:` birleşir.
+- **Son teslim: 23 Aralık 00:00** (hoca duyurusu, 24 Kasım). Teslim adayı Pazar 20 Aralık, adres 22 Aralık Salı gönderilir.
 
 ## Teslim için "bitti" tanımı
 
@@ -34,6 +35,7 @@ son-guncelleme: 2026-11-24
 3. Görevli en az bir yüzeyde (mobil ya da web) şu akışı tamamlar: giriş → liste → üstlen (409 mesajı dahil) → sonuç fotoğrafıyla çöz.
 4. Rule 00-07 testli (Rule 06 dahil), `pytest test/e2e` gerçek sunucuda yeşil ve CI'da koşuyor.
 5. README, ADR'ler, katkı raporu ve sunum dosyası çalışan sistemle tutarlı; demo en az bir kez prova edilmiş.
+6. `v1.0.0` etiketi ve APK'lı GitHub Release var. Erişilebilir GitHub adresi 22 Aralık'ta hocaya gönderilmiş.
 
 **Kesilebilecekler** (zaman kalmazsa ve gerekçesi yazılarak): #179, #160, #168, #178, HTTPS, #187-#189, #212.
 
@@ -75,13 +77,20 @@ Dağılım bağımlılık sırasına ve **katkı dengesine** göre yapıldı. `m
 
 ## Takvim
 
-| Hafta | Tarih | Hedef |
-| --- | --- | --- |
-| 11 | 24-29 Kas | Kuyruk açılır: #208, #184, #194, #205, #207 ve düzeltilen mobil PR'lar birleşir. #165, #94, #164 başlar. T8 iskeleti, T12 |
-| 12 | 30 Kas-6 Ara | #159, #170, #171, #172, T1, #177 birleşir. **6 Aralık özellik dondurma** |
-| 13 | 7-13 Ara | #166, #173, #174 (APK), #206, #204, T5. Hata düzeltmeleri |
-| 14 | 14-20 Ara | Demo provası (#181), T8 bölümleri, T9, T10, T11, T13, #183 |
-| 15 | 21-27 Ara | Teslim ve 2. sunum (25 Aralık varsayım, hocaya sorulacak) |
+**Son teslim: 23 Aralık 2026 Çarşamba 00:00.** Hocanın 24 Kasım duyurusuna göre, bitmiş projenin erişilebilir GitHub adresi bu saate kadar paylaşılır. Fiilen son gün **22 Aralık Salı**. Repo herkese açık (`https://github.com/HuseyinEmreTech/kampus-bildirim-sistemi`), erişim ayarı gerekmiyor.
+
+Takvim geriye doğru kuruldu. Son iki gün tampon olarak ayrıldı; neden: son gece toplu push hocanın açıkça uyardığı şey ve son anda çıkan bir hatanın düzeltilecek zamanı olmalı.
+
+| Hafta | Tarih | Hedef | Bitiş ölçütü |
+| --- | --- | --- | --- |
+| 11 | 24-29 Kas | Kuyruk açılır: #208, #184, #194, #205, #207, #216 ve düzeltilen mobil PR'lar birleşir. #230, #94, #164 başlar. T8 iskeleti (#224), T12 (#228) | Herkesin en az 1 PR'ı birleşmiş |
+| 12 | 30 Kas-6 Ara | #170, #171, #172, T1 (#219), #177, #166 birleşir. **Pazar 6 Aralık: özellik dondurma** | Bu tarihten sonra yalnızca `fix:`, `test:`, `docs:` birleşir |
+| 13 | 7-13 Ara | #173, #174 (APK), #206 ve #204 (E2E CI zorunlu kontrol olur), T5 (#221), #167, hata düzeltmeleri. ADR'ler (#229), README (#226, #227) | Bitti tanımının 1-4. maddeleri sağlanmış |
+| 14 | 14-20 Ara | **Prova haftası:** demo kabul turu (#181), katkı raporu bölümleri (#224), sunum (#225), #183. **Pazar 20 Aralık: teslim adayı** | `main`'de açık `sart` issue yok; demo bir kez baştan sona prova edilmiş |
+| 15 | 21-22 Ara | **21 Aralık Pazartesi:** son kontrol listesi (#183), temiz bir makinede README'yi izleyerek kurulum, `v1.0.0` etiketi ve GitHub Release (APK ekli). **22 Aralık Salı:** GitHub adresi hocaya gönderilir, iç hedef 20:00 | Adres gönderilmiş, gönderim kaydı #183'te |
+| — | 23 Ara 00:00 | Son teslim (hoca) | — |
+
+2. sunumun tarihi ve biçimi hâlâ belli değil; hocaya sorulacak (#225).
 
 ## Review Focus
 
@@ -285,7 +294,8 @@ Spec'in açıkça söylemediği ama demoda bir kullanıcıyı ilk vuracak duruml
 ## Hocaya sorulacaklar (Hüseyin)
 
 - Sunum tarihleri ve biçimi; 1. sunum yapıldı mı, yapılmadıysa ne zaman.
-- Teslim dersi 25 Aralık mı.
+- ~~Teslim dersi 25 Aralık mı~~ → Yanıtlandı (24 Kasım duyurusu): son teslim 23 Aralık 00:00, GitHub adresi paylaşılarak.
+- Katkı raporu repoda mı yoksa ayrı mı isteniyor; hoca sorulmazsa repoda `proje-bilgileri/ekip/katki-raporu.md` (#224).
 
 ## Issue numaraları
 

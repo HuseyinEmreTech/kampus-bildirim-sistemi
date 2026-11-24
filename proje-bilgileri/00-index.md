@@ -94,7 +94,8 @@ Bu dokümanların güncel kalması projenin bir parçasıdır.
 | Takım büyüklüğü ve süre | 6 kişi (hoca dağıttı), 15 ders haftası | Kabul ([ekip](10-ekip-ve-yol-haritasi.md)) |
 | Konum alma | GPS; izin yoksa bina listesi | Kabul ([mimari](11-kod-mimarisi-ve-korumalar.md#5-konum)) |
 | Çözümde sonuç fotoğrafı | Zorunlu | Kabul |
-| Sunum ve teslim tarihleri | Hafta 9 ve 15 varsayımı | Hoca'ya sorulacak |
+| Teslim tarihi | 23 Aralık 2026 00:00; erişilebilir GitHub adresi paylaşılır. Teslim adayı 20 Aralık, gönderim 22 Aralık ([teslim planı](planlar/2026-11-24-teslim-plani.md)) | Kabul (hoca duyurusu, 24 Kasım) |
+| Sunum tarihleri | 2. sunum tarihi ve biçimi | Hoca'ya sorulacak |
 | Kampüs sınırı koordinatları | Yapılandırma dosyasında dikdörtgen | Açık |
 | `OUTSIDE_CAMPUS` HTTP durumu | `422` | Öneri |
 | Görevlinin üstlendikleri listesi | `assignee=me` filtresi | Öneri |
