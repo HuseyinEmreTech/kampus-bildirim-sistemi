@@ -96,8 +96,10 @@ class _DetailView extends StatelessWidget {
           _Photo(url: resolution.photoUrl),
           if (resolution.note case final note?) Text(note),
         ],
-        const SizedBox(height: 16),
-        Text('Durum geçmişi', style: textTheme.titleMedium),
+        if (detail.history.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          Text('Durum geçmişi', style: textTheme.titleMedium),
+        ],
         for (final change in detail.history)
           ListTile(
             dense: true,
