@@ -64,9 +64,9 @@ Dağılım bağımlılık sırasına ve **katkı dengesine** göre yapıldı. `m
 
 | Kişi | Mevcut işler | Bu plandan | Neden |
 | --- | --- | --- | --- |
-| Hüseyin (`HuseyinEmreTech`) | #164, #183, #182; inceleme ve birleştirme | T8 iskeleti, T12, T13 (ADR-02/04 durumu, ADR-07) | Liderin izleme işleri; #182, Müberra'nın yükü fazla olduğu için geçti |
-| Çağdaş (`Cagdas3307`) | **#165 + #159**, #168, #212 | T4 | Kritik yolun başı; `openapi.yaml` sunucu uçlarıyla birlikte değişir |
-| Ertuğrul (`ertrlpkdmr`) | #203, #202, #166, #167 | T5, T13 (ADR-06) | Caddy ve canlı ortam onda |
+| Hüseyin (`HuseyinEmreTech`) | #164, #183, #182, #232; inceleme ve birleştirme | T8 iskeleti, T12, T13 (ADR-02/04 durumu, ADR-07) | Liderin izleme işleri; #182, Müberra'nın yükü fazla olduğu için geçti |
+| Çağdaş (`Cagdas3307`) | **#165 + #159** (PR #215, #216), #168, #212 (PR #217), #230 | T4 | Kritik yolun başı; `openapi.yaml` sunucu uçlarıyla birlikte değişir |
+| Ertuğrul (`ertrlpkdmr`) | #203, #202, #166, #167, #231 | T5, T13 (ADR-06) | Caddy ve canlı ortam onda |
 | Yusuf (`yusufekenel`) | #195, #198-#201 düzeltmeleri, #170, #171, #172 (görevli kısmı), #173, #174 | T2 (#170 ve #173'e eklenir) | Mobilin kritik yolu ve hazır kodu onda |
 | Müberra (`muberrayener`) | #207, #94, #172 (bildirim kaynağı), #213 | T1, T9 | Bildirim kaynağını yazan kişi rozeti de yazar; sunum 10-ekip'te onun rolü |
 | Murat (`yamanmurat761`) | #194, #177, #178, #179, #209 (+T3) | T7, T11, T13 (ADR-05) | Web yüzeyi onda; küçük ve bağımsız işler |
@@ -286,3 +286,54 @@ Spec'in açıkça söylemediği ama demoda bir kullanıcıyı ilk vuracak duruml
 
 - Sunum tarihleri ve biçimi; 1. sunum yapıldı mı, yapılmadıysa ne zaman.
 - Teslim dersi 25 Aralık mı.
+
+## Issue numaraları
+
+| Görev | Issue | Sahip |
+| --- | --- | --- |
+| T1 | #219 | Müberra |
+| T2 | #170 ve #173'e eklendi | Yusuf |
+| T3 | #209'a eklendi | Murat |
+| T4 | #220 | Çağdaş |
+| T5 | #221 | Ertuğrul |
+| T6 | #222 | Kerem |
+| T7 | #223 | Murat |
+| T8 | #224 | Hüseyin (iskelet) + herkes |
+| T9 | #225 | Müberra |
+| T10 | #226 | Kerem |
+| T11 | #227 | Murat |
+| T12 | #228 | Hüseyin |
+| T13 | #229 | Hüseyin, Murat, Ertuğrul |
+
+## Canlı test (24 Kasım)
+
+`a182b47` üzerinde `compose.prod.yaml` podman ile ayağa kaldırıldı ve her uç `curl` ile denendi. Web Selenium ile headless Firefox'ta denendi.
+
+**Geçenler.**
+- USR 01-07'nin API düzeyindeki ölçütlerinin hepsi geçti; istisnaları aşağıdaki "Kalanlar" bölümünde.
+- Rule 02: 5 bildirim × 4 paralel üstlenme → her birinde tam bir `200` ve üç `409`.
+- Rule 03/04/05 doğrulandı.
+- Rule 07: GIF, WEBP, uzantısı değiştirilmiş PNG/HTML ve bozuk JPEG reddedildi; EXIF ve XMP temizlendi.
+- Açıklama sınırları doğru çalışıyor.
+- JWT oynamaları reddedildi: süresi dolmuş, `alg:none`, rol değiştirilmiş, yanlış anahtar, HS512.
+- Yenileme belirteci yeniden kullanılınca tüm aile iptal ediliyor.
+- SQL enjeksiyonu denemeleri etkisiz kaldı.
+- IDOR denemeleri `404` döndü.
+- İstek sınırı ve `X-Forwarded-For` ile atlatma denemesi reddedildi.
+- Web'de giriş, filtre, sayfalama, otomatik yenileme ve çıkış çalışıyor.
+
+**Kalanlar ve yeni issue'lar.**
+
+| Bulgu | Ciddiyet | Nerede |
+| --- | --- | --- |
+| Python CSV tek bildirimle bile `502` dönüyor (`location.place` ile `place` uyuşmazlığı) | Kritik | #207 düzeltiyor, öncelikli |
+| Uçların `404`'leri düz metin "Route not found" (shelf `Cascade`) | Önemli | #230 (Çağdaş) |
+| Yarım multipart yanıtsız kalıyor ve `.part` dosyası diskte kalıyor; bozuk multipart `500` dönüyor | Önemli | #231 (Ertuğrul) |
+| SELinux'ta veritabanı açılmıyor (`:z` eksik); README `podman-compose`'u anlatmıyor; `TRUSTED_PROXIES` ve `CAMPUS_*` compose'ta yok | Önemli | #167'ye eklendi |
+| `latitude=NaN` gönderilince `500` | Önemli | #209'a eklendi |
+| `exp`'siz belirteç kabul ediliyor; `x-powered-by` başlığı; piksel sınırı mesajı yanlış; türü katı denetleniyor; Python hata biçimi farklı | Küçük | #232 (Hüseyin, olursa) |
+| README `PORT` değişkenini anlatıyor ama port sabit; seed fotoğrafları diskte yok | Küçük | #227'ye eklendi |
+| E2E: 1 passed, 3 xpassed (xfail'ler eskimiş) | Küçük | #206 düzeltiyor |
+| Rule 06, detay ucu, `/files`, bina filtresi | — | #164, #159 (PR #216), #166, #160 |
+
+**Denenemeyen.** C# istatistik servisi denenemedi: `dotnet/sdk:10.0` imajı indirilemedi.
