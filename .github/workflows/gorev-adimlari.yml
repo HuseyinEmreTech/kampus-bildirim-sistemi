@@ -1,0 +1,31 @@
+name: Görev adımları
+
+# proje-bilgileri/ekip/gorev-adimlari.md: dal adı, commit mesajları, önce test,
+# kod kuralları, PR başlığı ve yapay zeka beyanı. Yerel kancalar atlanabildiği
+# (--no-verify) ya da kurulmamış olabildiği için aynı kontrol PR'da da koşar.
+# "edited": PR açıklaması düzeltilince kontrol yeniden çalışsın.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  gorev-adimlari:
+    name: Görev adımları
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Kontrol betiğinin kendi testleri
+        run: bash scripts/gorev-kontrol-test.sh
+      - name: Dal ve PR kontrolü
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GOREV_DAL: ${{ github.head_ref }}
+          GOREV_TABAN: origin/${{ github.base_ref }}
+        run: bash scripts/gorev-kontrol.sh pr ${{ github.event.pull_request.number }}

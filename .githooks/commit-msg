@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Görev adımları: commit mesajı kuralı (scripts/gorev-kontrol.sh). Kurulum: bash scripts/hook-kur.sh
+exec bash "$(git rev-parse --show-toplevel)/scripts/gorev-kontrol.sh" mesaj "$1"

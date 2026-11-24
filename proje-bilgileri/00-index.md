@@ -33,6 +33,7 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 | 09 | [Yapay zeka kullanımı](09-ai-usage.md) | Çalışma ilkeleri, review süresi, prompt'lar | Güncel |
 | 10 | [Ekip ve yol haritası](10-ekip-ve-yol-haritasi.md) | Ekip, roller, GitHub kullanımı, 15 haftalık plan | Onaylandı (12.10.2026: 6 kişiye güncellendi) |
 | 11 | [Kod mimarisi ve korumalar](11-kod-mimarisi-ve-korumalar.md) | Paketler, izinli bağımlılıklar, hatayı önleyen korumalar | Onaylandı |
+| - | [Görev adımları](ekip/gorev-adimlari.md) | Issue'dan birleşmeye her adım; kurulum, kanıt, kontrol betiği ve kancalar (harfiyen uygulanır) | Güncel |
 | - | [Başlangıç kuralları](ekip/BASLANGIC_KURALLARI.md) | Her üye için roller, kurallar, onay tablosu | Onaylandı |
 | - | [Uygulama planı: repo iskeleti](planlar/2026-10-02-repo-iskeleti.md) | Hafta 4'ün ilk işi, adım adım | Onay bekliyor |
 | - | [ADR-01: Dart backend ve PostgreSQL](adr/01-dart-backend-postgresql.md) | Geri dönülmesi zor karar | Önerildi |
