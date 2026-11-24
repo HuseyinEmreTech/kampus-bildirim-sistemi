@@ -200,6 +200,11 @@ void main() {
       ReportCategory.temizlik,
     ));
     expect(find.textContaining('Yemekhane'), findsOneWidget);
+    // Seçilen kategori açılır listede görünür.
+    final dropdown = tester.widget<DropdownButton<ReportCategory?>>(
+      find.byType(DropdownButton<ReportCategory?>),
+    );
+    expect(dropdown.value, ReportCategory.temizlik);
   });
 
   testWidgets('keepsCategory_whenTabChanges', (tester) async {

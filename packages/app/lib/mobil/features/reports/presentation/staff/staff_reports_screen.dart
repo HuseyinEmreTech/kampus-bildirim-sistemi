@@ -96,7 +96,8 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
   }
 
   void _selectCategory(ReportCategory? category) {
-    _category = category;
+    // Açılır liste ListenableBuilder'ın dışında; seçim görünsün diye setState.
+    setState(() => _category = category);
     unawaited(_pager.reset());
   }
 
