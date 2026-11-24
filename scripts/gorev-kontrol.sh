@@ -23,6 +23,9 @@ uyari=0
 tamam() { printf '  ✓ %s\n' "$1"; }
 hata() { printf '  ✗ %s\n' "$1"; hata=$((hata + 1)); }
 uyar() { printf '  ! %s\n' "$1"; uyari=$((uyari + 1)); }
+# Geçmişe bağlı kurallar (dal adı, commit mesajı, test sırası). GOREV_ESKI=1: PR 24 Kasım
+# duyurusundan (#236) önce açıldı; geçmiş yeniden yazılmaz, bu yüzden hata değil uyarı.
+gecmis() { if [ "${GOREV_ESKI:-0}" = 1 ]; then uyar "$1 (duyurudan önce açılmış PR; geçmiş yeniden yazılmaz)"; else hata "$1"; fi; }
 
 # Commit mesajının ilk satırı commit kuralına uyuyor mu.
 mesaji_denetle() {
@@ -33,7 +36,7 @@ mesaji_denetle() {
   if printf '%s' "$ilk" | grep -Eq "$MESAJ_RE"; then
     tamam "Mesaj kurala uygun: $ilk"
   else
-    hata "Mesaj kurala uymuyor: \"$ilk\". Biçim: <önek>: <Türkçe özet>; önekler feat, fix, test, docs, refactor, chore (AGENTS.md)"
+    gecmis "Mesaj kurala uymuyor: \"$ilk\". Biçim: <önek>: <Türkçe özet>; önekler feat, fix, test, docs, refactor, chore (AGENTS.md)"
   fi
 }
 
@@ -115,7 +118,7 @@ dal_kontrol() {
   if printf '%s' "$dal" | grep -Eq "$DAL_RE"; then
     tamam "Dal adı kurala uygun (adım 4)"
   else
-    hata "Dal adı kurala uymuyor: $dal. Biçim: feature|fix|test|docs|chore/<issue-no>-<kisa-ad> (adım 4)"
+    gecmis "Dal adı kurala uymuyor: $dal. Biçim: feature|fix|test|docs|chore/<issue-no>-<kisa-ad> (adım 4)"
   fi
 
   local sayi
@@ -147,9 +150,9 @@ dal_kontrol() {
     ilk_test=$(git log --reverse --format='%h %s' "$TABAN..HEAD" | grep -E '^[0-9a-f]+ test(\([^)]+\))?: ' | head -1)
     ilk_kod=$(git log --reverse --format='%h %s' "$TABAN..HEAD" | grep -E '^[0-9a-f]+ (feat|fix|refactor)(\([^)]+\))?: ' | head -1)
     if [ -z "$ilk_test" ]; then
-      hata "Kod değişmiş ama test: commit'i yok. Önce kabul ölçütündeki testi yaz, kırmızı gör, test: önekiyle commit et"
+      gecmis "Kod değişmiş ama test: commit'i yok. Önce kabul ölçütündeki testi yaz, kırmızı gör, test: önekiyle commit et"
     elif [ -n "$ilk_kod" ] && [ "$(git log --reverse --format='%h' "$TABAN..HEAD" | grep -n "^${ilk_test%% *}" | cut -d: -f1)" -gt "$(git log --reverse --format='%h' "$TABAN..HEAD" | grep -n "^${ilk_kod%% *}" | cut -d: -f1)" ]; then
-      hata "İlk test: commit'i ($ilk_test) ilk kod commit'inden ($ilk_kod) sonra geliyor; test önce yazılmalı"
+      gecmis "İlk test: commit'i ($ilk_test) ilk kod commit'inden ($ilk_kod) sonra geliyor; test önce yazılmalı"
     else
       tamam "Kırmızı test commit'i: $ilk_test"
       [ -n "$ilk_kod" ] && tamam "Yeşil commit: $ilk_kod"
