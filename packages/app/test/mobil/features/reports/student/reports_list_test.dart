@@ -8,6 +8,7 @@ import 'package:campus_app/mobil/features/reports/presentation/student/report_cr
 import 'package:campus_app/mobil/features/reports/presentation/student/reports_list_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/widgets/report_card.dart';
 import 'package:campus_app/mobil/shared/photo/photo_picker.dart';
+import 'package:campus_app/mobil/shared/location/location_source.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -35,6 +36,31 @@ class AcceptingReportCreator implements ReportCreator {
       const ReportCreated();
 }
 
+/// Her seferinde aynı küçük PNG'yi veren sahte seçici.
+class SamplePicker implements PhotoPicker {
+  @override
+  Future<PhotoPickResult> pick(PhotoSource source) async =>
+      PhotoPicked(PickedPhoto(bytes: Uint8List(8), contentType: 'image/png'));
+}
+
+class CampusGps implements LocationProvider {
+  @override
+  Future<GpsResult> current() async =>
+      const GpsFix(latitude: 36.5871, longitude: 36.1742);
+}
+
+class NoBuildings implements BuildingsSource {
+  @override
+  Future<BuildingsResult> fetch() async => const BuildingsLoaded([]);
+}
+
+ReportCreateSources createSources() => ReportCreateSources(
+  creator: AcceptingReportCreator(),
+  photoPicker: SamplePicker(),
+  gps: CampusGps(),
+  buildings: NoBuildings(),
+);
+
 /// [count] tane bildirim; yerleri "Yer [from]", "Yer [from]+1", ...
 List<ReportListItem> reports(int count, {int from = 0}) => [
   for (var i = from; i < from + count; i++) report(place: 'Yer $i'),
@@ -43,13 +69,6 @@ List<ReportListItem> reports(int count, {int from = 0}) => [
 Future<void> scrollToEnd(WidgetTester tester) async {
   await tester.drag(find.byType(ListView), const Offset(0, -5000));
   await tester.pumpAndSettle();
-}
-
-/// Her seferinde aynı küçük PNG'yi veren sahte seçici.
-class SamplePicker implements PhotoPicker {
-  @override
-  Future<PhotoPickResult> pick(PhotoSource source) async =>
-      PhotoPicked(PickedPhoto(bytes: Uint8List(8), contentType: 'image/png'));
 }
 
 ReportListItem report({String place = 'A Blok'}) => ReportListItem(
@@ -63,11 +82,7 @@ ReportListItem report({String place = 'A Blok'}) => ReportListItem(
 Future<void> pumpScreen(WidgetTester tester, ReportsSource source) async {
   await tester.pumpWidget(
     MaterialApp(
-      home: ReportsListScreen(
-        source: source,
-        creator: AcceptingReportCreator(),
-        photoPicker: SamplePicker(),
-      ),
+      home: ReportsListScreen(source: source, createSources: createSources()),
     ),
   );
   await tester.pumpAndSettle();
@@ -144,12 +159,19 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Temizlik'));
-    await tester.enterText(find.byType(TextFormField), 'Kütüphanede ışık yok');
-    await tester.ensureVisible(find.text('Fotoğraf çek'));
-    await tester.tap(find.text('Fotoğraf çek'));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Gönder'));
-    await tester.tap(find.text('Gönder'));
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Açıklama'),
+      'Kütüphanede ışık yok',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Yer tarifi'),
+      'Kütüphane',
+    );
+    for (final button in ['Fotoğraf çek', 'Konumumu al', 'Gönder']) {
+      await tester.ensureVisible(find.text(button));
+      await tester.tap(find.text(button));
+      await tester.pumpAndSettle();
+    }
     await tester.pumpAndSettle();
 
     expect(find.byType(ReportCreateScreen), findsNothing);
