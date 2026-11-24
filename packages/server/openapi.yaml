@@ -19,6 +19,7 @@ tags:
   - name: Sistem
   - name: Kimlik doğrulama
   - name: Kullanıcı
+  - name: Bildirim
 
 paths:
   /health:
@@ -121,6 +122,40 @@ paths:
         '429':
           $ref: '#/components/responses/RateLimited'
 
+  /api/reports/{id}:
+    get:
+      tags: [Bildirim]
+      summary: Bildirim detayı ve durum geçmişi
+      description: >
+        Öğrenci yalnızca kendi bildirimini, görevli hepsini görür (Rule 01).
+        Kimlik UUID değilse, bildirim yoksa ya da öğrencinin değilse 404.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Bildirim, bina adı ve durum geçmişi.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Bildirim bulunamadı (`NOT_FOUND`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -196,6 +231,59 @@ components:
         role:
           type: string
           enum: [Student, Staff]
+
+    ReportDetail:
+      type: object
+      required: [reportId, category, description, status, photoUrl, createdAt, history]
+      properties:
+        reportId:
+          type: string
+          format: uuid
+        category:
+          type: string
+          enum: [Ariza, Temizlik, Guvenlik, Diger]
+        description:
+          type: string
+          example: B blok 2. kat koridor lambası yanmıyor
+        status:
+          type: string
+          enum: [Yeni, Ustlenildi, Cozuldu]
+        place:
+          type: string
+          nullable: true
+          example: B blok 2. kat
+        buildingName:
+          type: string
+          nullable: true
+        photoUrl:
+          type: string
+          example: /files/d4816d0a.jpg
+        createdAt:
+          type: string
+          format: date-time
+        history:
+          type: array
+          description: Durum değişiklikleri, eskiden yeniye.
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [Yeni, Ustlenildi, Cozuldu]
+              changedAt:
+                type: string
+                format: date-time
+              note:
+                type: string
+                nullable: true
+        resolutionPhotoUrl:
+          type: string
+          description: Yalnızca çözülen bildirimde.
+          example: /files/sonuc.jpg
+        resolutionNote:
+          type: string
+          nullable: true
+          description: Yalnızca çözülen bildirimde.
 
     Error:
       type: object

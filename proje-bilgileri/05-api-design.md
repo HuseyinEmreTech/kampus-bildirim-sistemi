@@ -1,7 +1,7 @@
 ---
 title: API Tasarımı
 durum: Taslak
-son-guncelleme: 2026-11-02
+son-guncelleme: 2026-11-24
 ---
 
 # API Tasarımı
@@ -168,6 +168,30 @@ Hiç bildirim yoksa `items` boş dizi, `unreadCount` 0 döner. Yalnızca öğren
 ### Bildirim listesi
 
 `GET /api/reports` (görevli; `assignee=me` ile yalnızca kendi üstlendikleri) ve `GET /api/me/reports` (öğrenci; yalnızca kendi bildirimleri) aynı biçimde döner: `{ "items": [...], "page", "pageSize", "total" }`. Her öğede `reportId`, `category`, `description`, `status`, `place`, `buildingName`, `photoUrl`, `assigneeId`, `createdAt` vardır. Öğrenci `GET /api/reports`'a, görevli `GET /api/me/reports`'a istek atarsa `403 FORBIDDEN`; `page`/`pageSize` sayı değilse ya da aralık dışındaysa `400 VALIDATION_ERROR`.
+
+### Bildirim detayı
+
+`GET /api/reports/{id}` (öğrenci yalnızca kendi bildirimini, görevli hepsini görür; Rule 01): `reportId`, `category`, `description`, `status`, `place`, `buildingName`, `photoUrl`, `createdAt` ve eskiden yeniye `history: [{ "status", "changedAt", "note" }]`. Bildirim çözüldüyse ayrıca `resolutionPhotoUrl` ve `resolutionNote`. Kimlik UUID değilse, bildirim yoksa ya da öğrencinin değilse `404 NOT_FOUND` (öğrenci başkasının bildiriminin var olup olmadığını öğrenemez).
+
+```json
+{
+  "reportId": "d4816d0a-cd8e-4442-98c0-65d3ba11be70",
+  "category": "Ariza",
+  "description": "B blok 2. kat koridor lambası yanmıyor",
+  "status": "Cozuldu",
+  "place": "B blok 2. kat",
+  "buildingName": null,
+  "photoUrl": "/files/d4816d0a.jpg",
+  "createdAt": "2026-10-02T09:15:00.000Z",
+  "history": [
+    { "status": "Yeni", "changedAt": "2026-10-02T09:15:00.000Z", "note": null },
+    { "status": "Ustlenildi", "changedAt": "2026-10-02T10:00:00.000Z", "note": null },
+    { "status": "Cozuldu", "changedAt": "2026-10-02T11:00:00.000Z", "note": "Ampul değişti" }
+  ],
+  "resolutionPhotoUrl": "/files/sonuc.jpg",
+  "resolutionNote": "Ampul değişti"
+}
+```
 
 Her yanıtta güvenlik başlıkları bulunur: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`, `Referrer-Policy: no-referrer`, `Strict-Transport-Security` (yalnızca HTTPS'te etkili; yerelde HTTP ile yok sayılır), `Cache-Control: no-store`.
 
