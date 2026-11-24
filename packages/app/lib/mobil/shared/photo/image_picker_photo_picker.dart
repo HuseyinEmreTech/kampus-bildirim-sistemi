@@ -46,7 +46,9 @@ class ImagePickerPhotoPicker implements PhotoPicker, LostPhotoRecovery {
         bytes: await file.readAsBytes(),
         contentType: _contentTypeOf(file),
       );
-    } on PlatformException {
+    } on Exception {
+      // Eklenti hatası ya da Android geçici dosyayı silmiş
+      // (FileSystemException): geri konacak fotoğraf yok.
       return null;
     }
   }

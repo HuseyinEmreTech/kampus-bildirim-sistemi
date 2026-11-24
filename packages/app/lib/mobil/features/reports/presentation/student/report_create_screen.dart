@@ -104,6 +104,7 @@ class _ReportCreateScreenState extends State<ReportCreateScreen> {
               key: _photoKey,
               picker: widget.photoPicker,
               requiredMessage: 'Fotoğraf ekleyin',
+              recoverLost: true,
             ),
             if (_errorMessage case final message?) _errorText(message),
             const SizedBox(height: 16),

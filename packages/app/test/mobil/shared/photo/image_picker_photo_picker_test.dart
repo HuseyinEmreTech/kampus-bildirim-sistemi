@@ -137,4 +137,14 @@ void main() {
 
     expect(await picker.recoverLostPhoto(), isNull);
   });
+
+  test('recoverLostPhoto_returnsNull_whenFileWasDeleted', () async {
+    // Android geçici dosyayı silmişse okuma FileSystemException verir.
+    final picker = ImagePickerPhotoPicker(
+      retrieveLostData: () async =>
+          LostDataResponse(file: XFile('silinmis-dosya/kayip.jpg')),
+    );
+
+    expect(await picker.recoverLostPhoto(), isNull);
+  });
 }
