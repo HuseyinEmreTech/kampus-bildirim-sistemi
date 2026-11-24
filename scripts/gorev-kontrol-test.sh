@@ -89,7 +89,14 @@ ekle "$d" scripts/ornek-test.sh "echo test" "test: örnek betik sınanıyor (#12
 ekle "$d" scripts/ornek.sh "echo ok" "chore: örnek betik (#12)"
 bekle "sh_test_dosyasi_taninir" 0 calistir "$d" dal
 
-# 10. commit-msg kipi.
+# 10. Duyurudan önce açılmış PR (GOREV_ESKI=1): dal adı, mesaj ve test sırası uyarı olur.
+d=$(depo); git -C "$d" switch -qc yusuf-eski
+ekle "$d" packages/server/lib/a.dart "int f() => 1;" "Sayfalama eklendi"
+ekle "$d" packages/server/test/a_test.dart "// test" "test eklendi"
+bekle "eski_pr_uyari_olur" 0 env GOREV_ESKI=1 bash -c "cd '$d' && bash '$BETIK' dal"
+bekle "eski_olmayan_pr_kalir" 1 calistir "$d" dal
+
+# 11. commit-msg kipi.
 f=$(mktemp); echo "feat: bildirim detayı (#159)" > "$f"
 bekle "mesaj_kipi_gecer" 0 bash "$BETIK" mesaj "$f"
 echo "detay eklendi" > "$f"

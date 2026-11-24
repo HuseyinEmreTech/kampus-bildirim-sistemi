@@ -28,4 +28,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GOREV_DAL: ${{ github.head_ref }}
           GOREV_TABAN: origin/${{ github.base_ref }}
-        run: bash scripts/gorev-kontrol.sh pr ${{ github.event.pull_request.number }}
+          PR_ACILIS: ${{ github.event.pull_request.created_at }}
+        # Görev adımları duyurusundan (#236) önce açılmış PR'larda geçmişe bağlı
+        # kurallar uyarıdır: dal adı ve eski commit'ler yeniden yazılmaz.
+        run: |
+          if [[ "$PR_ACILIS" < "2026-11-24T15:10:00Z" ]]; then export GOREV_ESKI=1; fi
+          bash scripts/gorev-kontrol.sh pr ${{ github.event.pull_request.number }}
