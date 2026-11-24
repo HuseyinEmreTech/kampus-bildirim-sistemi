@@ -6,6 +6,9 @@ import '../student/widgets/report_card.dart';
 /// Listenin sonuna bu kadar (piksel) kala bir sonraki sayfa istenir.
 const loadMoreThreshold = 200.0;
 
+/// Boş listedeki simgenin boyutu.
+const _emptyIconSize = 64.0;
+
 /// Bildirim listelerinin ortak gövdesi: yükleniyor, hata ve "Tekrar dene",
 /// boş durum ya da aşağı çekip yenilenebilen liste; sonunda sonraki sayfa
 /// yükleniyor ya da yüklenemedi satırı.
@@ -59,7 +62,7 @@ class ReportListBody extends StatelessWidget {
         ),
       );
     }
-    if (items.isEmpty) return _buildEmpty();
+    if (items.isEmpty) return _buildEmpty(context);
     final showFooter = isLoadingMore || loadMoreFailed;
     return RefreshIndicator(
       onRefresh: onRefresh,
@@ -79,7 +82,7 @@ class ReportListBody extends StatelessWidget {
   }
 
   /// Boş durum da kaydırılabilir olmalı ki aşağı çekip yenilenebilsin.
-  Widget _buildEmpty() {
+  Widget _buildEmpty(BuildContext context) {
     return RefreshIndicator(
       onRefresh: onRefresh,
       child: ListView(
@@ -87,7 +90,17 @@ class ReportListBody extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 120),
-            child: Center(child: Text(emptyMessage)),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.inbox_outlined,
+                  size: _emptyIconSize,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+                const SizedBox(height: 12),
+                Text(emptyMessage, textAlign: TextAlign.center),
+              ],
+            ),
           ),
         ],
       ),
