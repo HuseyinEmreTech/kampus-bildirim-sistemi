@@ -7,8 +7,8 @@ import 'package:campus_app/mobil/features/reports/data/reports_source.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/report_create_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/reports_list_screen.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/widgets/report_card.dart';
-import 'package:campus_app/mobil/shared/photo/photo_picker.dart';
 import 'package:campus_app/mobil/shared/location/location_source.dart';
+import 'package:campus_app/mobil/shared/photo/photo_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -192,6 +192,26 @@ void main() {
 
     expect(source.results, isEmpty);
     expect(find.byType(ReportCard), findsOneWidget);
+  });
+
+  testWidgets('callsOnReportTap_whenCardTapped', (tester) async {
+    ReportListItem? tapped;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ReportsListScreen(
+          source: FakeReportsSource([
+            ReportsPageLoaded([report()]),
+          ]),
+          createSources: createSources(),
+          onReportTap: (item) => tapped = item,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(ReportCard));
+
+    expect(tapped?.id, 'r1');
   });
 
   testWidgets('loadsMore_onScroll', (tester) async {

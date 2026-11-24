@@ -102,4 +102,23 @@ void main() {
     expect(find.text('İşaretlenemedi, tekrar deneyin'), findsOneWidget);
     expect(find.text('Okundu'), findsOneWidget);
   });
+
+  testWidgets('callsOnNotificationTap_whenTapped', (tester) async {
+    NotificationItem? tapped;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: NotificationsScreen(
+          source: FakeNotificationsSource([
+            NotificationsLoaded(items: [notification('a')], unreadCount: 1),
+          ]),
+          onNotificationTap: (item) => tapped = item,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.textContaining('koridor lambası a'));
+
+    expect(tapped?.reportId, 'rapor-a');
+  });
 }
