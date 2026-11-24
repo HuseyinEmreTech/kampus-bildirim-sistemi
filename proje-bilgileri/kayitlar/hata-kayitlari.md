@@ -1,7 +1,7 @@
 ---
 title: Hata Kayıtları
 durum: Güncel
-son-guncelleme: 2026-10-17
+son-guncelleme: 2026-11-01
 ---
 
 # Hata Kayıtları
@@ -20,6 +20,7 @@ Yapay zekanın yanıldığı yerler. Çıktının okunup doğrulandığının ka
 | 2026-09-30 | Katman diyagramı | Bağımlılık yönü ters yazılmıştı (`Domain` → `Infrastructure`) | Katman sırasının bağımlılık yönü sanılması | Ders materyalindeki Clean Architecture tanımıyla karşılaştırınca | `Domain` hiçbir katmana bağlı olmayacak biçimde düzeltildi ([mimari](../02-architecture-overview.md#katmanlar)) | Mimari diyagramları Mermaid ile okunabilir çizmek ve yönü açık yazmak |
 | 2026-09-30 | Veritabanı gerekçesi | "Firebase yasak" gibi okunabilecek bir yorum yazmıştı | Çıkarımın kural gibi sunulması | Ders şartı yeniden okununca (SQL, NoSQL, bellek içi serbest) | Yorumun bir çıkarım olduğu belirtildi ([ADR-01](../adr/01-dart-backend-postgresql.md)) | "Ders söyledi" ile "çıkarım" ayrımını yazmak |
 | 2026-09-30 | Doküman bağlantıları | `adr/` ve `journal/` klasör bağlantıları çözülemiyordu; iki dosya hiçbir yerden bağlanmamıştı | Klasöre bağlantı verilmesi, günlük dosyasının indekse eklenmemesi | Obsidian CLI taraması (çözülemeyen bağlantılar ve yetim dosyalar) | Bağlantılar dosyalara yönlendirildi; günlük haftalık kayıtlara birleştirildi | Doküman eklerken Obsidian CLI taramasını çalıştırmak |
+| 2026-11-01 | Kalan işler planı (#166, #94) | Plan fotoğrafı giriş yapmış herkese açıyor ve sunucunun contracts'a bağlanmayacağını söylüyordu; ilki Rule 01 ile, ikincisi `11-kod-mimarisi` gerekçesiyle çelişti | Issue'lar açılmadan önce güvenlik ve mimari dokümanları tam okunmadı | Vault okunurken dokümanlar kararlarla karşılaştırılınca | #166'ya sahiplik denetimi eklendi; contracts için doküman güncellendi | Karar yazmadan önce ilgili kural dokümanını oku; plandaki kararları dokümanla karşılaştır |
 
 ## Süreç hataları
 

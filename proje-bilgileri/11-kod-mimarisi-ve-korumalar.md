@@ -44,7 +44,7 @@ kampus-bildirim-sistemi/
 | --- | --- | --- | --- | --- |
 | `campus_domain` | `packages/domain` | Varlıklar, değer nesneleri, enum'lar, kurallar (Rule 00-07), domain hataları | **Hiçbiri** (yalnızca Dart çekirdeği; `dart:io` yasak) | Hüseyin Emre |
 | `campus_application` | `packages/application` | Kullanım senaryosu servisleri, repository ve depolama arayüzleri, `Result` ve uygulama hataları | `campus_domain` (`dart:io` yasak) | Hüseyin Emre |
-| `campus_contracts` | `packages/contracts` | API istek/yanıt sınıfları (JSON), hata kodları, enum metinleri | **Hiçbiri** (`dart:io` yasak) | Hüseyin Emre |
+| `campus_contracts` | `packages/contracts` | İstemcinin okuduğu API yanıt sınıfları (JSON) | **Hiçbiri** (`dart:io` yasak) | Hüseyin Emre |
 | `campus_infrastructure` | `packages/infrastructure` | PostgreSQL repository'leri, dosya depolama, EXIF temizleme, parola hash | `campus_domain`, `campus_application`, dış paketler | Ertuğrul Pekdemir |
 | `campus_server` | `packages/server` | Shelf endpoint'leri, kimlik doğrulama ara katmanı, hata eşleme, `bin/main.dart` (tek bağlama noktası) | Hepsi | Çağdaş Kemal Ağca |
 | `campus_app` | `packages/app` | Flutter ekranları, API istemcisi | **Yalnızca** `campus_contracts` ve Flutter paketleri | Yusuf Ekenel (mobil), Fatma Müberra Yener (web) |
@@ -62,7 +62,7 @@ flowchart LR
     app --> contracts
 ```
 
-Neden `contracts` ayrı: uygulamayı yazanlar domain sınıflarına hiç erişemez, iş kuralını ekranda yeniden yazamaz. API'nin JSON biçimi tek yerde tanımlıdır; sunucu ve uygulama aynı sınıfı kullandığı için alan adı uyuşmazlığı derleme hatası olur.
+Neden `contracts` ayrı: uygulamayı yazanlar domain sınıflarına hiç erişemez, iş kuralını ekranda yeniden yazamaz. İstemcinin okuduğu JSON biçimi tek yerde tanımlıdır. Sunucu yanıtı kendi mapper'larıyla üretir; iki tarafın alan adı uyumunu derleyici değil E2E testleri (`test/e2e`) korur.
 
 ## 3. Koruma katmanları
 
