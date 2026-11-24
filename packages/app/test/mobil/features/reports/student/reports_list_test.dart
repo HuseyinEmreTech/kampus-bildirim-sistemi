@@ -80,6 +80,7 @@ void main() {
     await pumpScreen(tester, source);
 
     expect(find.text('Henüz bildiriminiz yok'), findsOneWidget);
+    expect(find.byIcon(Icons.inbox_outlined), findsOneWidget);
   });
 
   testWidgets('showsReports_whenDataExists', (tester) async {

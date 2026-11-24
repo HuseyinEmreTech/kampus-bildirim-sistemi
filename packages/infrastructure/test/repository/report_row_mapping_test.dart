@@ -178,4 +178,38 @@ void main() {
     expect(summary.buildingName, 'Mühendislik');
     expect(summary.status, 'Yeni');
   });
+
+  group('statusChangesOf', () {
+    StatusChange change(String to, int hour, {String? note}) => (
+      fromStatus: null,
+      toStatus: to,
+      changedById: _staff,
+      changedByName: 'Görevli',
+      changedAt: DateTime.utc(2026, 10, 19, hour),
+      note: note,
+    );
+
+    test('rows_keepOrderStatusAndNote', () {
+      final changes = statusChangesOf([
+        change('Yeni', 9),
+        change('Ustlenildi', 10),
+        change('Cozuldu', 11, note: 'Değiştirildi'),
+      ])!;
+
+      expect(
+        [for (final c in changes) c.status],
+        [ReportStatus.yeni, ReportStatus.ustlenildi, ReportStatus.cozuldu],
+      );
+      expect(changes.last.changedAt, DateTime.utc(2026, 10, 19, 11));
+      expect(changes.last.note, 'Değiştirildi');
+      expect(changes.first.note, isNull);
+    });
+
+    test('unknownStatus_returnsNull', () {
+      expect(
+        statusChangesOf([change('Yeni', 9), change('Silindi', 10)]),
+        isNull,
+      );
+    });
+  });
 }
