@@ -83,7 +83,13 @@ d=$(depo)
 echo "JWT_SECRET=x" > "$d/.env"; git -C "$d" add -A
 bekle "env_dosyasi_yakalanir" 1 calistir "$d" staged
 
-# 9. commit-msg kipi.
+# 9. Betik testi (-test.sh) test dosyası sayılır.
+d=$(depo); git -C "$d" switch -qc chore/12-betik
+ekle "$d" scripts/ornek-test.sh "echo test" "test: örnek betik sınanıyor (#12)"
+ekle "$d" scripts/ornek.sh "echo ok" "chore: örnek betik (#12)"
+bekle "sh_test_dosyasi_taninir" 0 calistir "$d" dal
+
+# 10. commit-msg kipi.
 f=$(mktemp); echo "feat: bildirim detayı (#159)" > "$f"
 bekle "mesaj_kipi_gecer" 0 bash "$BETIK" mesaj "$f"
 echo "detay eklendi" > "$f"
