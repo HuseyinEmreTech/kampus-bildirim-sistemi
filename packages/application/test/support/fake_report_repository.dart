@@ -174,6 +174,24 @@ final class FakeReportRepository implements ReportRepository {
     return Success(_reports[reportId.value]);
   }
 
+  /// Sahte depoda bina tablosu yok; bina adı her zaman `null`.
+  @override
+  Future<Result<ReportDetailView?, AppError>> findDetail(
+    ReportId reportId,
+  ) async {
+    final report = _reports[reportId.value];
+    if (report == null) return const Success(null);
+    final history = [
+      for (final entry in historyFor(reportId.value))
+        ReportStatusChange(
+          status: ReportStatus.values.byName(entry.toStatus),
+          changedAt: entry.changedAt,
+          note: entry.note,
+        ),
+    ];
+    return Success(ReportDetailView(report: report, history: history));
+  }
+
   ReportSummary _toSummary(Report report) => ReportSummary(
     reportId: report.id.value,
     category: report.category.name,

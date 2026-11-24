@@ -106,6 +106,26 @@ final class PostgresReportRepository implements ReportRepository {
         return Success(report);
       });
 
+  /// Detay (#159): bildirim, bina adı ve durum geçmişi. Bildirim yoksa `null`.
+  @override
+  Future<Result<ReportDetailView?, AppError>> findDetail(ReportId reportId) =>
+      _guard(() async {
+        final row = await _reports.findById(reportId.value);
+        if (row == null) return const Success(null);
+        final report = restoreReport(row);
+        if (report == null) return const Failure(_unreadableRow);
+        final history = statusChangesOf(
+          await _reports.findHistory(reportId.value),
+        );
+        if (history == null) return const Failure(_unreadableRow);
+        return Success(
+          ReportDetailView(
+            report: report,
+            buildingName: row.buildingName,
+            history: history,
+          ),
+        );
+      });
   // Veritabanı hatası (bağlantı, zaman aşımı) istisna olarak gelir; servis akışı
   // istisnayla yönetilmez, [UnknownError]'a çevrilir. Programlama hataları
   // (`Error`) yakalanmaz.
