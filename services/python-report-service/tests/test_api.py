@@ -93,7 +93,7 @@ def test_export_forwards_token_filters_and_returns_csv():
                         "description": "Lamba bozuk",
                         "status": "Yeni",
                         "createdAt": "2026-10-24T10:00:00Z",
-                        "location": {"place": "B Blok"},
+                        "place": "B Blok",
                     }
                 ],
                 "total": 1,
@@ -231,7 +231,7 @@ def test_export_fetches_all_pages():
                 "description": "Lamba bozuk",
                 "status": "Yeni",
                 "createdAt": "2026-10-24T10:00:00Z",
-                "location": {"place": None},
+                "place": None,
             }
         ] if page <= 2 else []
         return httpx.Response(200, json={"items": items, "total": 2})
@@ -267,7 +267,7 @@ def test_export_escapes_spreadsheet_formulas():
                         "description": "=1+1",
                         "status": "Yeni",
                         "createdAt": "2026-10-24T10:00:00Z",
-                        "location": {"place": " @SUM(A1:A2)"},
+                        "place": " @SUM(A1:A2)",
                     }
                 ],
                 "total": 1,
@@ -349,7 +349,7 @@ def test_export_returns_bad_gateway_for_incomplete_pagination():
                 "description": "Lamba bozuk",
                 "status": "Yeni",
                 "createdAt": "2026-10-24T10:00:00Z",
-                "location": {"place": "B Blok"},
+                "place": "B Blok",
             }
         ] if page == 1 else []
         return httpx.Response(

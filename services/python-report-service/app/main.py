@@ -180,12 +180,7 @@ def _report_csv(reports: list[dict[str, Any]]) -> str:
         ):
             raise HTTPException(status_code=502, detail=INVALID_REPORT_DETAIL)
 
-        location = report.get("location")
         place = report.get("place")
-        if isinstance(location, dict):
-            place = location.get("place")
-        elif location is not None:
-            raise HTTPException(status_code=502, detail=INVALID_REPORT_DETAIL)
         if place is not None and not isinstance(place, str):
             raise HTTPException(status_code=502, detail=INVALID_REPORT_DETAIL)
 
