@@ -1,10 +1,13 @@
 ---
 title: Hüseyin Emre - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-10-24
+son-guncelleme: 2026-11-01
 ---
 
 # Hüseyin Emre (@HuseyinEmreTech) - Kişisel Plan
+
+> **Güncel görevler (1 Kasım 2026):** [Kalan işler planı](../planlar/2026-11-01-kalan-isler.md) ve `gh issue list --assignee HuseyinEmreTech`. Son tarih yok; sıra bağımlılığa göre. Bu dosyadaki haftalık hedefler geçmiş kayıttır.
+
 
 **Rol:** Teknik Lider / Domain & Application Owner
 **Ana Sorumluluk:** `campus_domain`, `campus_application`, `campus_contracts`, CI/CD, kabul testleri, PR incelemesi, mimari kararlar
@@ -150,3 +153,4 @@ Bu, [ADR-02](../adr/02-kalite-araci-sonarqube-cloud.md) kararının (Dart tarama
 - [2026-10-02](raporlar/huseyin-emre/2026-10-02.md): Ekip kurulumu, `main` koruması, doküman iskeleti
 - [2026-10-21](raporlar/huseyin-emre/2026-10-21.md): PR inceleme ve birleştirme, issue güncelleme, doküman/ADR, token kaydı
 - [2026-10-24](raporlar/huseyin-emre/2026-10-24.md): PR denetimi (#97-#99), Sonar kapsam düzeltmesi (#100, #102), JS bug düzeltmesi (#103), şablon ve kayıtlar (#101, #104, #107), yerel–bulut karşılaştırması (#108)
+- [2026-11-24](raporlar/huseyin-emre/2026-11-24.md): 15 PR incelemesi ve ilk birleşmeler (#196, #197, #214, #215), canlı test, teslim planı ve görev dağılımı (#184), görev adımları ve kontrol betiği (#234)

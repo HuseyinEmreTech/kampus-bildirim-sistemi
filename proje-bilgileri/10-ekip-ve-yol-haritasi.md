@@ -1,7 +1,7 @@
 ---
 title: Ekip ve 15 Haftalık Yol Haritası
 durum: Onaylandı
-son-guncelleme: 2026-10-21
+son-guncelleme: 2026-11-24
 ---
 
 # Ekip ve 15 Haftalık Yol Haritası
@@ -28,6 +28,8 @@ Görevler, her iş bağımsız ilerleyebilecek ve tek PR'a sığacak büyüklük
 
 ## 2. Takvim
 
+> **1 Kasım 2026'dan itibaren haftalık hedef ve son tarih yok.** Vize dönemi nedeniyle kalan işler haftaya bağlanmadı; sıra yalnızca bağımlılığa göre: [Kalan işler planı](planlar/2026-11-01-kalan-isler.md). Aşağıdaki tablo ilk planın kaydıdır; ders ve sunum takvimi hâlâ doğrulanmadı.
+
 - Dönem 15 ders haftası; ders **cuma** günü. 16. haftada ders yok, plana girmez.
 - Sprint **Pazartesi-Pazar**. Kapanış **Pazar 23:59**: o haftanın PR'ları birleşmiş, günlük raporlar girmiş olur.
 - **Cuma dersi:** herkes bir önceki sprintte ne yaptığını 1 dakikada anlatır; hafta ortası durum konuşulur.
@@ -47,10 +49,10 @@ Görevler, her iş bağımsız ilerleyebilecek ve tek PR'a sığacak büyüklük
 | 11 | 23 - 29 Kas | 27 Kas | Rate limit, kalan işler, bulgular tek tek; dağıtım kararı |
 | 12 | 30 Kas - 6 Ara | 4 Ara | **Özellik dondurma (Pazar 6 Ara)**; dağıtım denemesi, APK |
 | 13 | 7 - 13 Ara | 11 Ara | Kapsam, ADR'lar, README, dağıtım düzeltmeleri |
-| 14 | 14 - 20 Ara | 18 Ara | **Test haftası:** kod donuk, yalnızca hata düzeltme |
-| 15 | 21 - 27 Ara | 25 Ara | **Teslim ve 2. sunum (varsayım)**; katkı raporları |
+| 14 | 14 - 20 Ara | 18 Ara | **Test ve prova haftası:** kod donuk, yalnızca hata düzeltme; **Pazar 20 Ara teslim adayı** |
+| 15 | 21 - 27 Ara | 25 Ara | **Son teslim 23 Ara 00:00** (hoca duyurusu, 24 Kas): GitHub adresi 22 Ara Salı gönderilir; 2. sunum tarihi sorulacak |
 
-Kişi kişi haftalık görevler kişisel plan dosyalarındadır.
+Kişi kişi güncel görevler [Kalan işler planında](planlar/2026-11-01-kalan-isler.md).
 
 ## 3. Öncelik
 
@@ -69,7 +71,7 @@ Kural ve test hiçbir zaman kesilmez; önce "olursa" satırı kesilir. Dağıtı
 | Araç | Ne için | Kural |
 | --- | --- | --- |
 | **Issue** | Her görev bir kart | Şablonla açılır: kabul ölçütü, dokunulacak ve dokunulmayacak dosyalar, bağlı testler. Bir kişiye atanır |
-| **Milestone** | Her hafta bir milestone (`Hafta 04` ...) | Issue haftasına bağlanır; Pazar günü kapanır |
+| **Milestone** | Kullanılmıyor (1 Kasım 2026'dan itibaren) | Yeni issue milestone'a bağlanmaz; issue'lar `Bağımlı:` satırıyla sıralanır |
 | **Etiketler** | Katman ve tür | Katman: `domain`, `application`, `contracts`, `infrastructure`, `server`, `app`, `docs`, `ci`. Tür: `feat`, `fix`, `test`, `docs`. Öncelik: `sart`, `olmali`, `olursa` |
 | **Projects (Kanban)** | Haftanın durumu tek bakışta | Sütunlar: Yapılacak, Yapılıyor, İncelemede, Bitti |
 | **Branch** | Her issue kendi branch'inde | Ad: `feature/<issue-no>-<kisa-ad>`, `fix/...`, `docs/...`, `test/...` |
@@ -84,7 +86,7 @@ Yapılmayanlar: Wiki (dokümanlar repoda), Discussions (konuşma issue'larda ve 
 
 1. **Bir issue, bir branch, bir PR.** PR küçük tutulur (ideal 300 satırın altı, test dahil).
 2. **Başkasının adına commit yok.** Herkes kendi hesabıyla commit atar; hoca GitHub geçmişinden kimin ne yaptığını görür.
-3. **Her hafta en az bir birleşmiş PR**, herkes için.
+3. **Düzenli katkı:** herkes payına düşen issue'ları kendi hesabından, küçük PR'larla ve dönem boyunca düzenli olarak birleştirir; iş son geceye bırakılmaz. Görevlerde son tarih yok; yapamayacak olan issue'ya yazar, görev başkasına geçer.
 4. **Yapay zeka ile kodlama serbest, anlamadan almak yasak.** Kural seti: [AGENTS.md](../AGENTS.md); nasıl çalışılacağı: [Başlangıç rehberi](ekip/00-baslangic-rehberi.md#5-yapay-zeka-ile-nasıl-çalışıyoruz).
 5. **Anlatabilme kontrolü.** İnceleyen her PR'da en az bir "bu satır neden böyle?" sorusu sorar; yazar kendi cümlesiyle cevaplar. Hoca sorduğunda herkes kendi kodunu anlatabilmelidir.
 6. **Kabul testi önce.** Kural içeren görevlerde test Hüseyin Emre tarafından önceden yazılır (`bekliyor` etiketi); görev testi yeşile çevirmektir. Test değiştirilmez; değişmesi gerekiyorsa issue'da konuşulur.
@@ -109,7 +111,7 @@ Herkes yalnızca kendi dosyasına yazdığı için kayıtlarda merge çakışmas
 | Soru | Kime | Durum |
 | --- | --- | --- |
 | Sunum tarihleri ve biçimi | Hoca | Açık |
-| Teslim dersi 25 Aralık mı | Hoca | Açık |
+| Teslim tarihi | Hoca | Yanıtlandı (24 Kasım): son teslim 23 Aralık 2026 00:00, erişilebilir GitHub adresi paylaşılarak |
 | Dart için SonarQube Cloud kabul mü ([ADR-02](adr/02-kalite-araci-sonarqube-cloud.md)) | Hoca | Açık |
 | VPS var mı | Ekip | Hafta 11'de karar |
 | Emir Kerem (KeremC23) beceri seti netleşmesi | Hüseyin Emre | Hafta 5'te belirlenecek |

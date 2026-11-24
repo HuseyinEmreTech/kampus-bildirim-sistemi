@@ -124,8 +124,8 @@ class _DemoAuth implements AuthSource {
   }
 }
 
-/// Öğrencinin bildirimleri ve yeni bildirim. Konum 3. parçada geleceği için
-/// yeni bildirimin yeri "Konum seçilmedi" yazılır.
+/// Öğrencinin bildirimleri ve yeni bildirim. Yer tarifi yazılmadıysa yeni
+/// bildirimin yeri "Yer tarifi yok" görünür.
 class _DemoStudentReports implements ReportsSource, ReportCreator {
   _DemoStudentReports(this._demo);
 
@@ -145,7 +145,7 @@ class _DemoStudentReports implements ReportsSource, ReportCreator {
     _demo._add(
       DemoBackend.studentId,
       report.category,
-      'Konum seçilmedi',
+      report.place ?? 'Yer tarifi yok',
       DateTime.now(),
     );
     return const ReportCreated();
