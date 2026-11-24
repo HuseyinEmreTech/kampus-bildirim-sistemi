@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Görev adımları: push öncesi dal kontrolü (scripts/gorev-kontrol.sh). Kurulum: bash scripts/hook-kur.sh
+# main'e push zaten korumalı; yalnızca görev dallarında çalışır.
+dal=$(git rev-parse --abbrev-ref HEAD)
+case "$dal" in main|HEAD) exit 0 ;; esac
+exec bash "$(git rev-parse --show-toplevel)/scripts/gorev-kontrol.sh" dal
