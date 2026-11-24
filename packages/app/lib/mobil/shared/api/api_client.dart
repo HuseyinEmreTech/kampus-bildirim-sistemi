@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
@@ -8,6 +9,18 @@ const _requestTimeout = Duration(seconds: 20);
 
 /// 401 durum kodu: giriş yok ya da oturumun süresi doldu.
 const _unauthorized = 401;
+
+/// 401'de oturumu kapatan hata kodu (05-api-design). Yanlış şifrede giriş
+/// ucu `INVALID_CREDENTIALS` döner; o oturumu kapatmaz.
+const _unauthorizedCode = 'UNAUTHORIZED';
+
+/// Giriş ve yenileme uçları; buradaki 401 oturumu kapatmaz (yenileme
+/// eklenince döngüye girmesin).
+const _authPathPrefix = '/api/auth/';
+
+/// Başarılı durum kodları: 200 (dahil) ile 300 (hariç) arası.
+const _successStart = 200;
+const _successEnd = 300;
 
 /// Hata gövdesi okunamazsa kullanılan kod.
 const unknownErrorCode = 'UNKNOWN';
@@ -98,25 +111,37 @@ class ApiClient {
     try {
       final streamed = await _client.send(request).timeout(_requestTimeout);
       final response = await http.Response.fromStream(streamed);
-      return _read(response);
+      return _read(response, request.url.path);
     } on http.ClientException {
       return const ApiUnreachable();
     } on TimeoutException {
       return const ApiUnreachable();
     } on FormatException {
       return const ApiUnreachable();
+    } on IOException {
+      // TLS el sıkışması (HandshakeException) ya da gövde okunurken kopan
+      // bağlantı (SocketException): http paketi bunları çevirmeden geçirir.
+      return const ApiUnreachable();
     }
   }
 
-  ApiResponse _read(http.Response response) {
+  ApiResponse _read(http.Response response, String path) {
     final status = response.statusCode;
     final text = utf8.decode(response.bodyBytes);
-    if (status >= 200 && status < 300) {
+    if (status >= _successStart && status < _successEnd) {
       return ApiSuccess(text.isEmpty ? null : jsonDecode(text));
     }
-    if (status == _unauthorized) _onUnauthorized?.call();
-    return _error(status, text);
+    final error = _error(status, text);
+    if (_endsSession(error, path)) _onUnauthorized?.call();
+    return error;
   }
+
+  /// Oturum yalnızca giriş gerektiren bir uç `UNAUTHORIZED` dönünce biter;
+  /// giriş ve yenileme uçlarının 401'i (ör. yanlış şifre) bitirmez.
+  bool _endsSession(ApiError error, String path) =>
+      error.status == _unauthorized &&
+      error.code == _unauthorizedCode &&
+      !path.startsWith(_authPathPrefix);
 }
 
 /// Hata gövdesini okur; biçim beklenenden farklıysa bilinmeyen hata.

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:campus_app/mobil/shared/api/api_client.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -155,5 +156,85 @@ void main() {
     final response = await apiClient(server).get('/api/buildings');
 
     expect(response, isA<ApiUnreachable>());
+  });
+
+  test('addsBearerHeader', () async {
+    // Arrange
+    final server = FakeServer((_) async => jsonResponse({}, 200));
+
+    // Act
+    await apiClient(server, token: 'belirtec').get('/api/me/reports');
+
+    // Assert
+    expect(server.requests.single.headers['Authorization'], 'Bearer belirtec');
+  });
+
+  test('unreachable_whenTlsHandshakeFails', () async {
+    // Arrange: canlıda HTTPS; sertifika sorunu HandshakeException verir.
+    final server = FakeServer(
+      (_) async => throw const HandshakeException('sertifika geçersiz'),
+    );
+
+    // Act
+    final response = await apiClient(server).get('/health');
+
+    // Assert
+    expect(response, isA<ApiUnreachable>());
+  });
+
+  test('unreachable_whenConnectionDropsWhileReadingBody', () async {
+    // Arrange: başlıklar geldi, gövde okunurken bağlantı koptu.
+    final client = MockClient.streaming(
+      (request, _) async => http.StreamedResponse(
+        Stream<List<int>>.error(const SocketException('bağlantı koptu')),
+        200,
+      ),
+    );
+    final api = ApiClient(baseUrl: baseUrl, client: client, token: () => null);
+
+    // Act
+    final response = await api.get('/api/buildings');
+
+    // Assert
+    expect(response, isA<ApiUnreachable>());
+  });
+
+  test('unauthorized_doesNotSignOut_onWrongPassword', () async {
+    // Arrange: yanlış şifrede giriş ucu 401 INVALID_CREDENTIALS döner.
+    var signedOut = 0;
+    final server = FakeServer(
+      (_) async => jsonResponse({
+        'error': {'code': 'INVALID_CREDENTIALS', 'message': 'Hatalı'},
+      }, 401),
+    );
+
+    // Act
+    final response = await apiClient(
+      server,
+      onUnauthorized: () => signedOut++,
+    ).postJson('/api/auth/login', {'email': 'a@ornek.edu', 'password': 'x'});
+
+    // Assert: hata döner ama oturum kapatılmaz.
+    expect((response as ApiError).code, 'INVALID_CREDENTIALS');
+    expect(signedOut, 0);
+  });
+
+  test('unauthorized_doesNotSignOut_onAuthEndpoints', () async {
+    // Arrange: yenileme ucunun 401'i döngüye girmesin diye çıkış tetiklemez.
+    var signedOut = 0;
+    final server = FakeServer(
+      (_) async => jsonResponse({
+        'error': {'code': 'UNAUTHORIZED', 'message': 'Süresi doldu'},
+      }, 401),
+    );
+
+    // Act
+    await apiClient(
+      server,
+      onUnauthorized: () => signedOut++,
+    ).postJson('/api/auth/refresh', {'refreshToken': 'eski'});
+
+    // Assert
+    expect(signedOut, 0);
   });
 }
