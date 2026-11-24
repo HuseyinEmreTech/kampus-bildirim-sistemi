@@ -154,7 +154,7 @@ dal_kontrol() {
       tamam "Kırmızı test commit'i: $ilk_test"
       [ -n "$ilk_kod" ] && tamam "Yeşil commit: $ilk_kod"
     fi
-    if printf '%s\n' "$dosyalar" | grep -Eq '(^|/)test/|_test\.dart$|/tests/|test_.*\.py$|Tests?/'; then
+    if printf '%s\n' "$dosyalar" | grep -Eq '(^|/)test/|_test\.dart$|/tests/|test_.*\.py$|Tests?/|[-_]test\.sh$|\.test\.js$'; then
       tamam "Test dosyası değişmiş"
     else
       hata "Kod değişmiş ama hiçbir test dosyası değişmemiş"
