@@ -1,7 +1,7 @@
 ---
 title: "Uygulama Planı: Kalan İşler ve Görev Dağılımı"
-durum: Onay bekliyor
-son-guncelleme: 2026-11-01
+durum: Güncel
+son-guncelleme: 2026-11-24
 ---
 
 # Kalan İşler ve Görev Dağılımı: Uygulama Planı
@@ -21,6 +21,49 @@ son-guncelleme: 2026-11-01
 ## Çalışma düzeni
 
 **Son tarih yok.** Vize dönemi nedeniyle görevler haftaya bağlanmadı; milestone ve `[Hafta NN]` öneki kullanılmaz. Sırayı yalnızca bağımlılık belirler: bir görevin bağımlılıkları birleştiyse başlanabilir. Sınavı olan yoğunluğuna göre alır; yapamayacak olan issue'ya yazar, görev başkasına geçer.
+
+## 24 Kasım 2026 durumu
+
+Aşağıdaki "Durum tespiti" ve "Görev dağılımı" 1 Kasım'ın anlık görüntüsüdür ve geçmiş olarak korunur. Güncel durum bu bölümdedir.
+
+**Değişenler.** #162 (1 Kasım) ve #190, #191, #193 (3 Kasım) birleşti. #163 kapandı: rapor uçları sunucuya bağlı, `FILES_DIR` tanımlı, girişsiz istek `401` dönüyor. #175, #186 ile bitti. 3 Kasım'dan beri birleşme yok; 15 PR inceleme bekliyor.
+
+**`main` sağlık kontrolü (24 Kasım).**
+- Bütün paketlerin testleri geçiyor. Sonar kalite kapısı yeşil.
+- Sunucu API'si akışı gerçek veritabanında baştan sona yürütüyor: aç, üstlen, `409`, çöz, haber.
+- Kopukluklar:
+  - Mobil uygulama hâlâ yer tutucuyla açılıyor (#170).
+  - Web'de bildirim açma, üstlenme ve çözme yok (#177).
+  - Detay ucu yok (#159) ve fotoğraf sunumu yok (#166).
+  - Kampüs sınırı (Rule 06) uygulanmıyor (#164).
+
+**Birleşme sırası.** PR yorumlarında gerekçeleriyle yazıldı.
+1. #208, #184, #197, #196.
+2. #194: #208'den sonra.
+3. #205.
+4. Düzeltmeler gelince #195, #200 (#198'den sonra), #198, #199 (#196'dan sonra), #201, #202, #203, #207 (#203'ten sonra).
+5. #206 ve #204: #159'dan sonra, yığın adımlarıyla.
+
+**Yeni issue'lar.**
+- #209: sunucuda `place` için 100 karakter denetimi.
+- #210: giriş sınırı ortam değişkeniyle ayarlanabilir olsun.
+- #211: infrastructure testleri paralel koşunca çakışıyor.
+- #212: SIGTERM ile düzgün kapanma.
+- #213: Python servisinin portu HTTPS'i atlıyor.
+
+**Görev dağılımı (24 Kasım).** Dağılımda bağımlılık sırasının yanında katkı dengesine de bakıldı. Hoca her üyenin kendi katkısını GitHub geçmişinden değerlendirecek; repo squash-only olduğu için her birleşen PR `main`'e bir commit olarak giriyor. `main`'deki commit sayıları: Hüseyin 46, Ertuğrul 36, Çağdaş 27, Yusuf 22, Murat 3, Müberra 2, Kerem 1. Bu yüzden yeni ve bağımsız işler önce az commit'i olanlara verildi.
+
+| Kişi | `main` commit | Görevler | Neden |
+| --- | --- | --- | --- |
+| Hüseyin Emre (`HuseyinEmreTech`) | 46 | #164, #183, #208, #184; inceleme ve birleştirme | #94, katkı dengesi için Müberra'ya geçti. Liderin asıl işi birleşme darboğazını açmak |
+| Çağdaş Kemal Ağca (`Cagdas3307`) | 27 | **#159 (en öncelikli)**, #168, #212 | #159, #206, #204 ve mobil/web detay ekranlarını bekletiyor. #212 `bin/server.dart`'ta, onun alanında |
+| Ertuğrul Pekdemir (`ertrlpkdmr`) | 36 | #203 ve #202 düzeltmeleri, #165, #166, #167 | Canlı ortam ve depo onun alanı. Yeni iş verilmedi, yükü zaten fazla |
+| Yusuf Ekenel (`yusufekenel`) | 22 | #195-#201 düzeltmeleri, #170 2. parça, #171, #172'nin görevli listesi/üstlen/çöz kısmı, #173, #174 | #172'deki kod onda hazır ve testli (gerekçe #172'de). Mobilin kritik yolu onda |
+| Fatma Müberra Yener (`muberrayener`) | 2 | #207, **#94**, #172'nin `HttpNotificationsSource` kısmı, #213, #182 | Katkı dengesi. #94'ün DTO'larını kendi bildirim kaynağında kullanacak; #213, #207'nin devamı |
+| Murat Yaman (`yamanmurat761`) | 3 | #194, #177, #178, #179, #209 | Katkı dengesi. #209 bağımsız ve küçük; web işleri #194'ü beklerken başlanabilir |
+| Emir Kerem Çakıcı (`KeremC23`) | 1 | #205, #206, #204, #210, #211 | Katkı dengesi. E2E PR'ları #159'u beklerken boşta. #210 E2E'deki giriş sınırı sorununu çözüyor; #211 bağımsız bir test işi |
+
+**Hemen başlanabilir:** #159, #94, #209, #210, #211, #164.
 
 ## Durum tespiti (1 Kasım 2026)
 
@@ -49,7 +92,9 @@ Bu plan aşağıdaki kararlarla yazıldı; teknik lider onayıyla kesinleşir.
 | HTTPS: VPS varsa Caddy; yoksa demo yerel ağda, geliştirme derlemesiyle ve README'de açıkça yazılarak | #21'deki soruyu yanıtlar; [10-ekip bölüm 3](../10-ekip-ve-yol-haritasi.md) ile uyumlu |
 | Fotoğraf okuma: öğrenci yalnızca kendi bildiriminin fotoğrafını, görevli hepsini görür | Rule 01 ve [güvenlik dokümanı](../06-security-and-privacy.md); adresin tahmin edilemez olması yetki yerine geçmez |
 
-## Görev dağılımı
+## Görev dağılımı (1 Kasım)
+
+Güncel dağılım: [24 Kasım 2026 durumu](#24-kasım-2026-durumu).
 
 | Kişi | Görevler |
 | --- | --- |
@@ -79,7 +124,7 @@ graph TD
   G02 --> G08
   G08 --> G09["#168 C#"]
   G08 --> G10["#169 Python"]
-  G03 --> G12["#171 öğrenci HTTP"]
+  G03["#94 contracts"] --> G12["#171 öğrenci HTTP"]
   G11["#170 kabuk"] --> G12
   G01 --> G12
   G03 --> G13["#172 görevli HTTP"]
