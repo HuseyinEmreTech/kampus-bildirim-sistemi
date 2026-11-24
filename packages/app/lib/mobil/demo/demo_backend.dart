@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../features/auth/data/auth_source.dart';
 import '../features/auth/data/session.dart';
 import '../features/notifications/data/notification_item.dart';
@@ -5,9 +7,14 @@ import '../features/notifications/data/notifications_source.dart';
 import '../features/reports/data/new_report.dart';
 import '../features/reports/data/report_assigner.dart';
 import '../features/reports/data/report_creator.dart';
+import '../features/reports/data/report_detail.dart';
+import '../features/reports/data/report_detail_source.dart';
 import '../features/reports/data/report_list_item.dart';
+import '../features/reports/data/report_resolver.dart';
 import '../features/reports/data/reports_source.dart';
 import '../features/reports/data/staff_reports_source.dart';
+import '../shared/location/location_source.dart';
+import '../shared/photo/photo_picker.dart';
 
 /// Sunucu hazır olana kadar uygulamayı telefonda çalıştırmak için bellekte
 /// duran sahte veri. Bütün ekranlar aynı veriyi paylaşır; uygulama kapanınca
@@ -31,18 +38,46 @@ class DemoBackend {
   ReportCreator get creator => _student;
   StaffReportsSource get staffReports => _staff;
   ReportAssigner get assigner => _staff;
+  ReportResolver get resolver => _staff;
+  final PhotoPicker photoPicker = _DemoPhotoPicker();
+  final LocationProvider gps = _DemoGps();
+  final BuildingsSource buildings = _DemoBuildings();
   late final NotificationsSource notifications = _DemoNotifications(this);
+  late final ReportDetailSource reportDetail = _DemoReportDetail(this);
+
+  /// Demoda gerçek fotoğraf yok; detay ekranı yerinde kırık resim simgesi
+  /// gösterir.
+  static const _photoUrl = 'https://ornek.test/demo.jpg';
 
   /// Demo tarihleri Ekim 2026'nın günleri.
   static DateTime _day(int day) => DateTime(2026, 10, day);
 
   void _seed() {
-    _add(studentId, ReportCategory.ariza, 'B Blok 2. kat', _day(15));
-    _add('baska-ogrenci', ReportCategory.guvenlik, 'Otopark girişi', _day(16));
+    _add(
+      studentId,
+      ReportCategory.ariza,
+      'B Blok 2. kat',
+      _day(15),
+    ).description = 'Koridor lambası yanmıyor';
+    _add(
+      'baska-ogrenci',
+      ReportCategory.guvenlik,
+      'Otopark girişi',
+      _day(16),
+    ).description = 'Bariyer kapanmıyor';
     final resolved =
         _add(studentId, ReportCategory.temizlik, 'Kütüphane', _day(12))
+          ..description = 'Okuma salonunda çöp kutuları taşmış'
           ..status = ReportStatus.cozuldu
-          ..assigneeId = staffId;
+          ..assigneeId = staffId
+          ..resolution = const Resolution(
+            photoUrl: _photoUrl,
+            note: 'Çöpler toplandı.',
+          );
+    resolved.history.addAll([
+      StatusChange(to: ReportStatus.ustlenildi, changedAt: _day(12)),
+      StatusChange(to: ReportStatus.cozuldu, changedAt: _day(13)),
+    ]);
     _notifications.add(
       NotificationItem(
         id: 'n1',
@@ -67,9 +102,15 @@ class DemoBackend {
       place: place,
       createdAt: createdAt,
     );
+    report.history.add(
+      StatusChange(to: ReportStatus.yeni, changedAt: createdAt),
+    );
     _reports.add(report);
     return report;
   }
+
+  _DemoReport? _find(String id) =>
+      _reports.where((report) => report.id == id).firstOrNull;
 
   /// En yeni bildirim önde.
   List<ReportListItem> _list(bool Function(_DemoReport report) where) =>
@@ -93,7 +134,10 @@ class _DemoReport {
   final String place;
   final DateTime createdAt;
   ReportStatus status = ReportStatus.yeni;
+  String description = '';
   String? assigneeId;
+  Resolution? resolution;
+  final history = <StatusChange>[];
 
   ReportListItem toItem() => ReportListItem(
     id: id,
@@ -101,6 +145,18 @@ class _DemoReport {
     status: status,
     place: place,
     createdAt: createdAt,
+  );
+
+  ReportDetail toDetail() => ReportDetail(
+    id: id,
+    category: category,
+    status: status,
+    description: description,
+    place: place,
+    createdAt: createdAt,
+    photoUrl: DemoBackend._photoUrl,
+    history: List.of(history),
+    resolution: resolution,
   );
 }
 
@@ -142,19 +198,24 @@ class _DemoStudentReports implements ReportsSource, ReportCreator {
 
   @override
   Future<ReportCreateResult> create(NewReport report) async {
-    _demo._add(
-      DemoBackend.studentId,
-      report.category,
-      report.place ?? 'Yer tarifi yok',
-      DateTime.now(),
-    );
+    _demo
+            ._add(
+              DemoBackend.studentId,
+              report.category,
+              report.place ?? 'Yer tarifi yok',
+              DateTime.now(),
+            )
+            .description =
+        report.description;
     return const ReportCreated();
   }
 }
 
-/// Görevli listesi ve üstlenme; sunucudaki Rule 02 gibi üstlenilmiş
-/// bildirim ikinci kez üstlenilemez.
-class _DemoStaffReports implements StaffReportsSource, ReportAssigner {
+/// Görevli listesi, üstlenme ve çözme; sunucudaki gibi üstlenilmiş bildirim
+/// ikinci kez üstlenilemez (Rule 02), yalnızca üstlenen çözer (Rule 03) ve
+/// çözülünce bildirimi açan öğrenciye "çözüldü" bildirimi düşer (Rule 04).
+class _DemoStaffReports
+    implements StaffReportsSource, ReportAssigner, ReportResolver {
   _DemoStaffReports(this._demo);
 
   final DemoBackend _demo;
@@ -183,8 +244,43 @@ class _DemoStaffReports implements StaffReportsSource, ReportAssigner {
     if (report.assigneeId != null) return const ReportAlreadyTaken();
     report
       ..assigneeId = DemoBackend.staffId
-      ..status = ReportStatus.ustlenildi;
+      ..status = ReportStatus.ustlenildi
+      ..history.add(
+        StatusChange(to: ReportStatus.ustlenildi, changedAt: DateTime.now()),
+      );
     return const ReportAssigned();
+  }
+
+  /// Demo gerçek sonuç fotoğrafını saklamaz; yerine örnek adres konur.
+  @override
+  Future<ReportResolveResult> resolve({
+    required String reportId,
+    required PickedPhoto photo,
+    String? note,
+  }) async {
+    final report = _demo._reports.where((r) => r.id == reportId).firstOrNull;
+    if (report == null) return const ReportResolveFailed();
+    if (report.assigneeId != DemoBackend.staffId ||
+        report.status != ReportStatus.ustlenildi) {
+      return const ReportResolveRejected('Bu bildirimi siz üstlenmediniz.');
+    }
+    report
+      ..status = ReportStatus.cozuldu
+      ..resolution = Resolution(photoUrl: DemoBackend._photoUrl, note: note)
+      ..history.add(
+        StatusChange(to: ReportStatus.cozuldu, changedAt: DateTime.now()),
+      );
+    _demo._notifications.insert(
+      0,
+      NotificationItem(
+        id: 'n${_demo._nextId++}',
+        reportId: report.id,
+        message: 'Bildiriminiz çözüldü: ${report.place}',
+        createdAt: DateTime.now(),
+        isRead: false,
+      ),
+    );
+    return const ReportResolved();
   }
 }
 
@@ -208,4 +304,45 @@ class _DemoNotifications implements NotificationsSource {
     list[index] = list[index].markedRead();
     return true;
   }
+}
+
+/// Kamera yerine her seferinde 1x1 piksellik sahte bir PNG verir.
+class _DemoPhotoPicker implements PhotoPicker {
+  static final _png = base64Decode(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+  );
+
+  @override
+  Future<PhotoPickResult> pick(PhotoSource source) async =>
+      PhotoPicked(PickedPhoto(bytes: _png, contentType: 'image/png'));
+}
+
+class _DemoReportDetail implements ReportDetailSource {
+  _DemoReportDetail(this._demo);
+
+  final DemoBackend _demo;
+
+  @override
+  Future<ReportDetailResult> fetch(String reportId) async {
+    final report = _demo._find(reportId);
+    if (report == null) return const ReportDetailNotFound();
+    return ReportDetailLoaded(report.toDetail());
+  }
+}
+
+/// GPS yerine her seferinde örnek bir kampüs noktası verir (gerçek sınır değil).
+class _DemoGps implements LocationProvider {
+  @override
+  Future<GpsResult> current() async =>
+      const GpsFix(latitude: 36.5871, longitude: 36.1742);
+}
+
+/// Sahte bina listesi; gerçeği sunucudaki seed verisinden gelecek.
+class _DemoBuildings implements BuildingsSource {
+  @override
+  Future<BuildingsResult> fetch() async => const BuildingsLoaded([
+    Building(id: 'demo-a', name: 'A Blok'),
+    Building(id: 'demo-b', name: 'B Blok'),
+    Building(id: 'demo-k', name: 'Kütüphane'),
+  ]);
 }
