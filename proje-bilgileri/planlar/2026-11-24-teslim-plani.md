@@ -75,8 +75,12 @@ graph LR
   I171 --> I174["#174 cihaz + APK (Yusuf)"]
   I173 --> I174
   T1 --> I174
+  I170 --> I238["#238 cihazda deneme turu 1 (Yusuf)"]
+  I238 --> I174
   I174 --> I181["#181 demo turu (Kerem)"]
 ```
+
+**Neden cihazda deneme iki tur:** `lib/main.dart` bugün yer tutucu, bu yüzden uygulama cihazda açılmıyor. Tek tur #174 olsaydı ilk cihaz sorunu 13 Aralık haftasında çıkar, düzeltmeye zaman kalmazdı. Tur 1 (#238) #170 kabuğu birleşir birleşmez kamera, GPS, izinler, kaybolan fotoğraf, otomatik giriş, dar ekran ve TalkBack'i dener. Tur 2 (#174) gerçek sunucuyla USR 01-07 ve APK.
 
 **Bu hafta başlanabilir:** #165, #94, #164, #209, #210, #211, T7, T8, T9, T10, T11, T12, T13.
 
@@ -89,7 +93,7 @@ Dağılım bağımlılık sırasına ve **katkı dengesine** göre yapıldı. `m
 | Hüseyin (`HuseyinEmreTech`) | #164, #183, #182, #232; inceleme ve birleştirme | T8 iskeleti, T12, T13 (ADR-02/04 durumu, ADR-07) | Liderin izleme işleri; #182, Müberra'nın yükü fazla olduğu için geçti |
 | Çağdaş (`Cagdas3307`) | **#165 + #159** (PR #215, #216), #168, #212 (PR #217), #230 | T4 | Kritik yolun başı; `openapi.yaml` sunucu uçlarıyla birlikte değişir |
 | Ertuğrul (`ertrlpkdmr`) | #203, #202, #166, #167, #231 | T5, T13 (ADR-06) | Caddy ve canlı ortam onda |
-| Yusuf (`yusufekenel`) | #195, #198-#201 düzeltmeleri, #170, #171, #172 (görevli kısmı), #173, #174 | T2 (#170 ve #173'e eklenir) | Mobilin kritik yolu ve hazır kodu onda |
+| Yusuf (`yusufekenel`) | #195, #199, #200 düzeltmeleri, #170, #171, #172 (görevli kısmı), #173, #174, **#238 (cihazda deneme turu 1)** | T2 (#170 ve #173'e eklenir) | Mobilin kritik yolu ve hazır kodu onda. **Cihazda denemenin tamamı onda, çünkü gerçek Android cihaz onda** (lider kararı, 24 Kasım). Yükü en ağır olan o; #238 bu yüzden kod yazmadan, yalnızca kayıt dosyası olarak tutuldu |
 | Müberra (`muberrayener`) | #207, #94, #172 (bildirim kaynağı), #213 | T1, T9 | Bildirim kaynağını yazan kişi rozeti de yazar; sunum 10-ekip'te onun rolü |
 | Murat (`yamanmurat761`) | #194, #177, #178, #179, #209 (+T3) | T7, T11, T13 (ADR-05) | Web yüzeyi onda; küçük ve bağımsız işler |
 | Kerem (`KeremC23`) | #205, #206, #204, #210, #211 | T6, T10 | E2E PR'ları #159'u beklerken bağımsız işler; README'deki rolü dokümantasyon |
@@ -104,8 +108,8 @@ Takvim geriye doğru kuruldu. Son iki gün tampon olarak ayrıldı; neden: son g
 | Hafta | Tarih | Hedef | Bitiş ölçütü |
 | --- | --- | --- | --- |
 | 11 | 24-29 Kas | Kuyruk açılır: #208, #184, #194, #205, #207, #216 ve düzeltilen mobil PR'lar birleşir. #230, #94, #164 başlar. T8 iskeleti (#224), T12 (#228) | Herkesin en az 1 PR'ı birleşmiş |
-| 12 | 30 Kas-6 Ara | #170, #171, #172, T1 (#219), #177, #166 birleşir. **Pazar 6 Aralık: özellik dondurma** | Bu tarihten sonra yalnızca `fix:`, `test:`, `docs:` birleşir |
-| 13 | 7-13 Ara | #173, #174 (APK), #206 ve #204 (E2E CI zorunlu kontrol olur), T5 (#221), #167, hata düzeltmeleri. ADR'ler (#229), README (#226, #227) | Bitti tanımının 1-4. maddeleri sağlanmış |
+| 12 | 30 Kas-6 Ara | #170, #171, #172, T1 (#219), #177, #166 birleşir. **#238 cihazda deneme turu 1:** #170'ten sonraki 2 gün içinde. **Pazar 6 Aralık: özellik dondurma** | Bu tarihten sonra yalnızca `fix:`, `test:`, `docs:` birleşir |
+| 13 | 7-13 Ara | #173, #174 (cihazda deneme turu 2 ve APK), #206 ve #204 (E2E CI zorunlu kontrol olur), T5 (#221), #167, hata düzeltmeleri. ADR'ler (#229), README (#226, #227) | Bitti tanımının 1-4. maddeleri sağlanmış |
 | 14 | 14-20 Ara | **Prova haftası:** demo kabul turu (#181), katkı raporu bölümleri (#224), sunum (#225), #183. **Pazar 20 Aralık: teslim adayı** | `main`'de açık `sart` issue yok; demo bir kez baştan sona prova edilmiş |
 | 15 | 21-22 Ara | **21 Aralık Pazartesi:** son kontrol listesi (#183), temiz bir makinede README'yi izleyerek kurulum, `v1.0.0` etiketi ve GitHub Release (APK ekli). **22 Aralık Salı:** GitHub adresi hocaya gönderilir, iç hedef 20:00 | Adres gönderilmiş, gönderim kaydı #183'te |
 | — | 23 Ara 00:00 | Son teslim (hoca) | — |
@@ -336,6 +340,7 @@ Spec'in açıkça söylemediği ama demoda bir kullanıcıyı ilk vuracak duruml
 | T11 | #227 | Murat |
 | T12 | #228 | Hüseyin |
 | T13 | #229 | Hüseyin, Murat, Ertuğrul |
+| Cihazda deneme turu 1 | #238 | Yusuf |
 
 ## Canlı test (24 Kasım)
 
