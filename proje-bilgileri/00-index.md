@@ -16,7 +16,7 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 1. Proje ne ve neden: [Proje kapsamı ve amacı](01-project-scope.md)
 2. Bu hafta ne oldu: [Haftalık kayıtlar](haftalik/00-haftalik-index.md)
 3. Ekibe yeni katıldıysan: [Başlangıç rehberi](ekip/00-baslangic-rehberi.md)
-4. Kim ne yapıyor: [Kalan işler planı](planlar/2026-11-01-kalan-isler.md), [Ekip ve yol haritası](10-ekip-ve-yol-haritasi.md)
+4. Kim ne yapıyor: [Teslim planı](planlar/2026-11-24-teslim-plani.md), [Kalan işler planı](planlar/2026-11-01-kalan-isler.md), [Ekip ve yol haritası](10-ekip-ve-yol-haritasi.md)
 
 ## Tasarım dokümanları
 
@@ -35,6 +35,7 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 | 11 | [Kod mimarisi ve korumalar](11-kod-mimarisi-ve-korumalar.md) | Paketler, izinli bağımlılıklar, hatayı önleyen korumalar | Onaylandı |
 | - | [Başlangıç kuralları](ekip/BASLANGIC_KURALLARI.md) | Her üye için roller, kurallar, onay tablosu | Onaylandı |
 | - | [Uygulama planı: kalan işler](planlar/2026-11-01-kalan-isler.md) | Durum tespiti, kim ne yapıyor, bağımlılık sırası; son tarih yok; 24 Kasım güncellemesi | Güncel |
+| - | [Uygulama planı: teslime kadar](planlar/2026-11-24-teslim-plani.md) | 24 Kasım taramasında bulunan yeni işler (T1-T13), kritik yol, "bitti" tanımı, katkı dengesine göre dağılım, takvim | Güncel |
 | - | [Uygulama planı: repo iskeleti](planlar/2026-10-02-repo-iskeleti.md) | Hafta 4'ün ilk işi, adım adım | Onay bekliyor |
 | - | [ADR-01: Dart backend ve PostgreSQL](adr/01-dart-backend-postgresql.md) | Geri dönülmesi zor karar | Önerildi |
 | - | [ADR-02: Kod kalitesi aracı](adr/02-kalite-araci-sonarqube-cloud.md) | SonarQube Cloud ve yerel analiz kararı, karşılaştırma matrisi | Önerildi |

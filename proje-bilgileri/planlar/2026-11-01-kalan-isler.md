@@ -56,14 +56,14 @@ Aşağıdaki "Durum tespiti" ve "Görev dağılımı" 1 Kasım'ın anlık görü
 | Kişi | `main` commit | Görevler | Neden |
 | --- | --- | --- | --- |
 | Hüseyin Emre (`HuseyinEmreTech`) | 46 | #164, #183, #208, #184; inceleme ve birleştirme | #94, katkı dengesi için Müberra'ya geçti. Liderin asıl işi birleşme darboğazını açmak |
-| Çağdaş Kemal Ağca (`Cagdas3307`) | 27 | **#159 (en öncelikli)**, #168, #212 | #159, #206, #204 ve mobil/web detay ekranlarını bekletiyor. #212 `bin/server.dart`'ta, onun alanında |
-| Ertuğrul Pekdemir (`ertrlpkdmr`) | 36 | #203 ve #202 düzeltmeleri, #165, #166, #167 | Canlı ortam ve depo onun alanı. Yeni iş verilmedi, yükü zaten fazla |
+| Çağdaş Kemal Ağca (`Cagdas3307`) | 27 | **#165 + #159 (en öncelikli)**, #168, #212 | #159, #206, #204 ve mobil/web detay ekranlarını bekletiyor. #212 `bin/server.dart`'ta, onun alanında |
+| Ertuğrul Pekdemir (`ertrlpkdmr`) | 36 | #203 ve #202 düzeltmeleri, #166, #167 (#165 Çağdaş'a geçti) | Canlı ortam ve depo onun alanı. Yeni iş verilmedi, yükü zaten fazla |
 | Yusuf Ekenel (`yusufekenel`) | 22 | #195-#201 düzeltmeleri, #170 2. parça, #171, #172'nin görevli listesi/üstlen/çöz kısmı, #173, #174 | #172'deki kod onda hazır ve testli (gerekçe #172'de). Mobilin kritik yolu onda |
 | Fatma Müberra Yener (`muberrayener`) | 2 | #207, **#94**, #172'nin `HttpNotificationsSource` kısmı, #213, #182 | Katkı dengesi. #94'ün DTO'larını kendi bildirim kaynağında kullanacak; #213, #207'nin devamı |
 | Murat Yaman (`yamanmurat761`) | 3 | #194, #177, #178, #179, #209 | Katkı dengesi. #209 bağımsız ve küçük; web işleri #194'ü beklerken başlanabilir |
 | Emir Kerem Çakıcı (`KeremC23`) | 1 | #205, #206, #204, #210, #211 | Katkı dengesi. E2E PR'ları #159'u beklerken boşta. #210 E2E'deki giriş sınırı sorununu çözüyor; #211 bağımsız bir test işi |
 
-**Hemen başlanabilir:** #159, #94, #209, #210, #211, #164.
+**Hemen başlanabilir:** #165 (sonra #159), #94, #209, #210, #211, #164. Teslime kadarki yeni işler ve güncel dağılım: [Teslim planı](2026-11-24-teslim-plani.md).
 
 ## Durum tespiti (1 Kasım 2026)
 
