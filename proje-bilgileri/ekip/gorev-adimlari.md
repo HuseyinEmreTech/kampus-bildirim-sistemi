@@ -34,6 +34,8 @@ Elle çalıştırmak için:
 - `bash scripts/gorev-kontrol.sh`: dal
 - `bash scripts/gorev-kontrol.sh pr <no>`: PR başlığı, beyan ve adım kanıtı dahil
 
+**Duyurudan önce açılmış PR'lar** (#236, 24 Kasım 15:10 UTC): CI'da dal adı, eski commit mesajları ve "önce test" sırası **uyarı** olarak gösterilir. Neden: bunları düzeltmek geçmişi yeniden yazmayı gerektiriyor; bunun yerine bu PR'larda açıklama (yapay zeka beyanı, Adım kanıtı, kutular) eksiksiz istenir. Yeni commit'ler kancadan ve kurallardan muaf değildir.
+
 Kancalar `git commit --no-verify` ile atlanabilir, ama **atlanmaz**. CI aynı kontrolü yine yapar ve lider kırmızı "Görev adımları" ile birleştirmez.
 
 ## A. Görev sahibinin adımları
