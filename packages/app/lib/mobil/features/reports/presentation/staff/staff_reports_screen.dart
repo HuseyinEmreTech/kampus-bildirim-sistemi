@@ -23,6 +23,7 @@ class StaffReportsScreen extends StatefulWidget {
     required this.assigner,
     required this.resolver,
     required this.photoPicker,
+    this.onReportTap,
   });
 
   final StaffReportsSource source;
@@ -31,6 +32,9 @@ class StaffReportsScreen extends StatefulWidget {
   /// "Çöz" ekranı için (USR 06).
   final ReportResolver resolver;
   final PhotoPicker photoPicker;
+
+  /// Karta dokununca (ör. detayı açmak için).
+  final ValueChanged<ReportListItem>? onReportTap;
 
   @override
   State<StaffReportsScreen> createState() => _StaffReportsScreenState();
@@ -197,6 +201,7 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
                   StaffReportsView.incoming => _buildAssignButton,
                   StaffReportsView.mine => _buildResolveButton,
                 },
+                onTap: widget.onReportTap,
                 controller: _scroll,
                 isLoadingMore: _pager.isLoadingMore,
                 loadMoreFailed: _pager.loadMoreFailed,

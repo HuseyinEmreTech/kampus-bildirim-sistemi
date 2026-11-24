@@ -22,6 +22,7 @@ class ReportListBody extends StatelessWidget {
     required this.onRefresh,
     required this.onRetry,
     this.actionBuilder,
+    this.onTap,
     this.controller,
     this.isLoadingMore = false,
     this.loadMoreFailed = false,
@@ -38,6 +39,9 @@ class ReportListBody extends StatelessWidget {
   /// Verilirse her kartın altına bu düğme konur.
   /// `null` dönerse o kartta düğme olmaz.
   final Widget? Function(ReportListItem report)? actionBuilder;
+
+  /// Verilirse karta dokununca çağrılır.
+  final ValueChanged<ReportListItem>? onTap;
 
   /// Listenin kaydırma denetleyicisi (sona yaklaşınca sonraki sayfa için).
   final ScrollController? controller;
@@ -75,6 +79,7 @@ class ReportListBody extends StatelessWidget {
           return ReportCard(
             report: items[index],
             action: actionBuilder?.call(items[index]),
+            onTap: _tapOf(items[index]),
           );
         },
       ),
@@ -121,5 +126,10 @@ class ReportListBody extends StatelessWidget {
         TextButton(onPressed: onRetryMore, child: const Text('Tekrar dene')),
       ],
     );
+  }
+
+  VoidCallback? _tapOf(ReportListItem report) {
+    final onTap = this.onTap;
+    return onTap == null ? null : () => onTap(report);
   }
 }
