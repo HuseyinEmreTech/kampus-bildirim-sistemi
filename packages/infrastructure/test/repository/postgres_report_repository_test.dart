@@ -16,6 +16,7 @@ const _student = 'a0000000-0000-4000-8000-000000000091';
 const _staffA = 'a0000000-0000-4000-8000-000000000092';
 const _staffB = 'a0000000-0000-4000-8000-000000000093';
 const _missingReport = 'c0000000-0000-4000-8000-000000000099';
+const _building = 'b0000000-0000-4000-8000-000000000091';
 
 const _insertUser = r'''
 INSERT INTO users (user_id, full_name, email, password_hash, role)
@@ -44,6 +45,9 @@ Future<void> _deleteFixtures(Database db) async {
     [_student],
   );
   await db.execute(r'DELETE FROM reports WHERE reporter_id = $1', [_student]);
+  await db.execute(r'DELETE FROM buildings WHERE building_id = $1', [
+    _building,
+  ]);
   await db.execute(r'DELETE FROM users WHERE user_id IN ($1, $2, $3)', [
     _student,
     _staffA,
@@ -51,7 +55,10 @@ Future<void> _deleteFixtures(Database db) async {
   ]);
 }
 
-Report _newReport({String description = 'Arayüz testi bildirimi'}) {
+Report _newReport({
+  String description = 'Arayüz testi bildirimi',
+  String? buildingId,
+}) {
   final result = Report.create(
     reporterId: _student,
     category: 'ariza',
@@ -61,7 +68,8 @@ Report _newReport({String description = 'Arayüz testi bildirimi'}) {
     photoSizeBytes: 1000,
     latitude: 36.5871,
     longitude: 36.1742,
-    locationSource: 'gps',
+    locationSource: buildingId == null ? 'gps' : 'building',
+    buildingId: buildingId,
     createdAt: DateTime.now(),
   );
   return (result as Success<Report, DomainError>).value;
@@ -333,6 +341,52 @@ void main() {
       final result = await repository.findById(_reportId(_missingReport));
 
       expect((result as Success<Report?, AppError>).value, isNull);
+    });
+
+    test('findDetail_returnsHistoryInOrder', () async {
+      final id = await createReport();
+      await repository.assign(id, _userId(_staffA));
+      await repository.resolve(
+        id,
+        _userId(_staffA),
+        _resolutionPhoto(),
+        note: 'Değiştirildi',
+      );
+
+      final result = await repository.findDetail(id);
+
+      final detail = (result as Success<ReportDetailView?, AppError>).value!;
+      expect(detail.report.id.value, id.value);
+      expect(detail.report.status, ReportStatus.cozuldu);
+      expect(
+        [for (final change in detail.history) change.status],
+        [ReportStatus.yeni, ReportStatus.ustlenildi, ReportStatus.cozuldu],
+      );
+      expect(detail.history.last.note, 'Değiştirildi');
+      expect(detail.buildingName, isNull);
+    });
+
+    test('findDetail_returnsBuildingName', () async {
+      await db.execute(
+        r'INSERT INTO buildings (building_id, name, latitude, longitude) '
+        r'VALUES ($1, $2, 36.58, 36.17)',
+        [_building, 'Arayüz Testi Binası'],
+      );
+      final report = _newReport(buildingId: _building);
+      await repository.create(report);
+
+      final result = await repository.findDetail(report.id);
+
+      final detail = (result as Success<ReportDetailView?, AppError>).value!;
+      expect(detail.buildingName, 'Arayüz Testi Binası');
+      expect(detail.report.location.buildingId, _building);
+      expect(detail.history.single.status, ReportStatus.yeni);
+    });
+
+    test('findDetail_returnsNull_whenMissing', () async {
+      final result = await repository.findDetail(_reportId(_missingReport));
+
+      expect((result as Success<ReportDetailView?, AppError>).value, isNull);
     });
   }, skip: url == null ? 'DATABASE_URL tanımlı değil' : false);
 }

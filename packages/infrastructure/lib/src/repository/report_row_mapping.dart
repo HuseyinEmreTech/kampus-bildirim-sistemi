@@ -64,6 +64,24 @@ ReportSummary summaryOf(ReportListRow row) => ReportSummary(
   createdAt: row.createdAt,
 );
 
+/// Durum geçmişi satırlarını sırası korunarak domain durumuna çevirir. Bir
+/// satırdaki durum tanınmazsa (ör. elle değiştirilmiş kayıt) `null` döner.
+List<ReportStatusChange>? statusChangesOf(List<StatusChange> rows) {
+  final changes = <ReportStatusChange>[];
+  for (final row in rows) {
+    final status = _valueOrNull(parseReportStatus(row.toStatus));
+    if (status == null) return null;
+    changes.add(
+      ReportStatusChange(
+        status: status,
+        changedAt: row.changedAt,
+        note: row.note,
+      ),
+    );
+  }
+  return changes;
+}
+
 /// Kayıtlı satırdan [Report] kurar; kimlik, durum ve zamanlar korunur. Değerler
 /// yazılırken denetlendiği için kayıtlı satır geçerlidir; yine de bir alan
 /// domain'e uymazsa (ör. elle değiştirilmiş satır) `null` döner.
