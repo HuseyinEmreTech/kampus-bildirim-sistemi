@@ -57,11 +57,12 @@ ReportListItem? reportListItemFromJson(
 }
 
 /// Yer tarifi yoksa bina adı; ikisi de yoksa boş.
-String _placeOf(Map<String, Object?> json) => switch (json) {
-  {'place': final String place} when place.isNotEmpty => place,
-  {'buildingName': final String building} => building,
-  _ => '',
-};
+String _placeOf(Map<String, Object?> json) {
+  final place = json['place'];
+  if (place is String && place.isNotEmpty) return place;
+  final building = json['buildingName'];
+  return building is String ? building : '';
+}
 
 /// Sayfalı yanıtın (`{ items: [...] }`) bildirimlerini okur; biçim farklıysa
 /// ya da bir öğe okunamazsa `null`.
