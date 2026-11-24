@@ -1,7 +1,7 @@
 ---
 title: Skill, Plugin ve Araç Kullanım Günlüğü
 durum: Güncel
-son-guncelleme: 2026-10-31
+son-guncelleme: 2026-11-01
 ---
 
 # Skill, Plugin ve Araç Kullanım Günlüğü
@@ -98,6 +98,7 @@ Not: Bu haftanın günlük raporlarında **skill adı** yazılmamış; tablo ara
 | 2026-10-31 | OpenCode (GLM-5.3 Flash), 4 paralel inceleme temsilcisi (aynı model); `gh` + `python3`, diff/gövde `/tmp` önbelleği | 32 açık PR'ın tek tek incelemesi (110-129, 132, 134-144); ölçüt: AGENTS.md + 11-kod-mimarisi + 05-api-design | PR bekçesi birikmişti; her PR için diff tam okunup Türkçe review yorumu hazırlanırken GitHub'a temsilcinin kendisi yazmadı (gönderi sahibi yaptı) | 23 approve, 8 yorum, 1 değişiklik iste; yorumlar PR'larda | Yorum metninde 2 kelimelik bozuk yazım sonradan görüldü; düzeltme yorumu yazılmadı |
 | 2026-10-31 | OpenCode (GLM-5.3 Flash); `gh api` karşılaştırma (`ffd6d61...d2abbf7`) | #140,#135-144 birleşme sonrası durum taraması; #142 çakışma çözümü | Yeni commit'in onayı düşürmüştü; merge'in PR'ın kendi koduna dokunmadığı dosya düzeyinde doğrulandı | #142 yeniden onaylandı; 135, 141, 143, 144 birleşti | Yok |
 | 2026-10-31 | OpenCode (GLM-5.3 Flash); Obsidian CLI/kasası | PR inceleme turu kaydı (`02 - Proje/PR İnceleme Turu`) | İncelemenin özeti ve durum takibi vault'ta kalsın | Not yazıldı, `Home.md` bağlandı | Obsidian CLI kapalıyken direct dosya yazımı kullanıldı |
+| 2026-11-01 | Claude Code (Claude Opus 5.5); `superpowers:writing-plans`, `obsidian-cli`, `ponytail` | Proje taraması, kalan işler planı, #163-#183, dokümantasyon denetimi | Görev dağılımı ve süreç denetimi | [Kayıt](2026-11-01-gorev-dagilimi-ve-dokumantasyon-denetimi.md) | İki plan kararı kurallarla çelişti ve düzeltildi; #21 kapatma komutu izin denetimine takıldı |
 
 ## Planlanan
 
