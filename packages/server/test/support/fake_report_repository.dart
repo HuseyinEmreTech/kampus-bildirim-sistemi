@@ -73,6 +73,16 @@ class FakeReportRepository implements ReportRepository {
   @override
   Future<Result<Report?, AppError>> findById(ReportId reportId) async =>
       Success(stored);
+
+  /// Detay ucu (#159) gelene kadar yalnızca arayüzü karşılar.
+  @override
+  Future<Result<ReportDetailView?, AppError>> findDetail(
+    ReportId reportId,
+  ) async {
+    final report = stored;
+    if (report == null) return const Success(null);
+    return Success(ReportDetailView(report: report, history: const []));
+  }
 }
 
 /// Kurallara uygun, `Yeni` durumunda örnek bildirim.

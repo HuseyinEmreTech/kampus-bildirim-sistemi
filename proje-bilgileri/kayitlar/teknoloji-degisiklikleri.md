@@ -1,7 +1,7 @@
 ---
 title: Teknoloji Değişiklikleri
 durum: Güncel
-son-guncelleme: 2026-11-01
+son-guncelleme: 2026-11-24
 ---
 
 # Teknoloji Değişiklikleri
@@ -48,6 +48,7 @@ Projede teknoloji yığınına eklenen, değiştirilen veya elenen her şey bura
 | 2026-10-15 | EXIF temizleme (Rule 07) | Seçilmedi | `image` 4.12.0 ile yeniden kodlama (yalnızca pikseller kalır); 25 megapiksel üstü açılmaz | Elle EXIF bölümü kırpmaya göre gizlenmiş içeriği de temizler. Yerel denemede 12 MP, 5,5 MB JPEG yaklaşık 1,7 sn ve 120 MB bellek; sunucuda ölçülmedi |
 | 2026-11-01 | E2E test altyapısı | Yok | Python + pytest + requests (`test/e2e/`); sunucu kapalıyken testler atlanır, seed betiği ve rehber eklendi | QA/E2E ayağı ADR-04 kapsamında; ürün bağımlılığı değil, test aracı. Hüseyin onayı: #132 (2026-11-01) |
 | 2026-10-31 | Sonar kapsam ölçütü | `bin/server.dart` kapsam içi (kapıyı %77,8'e düşürüyordu) | `sonar.coverage.exclusions` ile `bin/*.dart` kapsam dışı | `bin/server.dart` bağlama satırları; birleştirme testi yok. Kabul ölçütü değişti: uç/iş katmanı %80'de kalır, bağlama dosyası hariç |
+| 2026-11-24 | Sonar kapsam ölçütü (web) | `web/js` kapsam içi; tarayıcı testleri LCOV üretmediği için yeni kod kapsamı hep %0 görünüyordu | `sonar.coverage.exclusions`'a `web/js/**` eklendi; kod kokusu, hata ve güvenlik taraması sürüyor, yalnızca kapsam ölçümü dışarıda | Web testleri (`web/tests/index.html`) tarayıcıda koşuyor ve Sonar'a rapor veremiyor. 20 satırı aşan ilk web PR'ı (#194) zorunlu kontrolü bu yüzden kırdı; önceki web PR'ları 20 satır altında kaldığı için kapsam koşulu uygulanmamıştı. Alternatif jsdom + c8 ile Node'da ölçmekti; yeni paket gerektirdiği ve kazancı düşük olduğu için seçilmedi. Web testleri elle ve PR'da tarayıcıda koşulmaya devam eder |
 | 2026-10-31 | C# istatistik servisi | Yok (tek dil: Dart) | `services/rapor-istatistik/`: .NET 10 minimal API, salt okunur PostgreSQL bağlantısı, çekirdeğin JWT'siyle doğrulama; `GET /health`, `GET /api/stats/summary`, CSV dışa aktarma | ADR-04'ün C# ayağı; okuma ağırlıklı işler çekirdekten ayrıldı. Çekirdek veritabanına yazma yok (`default_transaction_read_only=on`). ADR-04 hâlâ "Önerildi"; CI'da `dotnet test` işi henüz yok |
 | 2026-10-31 | Yan servis yerleşimi | Belirsiz | `services/<ad>/` üst düzey klasör; çekirdeğe yalnızca HTTP ile bağlanır, `packages/` altına girmez | Python (`python-report-service`) ve C# servisi aynı düzeni paylaşsın; [kod mimarisi](../11-kod-mimarisi-ve-korumalar.md) bölüm 1-2 güncellendi |
 | 2026-11-01 | Python rapor servisi | Yok | `services/python-report-service/` (FastAPI): çekirdekten `GET /api/reports` sayfalarını okuyup CSV döndürür; çekirdeğe yazma yok, giriş görevli belirteci ile | ADR-04'ün Python ayağı; tek yönlü okuyucu servis. Docker health check, 23+ test, Sonar kapsamı %90. Hüseyin onayı: #129 (2026-11-01) |

@@ -33,6 +33,7 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 | 09 | [Yapay zeka kullanımı](09-ai-usage.md) | Çalışma ilkeleri, review süresi, prompt'lar | Güncel |
 | 10 | [Ekip ve yol haritası](10-ekip-ve-yol-haritasi.md) | Ekip, roller, GitHub kullanımı, 15 haftalık plan | Onaylandı (12.10.2026: 6 kişiye güncellendi) |
 | 11 | [Kod mimarisi ve korumalar](11-kod-mimarisi-ve-korumalar.md) | Paketler, izinli bağımlılıklar, hatayı önleyen korumalar | Onaylandı |
+| - | [Görev adımları](ekip/gorev-adimlari.md) | Issue'dan birleşmeye her adım; kurulum, kanıt, kontrol betiği ve kancalar (harfiyen uygulanır) | Güncel |
 | - | [Başlangıç kuralları](ekip/BASLANGIC_KURALLARI.md) | Her üye için roller, kurallar, onay tablosu | Onaylandı |
 | - | [Uygulama planı: kalan işler](planlar/2026-11-01-kalan-isler.md) | Durum tespiti, kim ne yapıyor, bağımlılık sırası; son tarih yok; 24 Kasım güncellemesi | Güncel |
 | - | [Uygulama planı: teslime kadar](planlar/2026-11-24-teslim-plani.md) | 24 Kasım taramasında bulunan yeni işler (T1-T13), kritik yol, "bitti" tanımı, katkı dengesine göre dağılım, takvim | Güncel |

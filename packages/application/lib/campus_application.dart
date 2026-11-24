@@ -6,6 +6,7 @@ export 'src/dto/assign_report_command.dart';
 export 'src/dto/create_report_command.dart';
 export 'src/dto/list_reports_query.dart';
 export 'src/dto/paginated.dart';
+export 'src/dto/report_detail_view.dart';
 export 'src/dto/report_summary.dart';
 export 'src/dto/resolve_report_command.dart';
 export 'src/repository/report_list_filter.dart';
