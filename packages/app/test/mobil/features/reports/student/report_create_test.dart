@@ -23,6 +23,20 @@ class FakeReportCreator implements ReportCreator {
   }
 }
 
+/// Sonuçları sırayla veren sahte kaynak (art arda iki ret için).
+class SequenceReportCreator implements ReportCreator {
+  SequenceReportCreator(this.results);
+
+  final List<ReportCreateResult> results;
+  final received = <NewReport>[];
+
+  @override
+  Future<ReportCreateResult> create(NewReport report) async {
+    received.add(report);
+    return results.removeAt(0);
+  }
+}
+
 final tinyPng = PickedPhoto(
   bytes: base64Decode(
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
@@ -175,17 +189,22 @@ void main() {
     expect(find.text('Bildirim oluşturuldu'), findsOneWidget);
   });
 
-  testWidgets('showsServerError_whenRejected', (tester) async {
-    final creator = FakeReportCreator(
-      const ReportRejected('Konum kampüs dışında.'),
-    );
+  testWidgets('create_shows400And413Message_andKeepsForm', (tester) async {
+    // Arrange: sunucu önce 400, sonra 413 ile reddeder.
+    final creator = SequenceReportCreator([
+      const ReportRejected('Açıklama en az 5 karakter olmalı.'),
+      const ReportRejected('Fotoğraf en fazla 5 MB olabilir.'),
+    ]);
     await openScreen(tester, creator);
-
     await fillForm(tester, validDescription);
-    await submit(tester);
 
-    expect(find.text('Konum kampüs dışında.'), findsOneWidget);
+    // Act / Assert: her ret mesajı görünür, form ve yazılanlar korunur.
+    await submit(tester);
+    expect(find.text('Açıklama en az 5 karakter olmalı.'), findsOneWidget);
+    await submit(tester);
+    expect(find.text('Fotoğraf en fazla 5 MB olabilir.'), findsOneWidget);
     expect(find.byType(ReportCreateScreen), findsOneWidget);
+    expect(find.text(validDescription), findsOneWidget);
   });
 
   testWidgets('showsValidationError_whenPhotoMissing', (tester) async {
@@ -220,7 +239,7 @@ void main() {
     expect(find.textContaining('Konum seçin'), findsNothing);
   });
 
-  testWidgets('showsValidationError_whenLocationMissing', (tester) async {
+  testWidgets('createScreen_requiresLocation', (tester) async {
     final creator = FakeReportCreator(const ReportCreated());
     await openScreen(tester, creator);
 
