@@ -2,25 +2,35 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../../shared/photo/photo_picker.dart';
 import '../../data/report_assigner.dart';
 import '../../data/report_list_item.dart';
+import '../../data/report_resolver.dart';
 import '../../data/staff_reports_source.dart';
 import '../../state/report_pager.dart';
 import '../student/widgets/report_card.dart';
 import '../widgets/report_list_body.dart';
+import 'resolve_screen.dart';
 
 /// Görevlinin bildirim listesi: "Gelen" ve "Benimkiler" sekmeleri ve kategori
-/// filtresi (USR 04); "Gelen"deki bildirimler buradan üstlenilir (USR 05).
-/// Aşağı kaydırdıkça sonraki sayfa yüklenir.
+/// filtresi (USR 04); "Gelen"deki bildirimler buradan üstlenilir (USR 05),
+/// "Benimkiler"deki üstlenilmiş bildirimler çözülür (USR 06). Aşağı
+/// kaydırdıkça sonraki sayfa yüklenir.
 class StaffReportsScreen extends StatefulWidget {
   const StaffReportsScreen({
     super.key,
     required this.source,
     required this.assigner,
+    required this.resolver,
+    required this.photoPicker,
   });
 
   final StaffReportsSource source;
   final ReportAssigner assigner;
+
+  /// "Çöz" ekranı için (USR 06).
+  final ReportResolver resolver;
+  final PhotoPicker photoPicker;
 
   @override
   State<StaffReportsScreen> createState() => _StaffReportsScreenState();
@@ -83,6 +93,34 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
         .showSnackBar(SnackBar(content: Text(message)));
     if (result is ReportAssignFailed) return;
     await _pager.reload();
+  }
+
+  /// Çözme ekranını açar; çözüldüyse listeyi yeniler.
+  Future<void> _openResolve(String reportId) async {
+    final resolved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => ResolveScreen(
+          reportId: reportId,
+          resolver: widget.resolver,
+          photoPicker: widget.photoPicker,
+        ),
+      ),
+    );
+    if (resolved != true) return;
+    await _pager.reload();
+  }
+
+  /// Yalnızca üstlenilmiş (henüz çözülmemiş) ve kimliği olan bildirimde
+  /// "Çöz".
+  Widget? _buildResolveButton(ReportListItem report) {
+    final reportId = report.id;
+    if (reportId == null || report.status != ReportStatus.ustlenildi) {
+      return null;
+    }
+    return FilledButton.tonal(
+      onPressed: () => _openResolve(reportId),
+      child: const Text('Çöz'),
+    );
   }
 
   /// Kimliği olmayan bildirim üstlenilemez; düğme gösterilmez.
@@ -155,9 +193,10 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
                 },
                 onRefresh: _pager.reload,
                 onRetry: () => unawaited(_pager.reset()),
-                actionBuilder: _view == StaffReportsView.incoming
-                    ? _buildAssignButton
-                    : null,
+                actionBuilder: switch (_view) {
+                  StaffReportsView.incoming => _buildAssignButton,
+                  StaffReportsView.mine => _buildResolveButton,
+                },
                 controller: _scroll,
                 isLoadingMore: _pager.isLoadingMore,
                 loadMoreFailed: _pager.loadMoreFailed,
