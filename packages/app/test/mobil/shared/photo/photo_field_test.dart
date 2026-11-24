@@ -33,18 +33,25 @@ final formKey = GlobalKey<FormState>();
 Future<void> pumpField(
   WidgetTester tester,
   PhotoPicker picker, {
-  bool recoverLost = false,
+  bool? recoverLost,
 }) async {
+  // Değer verilmezse parametre hiç geçilmez: PhotoField'ın kendi varsayılanı
+  // sınanır.
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
         body: Form(
           key: formKey,
-          child: PhotoField(
-            picker: picker,
-            requiredMessage: 'Sonuç fotoğrafı ekleyin',
-            recoverLost: recoverLost,
-          ),
+          child: recoverLost == null
+              ? PhotoField(
+                  picker: picker,
+                  requiredMessage: 'Sonuç fotoğrafı ekleyin',
+                )
+              : PhotoField(
+                  picker: picker,
+                  requiredMessage: 'Sonuç fotoğrafı ekleyin',
+                  recoverLost: recoverLost,
+                ),
         ),
       ),
     ),
