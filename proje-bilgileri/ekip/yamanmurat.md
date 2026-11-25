@@ -1,7 +1,7 @@
 ---
 title: Murat Yaman - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-11-01
+son-guncelleme: 2026-11-26
 ---
 
 # Murat Yaman (@yamanmurat761) - Kişisel Plan
@@ -42,3 +42,4 @@ son-guncelleme: 2026-11-01
 ## Raporlar
 
 - [2026-10-24](raporlar/yamanmurat/2026-10-24.md): Web istemcisi (#90, #99), #99 yapay zeka kaydı, Sonar `javascript:S7721` düzeltmesi
+- [2026-11-26](raporlar/yamanmurat/2026-11-26.md): PR #242 Sonar kapsam düzeltmesi (#209), README mimari diyagram ve çalıştırma (#227)
