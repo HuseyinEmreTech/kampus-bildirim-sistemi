@@ -1,7 +1,7 @@
 ---
 title: Mimari Genel Bakış
-durum: Taslak
-son-guncelleme: 2026-09-30
+durum: Güncel
+son-guncelleme: 2026-11-26
 ---
 
 # Mimari Genel Bakış
@@ -28,23 +28,64 @@ son-guncelleme: 2026-09-30
 
 Paket sürümleri pub.dev üzerinde kontrol edildikten sonra bu tabloya eklenir.
 
-## Katmanlar
+## Bileşenler
 
-`Domain`, `Application`, `Infrastructure`, `Api`.
+İstemciler ve yan servisler Dart çekirdeğinin etrafında durur; oklar isteği başlatandan karşılayana doğrudur. Bütün yazma işleri ve kimlik doğrulama çekirdekte kalır; iki yan servis yalnızca okur ([ADR-04](adr/04-cok-dilli-web-ve-servisler.md)). Aynı diyagram [README §5](../README.md#5-mimari)'te.
 
 ```mermaid
 flowchart LR
-    Api --> Application
-    Infrastructure --> Application
-    Application --> Domain
-    Infrastructure --> Domain
+    subgraph istemci["İstemciler"]
+        mobil["Mobil<br/>Flutter · packages/app"]
+        web["Web<br/>HTML/CSS/JS · web/"]
+    end
+    subgraph cekirdek["Dart çekirdeği (Shelf, :8080)"]
+        server["server<br/>HTTP uçları, kimlik, hata eşleme"]
+        application["application<br/>kullanım senaryoları"]
+        domain["domain<br/>varlıklar ve kurallar"]
+        infrastructure["infrastructure<br/>PostgreSQL ve dosya"]
+        contracts["contracts<br/>istemcinin okuduğu yanıtlar"]
+    end
+    python["Python rapor servisi<br/>FastAPI · :8001"]
+    csharp["C# istatistik servisi<br/>.NET"]
+    db[("PostgreSQL 16")]
+    files[("Fotoğraf klasörü<br/>FILES_DIR")]
+
+    mobil -- "REST/JSON + JWT" --> server
+    web -- "REST/JSON + JWT" --> server
+    python -- "REST/JSON, görevli belirteci" --> server
+    mobil -.-> contracts
+    server --> application
+    server --> infrastructure
+    application --> domain
+    infrastructure --> application
+    infrastructure --> domain
+    infrastructure -- "parametreli SQL" --> db
+    infrastructure --> files
+    csharp -- "salt okunur SQL" --> db
+```
+
+- **Mobil ve web** yalnızca çekirdeğin REST API'siyle konuşur; mobil, yanıt sınıflarını `contracts` paketinden okur.
+- **Python rapor servisi** çekirdek API'yi görevlinin belirteciyle çağırır ve CSV üretir; veritabanına bağlanmaz.
+- **C# istatistik servisi** veritabanını salt okunur bağlantıyla okur, çekirdeğin erişim belirtecini aynı sırla doğrular.
+
+## Katmanlar
+
+Dart çekirdeği dört katmandır: `domain`, `application`, `infrastructure`, `server`. Paket kuralları `test/architecture_test.dart` ile CI'da denetlenir.
+
+```mermaid
+flowchart LR
+    server --> application
+    server --> infrastructure
+    infrastructure --> application
+    application --> domain
+    infrastructure --> domain
 ```
 
 - **Domain:** varlıklar, değer nesneleri, iş kuralları. Hiçbir katmana bağlı değildir.
-- **Application:** kullanım senaryoları (servisler) ve arayüzler (ör. `ReportRepository`, `PhotoStorage`).
+- **Application:** kullanım senaryoları (servisler) ve depo arayüzleri (ör. `ReportRepository`). Fotoğraf saklama `infrastructure` içindeki `LocalFileStorage` ile yapılır; sunucu onu doğrudan kullanır.
 - **Infrastructure:** PostgreSQL ve dosya sistemi gerçeklemeleri.
-- **Api:** HTTP endpoint'leri, kimlik doğrulama, hata eşleme.
-- **Bağlama:** bağımlılıklar `main.dart` içinde verilir; somut sınıfı yalnızca orası bilir.
+- **Server:** HTTP endpoint'leri, kimlik doğrulama, hata eşleme; iş kuralı yazmaz.
+- **Bağlama:** bağımlılıklar `packages/server/bin/server.dart` içinde verilir; somut sınıfı yalnızca orası bilir.
 
 Zengin domain nesnesi: `private` alanlar, doğrulama `Create` fabrika metodunda; geçersiz nesne oluşamaz.
 

@@ -8,7 +8,7 @@
 
 ## Ekip ve çalışma düzeni
 
-Proje ekiple, GitHub üzerinde branch ve Pull Request ile yürütülür. Ders cuma günleri; dönem 15 ders haftası, şu an 5. haftadayız. Ekibe yeni katılan: [Başlangıç rehberi](proje-bilgileri/ekip/00-baslangic-rehberi.md).
+Proje ekiple, GitHub üzerinde branch ve Pull Request ile yürütülür. Ders cuma günleri; dönem 15 ders haftası, son teslim 23 Aralık 2026 ([teslim planı](proje-bilgileri/planlar/2026-11-24-teslim-plani.md)). Ekibe yeni katılan: [Başlangıç rehberi](proje-bilgileri/ekip/00-baslangic-rehberi.md).
 
 | Kişi | GitHub | Rol | Ana sorumluluk |
 | --- | --- | --- | --- |
@@ -93,7 +93,7 @@ Roller: **Student** (bildirim açar, kendi bildirimlerini görür) ve **Staff** 
 
 ## 4. Özellikler ve kapsam
 
-**İlk sürümde olacaklar (planlanan):**
+**İlk sürümde olacaklar:**
 
 - E-posta ve parola ile giriş, iki rol
 - Fotoğraflı ve konumlu sorun bildirimi
@@ -103,34 +103,80 @@ Roller: **Student** (bildirim açar, kendi bildirimlerini görür) ve **Staff** 
 
 **İlk sürümde olmayacaklar:** push bildirimi, puan ve yorum, yeniden açma, kayıt ol ekranı (hesaplar seed veriden), yönetici paneli, otomatik atama, harita ısı görünümü, yapay zeka ile kategori önerisi, çoklu kampüs. Gerekçeler: [kapsam](proje-bilgileri/01-project-scope.md#6-kapsam).
 
-**Bilinçli sadeleştirmeler (kapsam ve ölçek):** tek PostgreSQL veritabanı; dağıtık mikroservis ağı, mesaj kuyruğu ve önbellek yok. Python rapor servisi çekirdek API'ye tek yönlü bağlıdır; transaction gerektiren işler Dart çekirdeğinde kalır.
+**Bilinçli sadeleştirmeler (kapsam ve ölçek):** tek PostgreSQL veritabanı; dağıtık mikroservis ağı, mesaj kuyruğu ve önbellek yok. Python rapor servisi çekirdek API'ye tek yönlü bağlıdır, C# istatistik servisi veritabanını yalnızca okur; transaction gerektiren işler Dart çekirdeğinde kalır.
 
 ## 5. Mimari
 
 ### Bileşenler ve çağrı yönü
 
-(yazılacak, #227)
-
-### Dart çekirdeğinin katmanları
-
-Katmanlı mimari; bağımlılıklar içe doğru akar.
+Oklar isteği başlatandan karşılayana doğrudur. Bütün yazma işleri ve kimlik doğrulama Dart çekirdeğinde kalır; iki yan servis yalnızca okur ([ADR-04](proje-bilgileri/adr/04-cok-dilli-web-ve-servisler.md)).
 
 ```mermaid
 flowchart LR
-    Api --> Application
-    Infrastructure --> Application
-    Application --> Domain
-    Infrastructure --> Domain
+    subgraph istemci["İstemciler"]
+        mobil["Mobil<br/>Flutter · packages/app"]
+        web["Web<br/>HTML/CSS/JS · web/"]
+    end
+    subgraph cekirdek["Dart çekirdeği (Shelf, :8080)"]
+        server["server<br/>HTTP uçları, kimlik, hata eşleme"]
+        application["application<br/>kullanım senaryoları"]
+        domain["domain<br/>varlıklar ve kurallar"]
+        infrastructure["infrastructure<br/>PostgreSQL ve dosya"]
+        contracts["contracts<br/>istemcinin okuduğu yanıtlar"]
+    end
+    python["Python rapor servisi<br/>FastAPI · :8001"]
+    csharp["C# istatistik servisi<br/>.NET"]
+    db[("PostgreSQL 16")]
+    files[("Fotoğraf klasörü<br/>FILES_DIR")]
+
+    mobil -- "REST/JSON + JWT" --> server
+    web -- "REST/JSON + JWT" --> server
+    python -- "REST/JSON, görevli belirteci" --> server
+    mobil -.-> contracts
+    server --> application
+    server --> infrastructure
+    application --> domain
+    infrastructure --> application
+    infrastructure --> domain
+    infrastructure -- "parametreli SQL" --> db
+    infrastructure --> files
+    csharp -- "salt okunur SQL" --> db
+```
+
+| Bileşen | Klasör | Ne yapar |
+| --- | --- | --- |
+| Mobil istemci | `packages/app` (`lib/mobil/`) | Öğrencinin bildirim açtığı, görevlinin üstlenip çözdüğü Flutter uygulaması |
+| Web istemcisi | `web/` | Görevli için bildirim listesi, filtre ve sayfalama; bağımlılıksız HTML/CSS/JS |
+| Sunucu | `packages/server` | HTTP uçları, JWT doğrulama, rol kontrolü, hata eşleme; iş kuralı yazmaz |
+| Application | `packages/application` | Kullanım senaryoları ve depo arayüzleri |
+| Domain | `packages/domain` | Varlıklar, değer nesneleri, Rule 00-07; hiçbir pakete bağlı değil |
+| Infrastructure | `packages/infrastructure` | PostgreSQL depoları ve fotoğraf dosyası gerçeklemeleri |
+| Contracts | `packages/contracts` | İstemcinin okuduğu yanıt sınıfları (#94 ile doluyor) |
+| Python rapor servisi | `services/python-report-service` | Çekirdek API'den görevli listesini okuyup CSV dışa aktarır; veri yazmaz |
+| C# istatistik servisi | `services/rapor-istatistik` | Veritabanını salt okunur bağlantıyla okuyup sayıları ve CSV'yi verir; çekirdeğin JWT'sini aynı sırla doğrular |
+| PostgreSQL 16 | `db/` | Tek veritabanı; şema `db/migrations/` içindeki SQL dosyalarıyla kurulur |
+
+### Dart çekirdeğinin katmanları
+
+Katmanlı mimari; bağımlılıklar içe doğru akar. Paket kuralları `test/architecture_test.dart` ile CI'da denetlenir.
+
+```mermaid
+flowchart LR
+    server --> application
+    server --> infrastructure
+    infrastructure --> application
+    application --> domain
+    infrastructure --> domain
 ```
 
 | Katman | Sorumluluk |
 | --- | --- |
 | Domain | Varlıklar, değer nesneleri, iş kuralları; hiçbir katmana bağlı değil |
-| Application | Kullanım senaryoları (servisler) ve arayüzler (repository, dosya depolama) |
-| Infrastructure | PostgreSQL ve dosya sistemi gerçeklemeleri |
-| Api | HTTP endpoint'leri, kimlik doğrulama, hata eşleme |
+| Application | Kullanım senaryoları (servisler) ve depo arayüzleri (ör. `ReportRepository`) |
+| Infrastructure | PostgreSQL depoları ve fotoğraf saklama (`LocalFileStorage`) |
+| Server | HTTP endpoint'leri, kimlik doğrulama, hata eşleme |
 
-Bağımlılıklar arayüzle verilir; bağlama `main.dart` içinde yapılır. Zengin domain nesnesi: doğrulama `Create` metodunda, geçersiz nesne oluşamaz. İlkeler: SOLID, Clean Code. Ayrıntı: [mimari genel bakış](proje-bilgileri/02-architecture-overview.md).
+Bağımlılıklar arayüzle verilir; bağlama `packages/server/bin/server.dart` içinde yapılır. Zengin domain nesnesi: doğrulama `Create` metodunda, geçersiz nesne oluşamaz. İlkeler: SOLID, Clean Code. Ayrıntı: [mimari genel bakış](proje-bilgileri/02-architecture-overview.md).
 
 ## 6. Teknoloji yığını
 
@@ -205,7 +251,7 @@ Tümü: [güvenlik ve gizlilik](proje-bilgileri/06-security-and-privacy.md). Dem
 
 ## 10. Kurulum ve çalıştırma
 
-Veritabanı kurulumu (compose + migration) hazır. Sunucu iskeleti (`/health`) çalışıyor; istemci tarafında geçici bir kök uygulama var, mobil ve web ekranları `lib/mobil/` ve `lib/web/` altında geliştiriliyor.
+Sırasıyla: veritabanı, Dart sunucusu, ardından istemciler ve yan servisler. Veritabanı, sunucu, web istemcisi ve iki yan servis yerelde çalıştırılabilir. Mobil uygulamanın gerçek giriş noktası #170 ile geliyor; şu an `packages/app/lib/main.dart` yer tutucu.
 
 **Gereksinimler**
 
@@ -312,11 +358,31 @@ aktarma isteği görevli access token'ı gerektirir.
 
 **C# istatistik servisi**
 
-(yazılacak, #227)
+Servis çekirdeğin veritabanını salt okunur bağlantıyla okur ve görevliye sayıları (`GET /api/stats/summary`) ve CSV'yi (`GET /api/stats/export.csv`) verir. Giriş adresi yoktur; çekirdeğin erişim belirtecini aynı sırla doğrular. Gerekenler: .NET SDK 10 ve çalışan veritabanı. Uçlar, sınırlar ve Docker adımları: [servis README'si](services/rapor-istatistik/README.md).
+
+```powershell
+cd services\rapor-istatistik
+$env:DATABASE_URL = "postgres://<kullanici>:<parola>@localhost:5440/campus?sslmode=disable"
+$env:JWT_ACCESS_SECRET = "<.env'deki JWT_ACCESS_SECRET>"
+dotnet run --project src/RaporIstatistik
+dotnet test   # veritabanı gerekmez
+```
+
+Yerel compose'daki PostgreSQL `5440` portunda açılır; servis README'sindeki örnek `5432` başka bir kurulum içindir. Servis `GET /health` ile `200 { "status": "ok" }` döner. Compose'a ve CI'a eklenmesi #168'de.
 
 **Web istemcisi (HTML/CSS/JS)**
 
-(yazılacak, #227)
+Web istemcisi derleme adımı gerektirmez; yalnızca statik bir sunucu yeter. ES modülleri `file://` üzerinden yüklenmez.
+
+```bash
+cd web
+python -m http.server 5500
+# tarayıcıda: http://localhost:5500   (testler: http://localhost:5500/tests/index.html)
+```
+
+- Sunucu adresi `web/js/config.js` içindeki `API_BASE_URL` (varsayılan `http://localhost:8080`). Çekirdek CORS başlığı gönderdiği için web farklı porttan açılabilir.
+- Seed'deki görevli hesaplarıyla giriş yapılır (parola `Demo.1234`); liste yalnızca görevliye açıktır.
+- Ayrıntı ve sunucuyla sözleşme: [web README'si](web/README.md).
 
 **Canlı ortam (sunucu + veritabanı konteynerde)**
 
@@ -336,23 +402,28 @@ docker compose -f compose.prod.yaml up -d --build
 
 Fotoğraflar `files` adlı kalıcı diskte (`/data/files`) durur. HTTPS (Caddy) dağıtım kararından sonra eklenecek.
 
-**Mobil / Web istemci**
+**Mobil istemci**
 
 ```bash
 cd packages/app
-flutter run --target lib/main.dart   # geçici kök uygulama
+flutter run --target lib/main.dart   # şu an yer tutucu ekran açılır
 ```
 
-Mobil ekranlar `lib/mobil/`, web ekranlar `lib/web/` altında geliştiriliyor. Platforma özgü gerçek giriş noktası Hafta 6'da eklenecek.
+Mobil ekranlar `lib/mobil/` altında. Uygulama kabuğu, gerçek giriş ve sunucuya bağlanan HTTP kaynakları #170, #171 ve #172 ile geliyor; o zamana kadar ekranlar yalnızca bellekteki demo verisiyle çalışır. `lib/web/` altındaki Flutter Web kodu donduruldu (web yüzeyi `web/`), silinmesi #222'de.
 
-**Yapılandırma (planlanan)**
+**Yapılandırma**
+
+Sunucu ortam değişkenleri; örnek değerler `.env.example`'da.
 
 | Değişken | Varsayılan | Açıklama |
 | --- | --- | --- |
-| `DATABASE_URL` | (yok) | PostgreSQL bağlantı adresi; havuz boyutu ve zaman aşımları adresin sonundaki ayarlarla verilir (`.env.example`) |
-| `PORT` | `8080` | Sunucu portu |
-| `CAMPUS_BOUNDS` | (yok) | Kampüs sınırı (dikdörtgen koordinatları) |
+| `DATABASE_URL` | (yok) | PostgreSQL bağlantı adresi; havuz boyutu ve zaman aşımları adresin sonundaki ayarlarla verilir. Tanımlı değilse sunucu açılmaz |
+| `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | (yok) | Belirteç sırları; en az 32 karakter ve birbirinden farklı. Tanımlı değilse sunucu açılmaz |
 | `FILES_DIR` | (yok) | Fotoğrafların saklanacağı klasör; tanımlı değilse sunucu açılmaz (canlıda `/data/files`) |
+| `CAMPUS_SW_LAT`, `CAMPUS_SW_LNG`, `CAMPUS_NE_LAT`, `CAMPUS_NE_LNG` | (yok) | Kampüs sınırı dikdörtgeninin güneybatı ve kuzeydoğu köşeleri (Rule 06). Okuyan kod `packages/infrastructure` içinde hazır, sunucuya bağlanması #164'te; şu an sunucu bu değişkenleri okumuyor. Gerçek kampüs sınırı doğrulanmadı |
+| `TRUSTED_PROXIES` | boş | Sunucu bir ters proxy arkasındaysa proxy IP'leri, virgülle; istek sınırı gerçek istemci IP'sini buradan okur |
+
+Sunucu portu kodda sabittir (`8080`); canlı ortamda dışarı açılan port `compose.prod.yaml`'daki `SERVER_PORT` ile değişir. Seed'deki fotoğraf adresleri diskte yok; yerel demo için örnek fotoğraflar #202 ile geliyor.
 
 Ortam ayrıntısı: [geliştirme ortamı](proje-bilgileri/07-development-environment.md).
 
