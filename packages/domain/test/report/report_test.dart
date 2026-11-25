@@ -98,7 +98,7 @@ void main() {
       expect(result, isA<Failure<Report, DomainError>>());
     });
 
-    test('invalidCategory_returnsInvalidDescription', () {
+    test('invalidCategory_returnsInvalidCategory', () {
       final result = Report.create(
         reporterId: reporterId,
         category: 'Yok',
@@ -111,7 +111,7 @@ void main() {
         locationSource: 'Gps',
         createdAt: now,
       );
-      expect(result, isA<Failure<Report, DomainError>>());
+      expect((result as Failure).error, isA<InvalidCategory>());
     });
   });
 
@@ -212,7 +212,7 @@ void main() {
       expect(result, isA<Failure<Report, DomainError>>());
     });
 
-    test('longNote_returnsInvalidDescription', () {
+    test('longNote_returnsInvalidResolutionNote', () {
       final result = assignedReport().resolve(
         assigneeId: staffId,
         role: Role.staff,
@@ -220,7 +220,7 @@ void main() {
         resolvedAt: now,
         note: 'a' * 501,
       );
-      expect(result, isA<Failure<Report, DomainError>>());
+      expect((result as Failure).error, isA<InvalidResolutionNote>());
     });
   });
 
