@@ -108,7 +108,14 @@ staged_kontrol() {
 dal_kontrol() {
   local dal
   dal="${GOREV_DAL:-$(git rev-parse --abbrev-ref HEAD)}"
-  echo "Görev kontrolü: $dal ($TABAN ile karşılaştırılıyor)"
+  # Denetlenen uç: yerelde başka bir daldayken GOREV_DAL verilirse origin/<dal>.
+  # CI'da HEAD ayrık (PR'ın kendisi) olduğu için HEAD kalır.
+  local uc=HEAD su_an
+  su_an=$(git rev-parse --abbrev-ref HEAD)
+  if [ "$su_an" != HEAD ] && [ "$su_an" != "$dal" ] && git rev-parse --verify -q "origin/$dal" >/dev/null; then
+    uc="origin/$dal"
+  fi
+  echo "Görev kontrolü: $dal ($TABAN ile karşılaştırılıyor; uç: $uc)"
 
   if ! git rev-parse --verify -q "$TABAN" >/dev/null; then
     hata "$TABAN bulunamadı; önce git fetch origin"
@@ -122,23 +129,23 @@ dal_kontrol() {
   fi
 
   local sayi
-  sayi=$(git rev-list --count "$TABAN..HEAD")
+  sayi=$(git rev-list --count "$TABAN..$uc")
   if [ "$sayi" -eq 0 ]; then
     uyar "$TABAN'a göre yeni commit yok"
     return
   fi
 
-  if ! git merge-base --is-ancestor "$TABAN" HEAD; then
+  if ! git merge-base --is-ancestor "$TABAN" "$uc"; then
     uyar "Dal güncel $TABAN'ı içermiyor; PR'dan önce: git fetch origin && git rebase $TABAN"
   fi
 
   echo "Commit mesajları ($sayi):"
   while IFS= read -r konu; do
     mesaji_denetle "$konu"
-  done < <(git log --reverse --format='%s' "$TABAN..HEAD")
+  done < <(git log --reverse --format='%s' "$TABAN..$uc")
 
   local dosyalar
-  dosyalar=$(git diff --name-only --diff-filter=ACMR "$TABAN...HEAD")
+  dosyalar=$(git diff --name-only --diff-filter=ACMR "$TABAN...$uc")
   local kod_dosyalari
   kod_dosyalari=$(printf '%s\n' "$dosyalar" | grep -Ev "$DOKUMAN_RE" | grep -v '^$' || true)
 
@@ -147,11 +154,11 @@ dal_kontrol() {
     tamam "Yalnızca doküman/yapılandırma değişmiş; kırmızı test adımı aranmıyor"
   else
     local ilk_test ilk_kod
-    ilk_test=$(git log --reverse --format='%h %s' "$TABAN..HEAD" | grep -E '^[0-9a-f]+ test(\([^)]+\))?: ' | head -1)
-    ilk_kod=$(git log --reverse --format='%h %s' "$TABAN..HEAD" | grep -E '^[0-9a-f]+ (feat|fix|refactor)(\([^)]+\))?: ' | head -1)
+    ilk_test=$(git log --reverse --format='%h %s' "$TABAN..$uc" | grep -E '^[0-9a-f]+ test(\([^)]+\))?: ' | head -1)
+    ilk_kod=$(git log --reverse --format='%h %s' "$TABAN..$uc" | grep -E '^[0-9a-f]+ (feat|fix|refactor)(\([^)]+\))?: ' | head -1)
     if [ -z "$ilk_test" ]; then
       gecmis "Kod değişmiş ama test: commit'i yok. Önce kabul ölçütündeki testi yaz, kırmızı gör, test: önekiyle commit et"
-    elif [ -n "$ilk_kod" ] && [ "$(git log --reverse --format='%h' "$TABAN..HEAD" | grep -n "^${ilk_test%% *}" | cut -d: -f1)" -gt "$(git log --reverse --format='%h' "$TABAN..HEAD" | grep -n "^${ilk_kod%% *}" | cut -d: -f1)" ]; then
+    elif [ -n "$ilk_kod" ] && [ "$(git log --reverse --format='%h' "$TABAN..$uc" | grep -n "^${ilk_test%% *}" | cut -d: -f1)" -gt "$(git log --reverse --format='%h' "$TABAN..$uc" | grep -n "^${ilk_kod%% *}" | cut -d: -f1)" ]; then
       gecmis "İlk test: commit'i ($ilk_test) ilk kod commit'inden ($ilk_kod) sonra geliyor; test önce yazılmalı"
     else
       tamam "Kırmızı test commit'i: $ilk_test"
@@ -172,16 +179,16 @@ dal_kontrol() {
   fi
 
   echo "Kod kuralları (adım 9):"
-  farki_denetle "$(git diff -U0 --diff-filter=ACMR "$TABAN...HEAD")" "$dosyalar"
+  farki_denetle "$(git diff -U0 --diff-filter=ACMR "$TABAN...$uc")" "$dosyalar"
   dart_bicim "$dosyalar"
 
   echo
   echo "Adım kanıtı taslağı (PR açıklamasına kopyala, eksikleri doldur):"
   echo "4. Dal: $dal"
-  echo "5. Kırmızı test commit'i: $(git log --reverse --format='%h %s' "$TABAN..HEAD" | grep -E '^[0-9a-f]+ test' | head -1)"
-  echo "6. Yeşil commit: $(git log --reverse --format='%h %s' "$TABAN..HEAD" | grep -E '^[0-9a-f]+ (feat|fix)' | head -1)"
+  echo "5. Kırmızı test commit'i: $(git log --reverse --format='%h %s' "$TABAN..$uc" | grep -E '^[0-9a-f]+ test' | head -1)"
+  echo "6. Yeşil commit: $(git log --reverse --format='%h %s' "$TABAN..$uc" | grep -E '^[0-9a-f]+ (feat|fix)' | head -1)"
   echo "8. git diff --stat:"
-  git diff --stat "$TABAN...HEAD" | tail -1
+  git diff --stat "$TABAN...$uc" | tail -1
 }
 
 pr_kontrol() {
@@ -224,7 +231,12 @@ pr_kontrol() {
   done
   if printf '%s\n' "$govde" | grep -q '^## Adım kanıtı'; then
     local bos
-    bos=$(printf '%s\n' "$govde" | sed -n '/^## Adım kanıtı/,/^## /p' | grep -Ec '^[0-9]+\. [^:]*:[[:space:]]*$' || true)
+    # "N. Ad:" satırı, altında girintili madde yoksa boştur.
+    bos=$(printf '%s\n' "$govde" | tr -d '\r' | sed -n '/^## Adım kanıtı/,/^## /p' | awk '
+      bekle && /^[[:space:]]+[^[:space:]]/ { bekle = 0; next }
+      { if (bekle) n++; bekle = 0 }
+      /^[0-9]+\. [^:]*:[[:space:]]*$/ { bekle = 1 }
+      END { if (bekle) n++; print n + 0 }')
     if [ "$bos" -gt 0 ]; then
       hata "Adım kanıtında $bos boş satır var"
     else
