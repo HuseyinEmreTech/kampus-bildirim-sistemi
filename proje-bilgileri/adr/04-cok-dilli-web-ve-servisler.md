@@ -82,10 +82,11 @@ son-guncelleme: 2026-11-01
 
 - Hoca mikroservisi **zorunlu** mu tutuyor, yoksa "deneyin" mi diyor?
 - Python/C# servisleri teslim kapsamında mı, yoksa deneme/retrospektif mi?
-- Web istemcisi Flutter Web'in yerini mi alacak, yoksa yanında mı duracak?
+- ~~Web istemcisi Flutter Web'in yerini mi alacak, yoksa yanında mı duracak?~~ Öneri (2026-11-01): yerini alır, `lib/web/` dondurulur ([plan](../planlar/2026-11-01-kalan-isler.md)).
 
 ## Değişiklik geçmişi
 
 | Tarih | Değişiklik |
 | --- | --- |
 | 2026-10-21 | İlk taslak. ADR-03'ün yerini kısmen alır; çekirdek Dart, kenarlar çok dilli. |
+| 2026-11-01 | Web yüzeyi önerisi: HTML/JS istemcisi Flutter Web'in yerini alır; `lib/web/` dondurulur. |
