@@ -10,6 +10,12 @@ void main() {
     test('invalidCategory_returnsFailure', () {
       expect(parseCategory('Yok'), isA<Failure<Category, DomainError>>());
     });
+
+    // #209: kategori hatası açıklama hatası gibi görünmesin.
+    test('invalidCategory_returnsInvalidCategory', () {
+      final result = parseCategory('Yok');
+      expect((result as Failure).error, isA<InvalidCategory>());
+    });
   });
 
   group('parseRole', () {

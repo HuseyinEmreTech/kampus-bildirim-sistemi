@@ -145,6 +145,32 @@ void main() {
     expect(photos.saved, isEmpty);
   });
 
+  // #209: veritabanı notu VARCHAR(500) tutuyor; uzun not 500 değil 400 dönmeli.
+  test('resolve_note501Chars_returns400', () async {
+    final res = await app(
+      _resolve(staffToken, [
+        textPart('note', 'a' * 501),
+        filePart('resolutionPhoto', 'image/jpeg', jpeg),
+      ]),
+    );
+
+    expect(res.statusCode, 400);
+    expect((await _errorOf(res))['details'], 'note');
+    expect(reports.lastResolve, isNull);
+  });
+
+  test('resolve_note500Chars_returns200', () async {
+    final res = await app(
+      _resolve(staffToken, [
+        textPart('note', 'a' * 500),
+        filePart('resolutionPhoto', 'image/jpeg', jpeg),
+      ]),
+    );
+
+    expect(res.statusCode, 200);
+    expect(reports.lastResolve?.note, 'a' * 500);
+  });
+
   test('resolve_withoutToken_returns401', () async {
     final res = await app(_resolve(null, []));
 

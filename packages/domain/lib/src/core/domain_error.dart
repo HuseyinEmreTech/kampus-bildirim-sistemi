@@ -34,6 +34,22 @@ final class InvalidDescription extends DomainError {
   final String reason;
 }
 
+final class InvalidPlace extends DomainError {
+  const InvalidPlace(this.reason);
+
+  final String reason;
+}
+
+final class InvalidCategory extends DomainError {
+  const InvalidCategory();
+}
+
+final class InvalidResolutionNote extends DomainError {
+  const InvalidResolutionNote(this.reason);
+
+  final String reason;
+}
+
 final class InvalidId extends DomainError {
   const InvalidId(this.reason);
 
