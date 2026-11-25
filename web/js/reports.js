@@ -34,14 +34,17 @@ export function totalPages(total, pageSize) {
   return Math.max(1, Math.ceil(total / pageSize));
 }
 
-/** /api/buildings yanıtı { items } biçimindedir; düz dizi de kabul edilir. */
+/** /api/buildings yanıtı { items } biçimindedir (building_endpoints.dart). */
 export function normalizeBuildings(data) {
-  if (Array.isArray(data)) return data;
   return Array.isArray(data?.items) ? data.items : [];
 }
 
-/** Sunucu bina süzgecini destekleyene dek (#160) seçimi kapatır. */
-export function markBuildingFilterPending(select) {}
+/** Sunucu bina süzgecini destekleyene dek (#160) seçimi kapatır; liste değişmeyince hata sanılmasın. */
+export function markBuildingFilterPending(select) {
+  select.value = '';
+  select.disabled = true;
+  select.closest('label')?.append(element('span', 'muted', ' (yakında)'));
+}
 
 function element(tag, className, text) {
   const node = document.createElement(tag);

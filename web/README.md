@@ -36,4 +36,4 @@ Statik sunucu açıkken tarayıcıda `tests/index.html` sayfasını aç. Sonuç 
 - `GET /api/reports` yanıtı `{ items, page, pageSize, total }`; her bildirimde konum düz `place` ve `buildingName` alanlarıyla gelir (`packages/server/lib/src/mapper/report_mapper.dart`). Kartta önce `place`, yoksa bina adı gösterilir.
 - `GET /api/buildings` yanıtı `{ items: [{ buildingId, name, ... }] }`.
 - Liste yalnızca görevli rolüne açıktır; öğrenci girerse `403` için "yalnızca görevliler" mesajı gösterilir.
-- **Bina filtresi sunucuda yok:** istemci `buildingId` gönderir, ama çekirdek bu parametreyi henüz tanımadığı için bütün bildirimler gelir. Sunucu tarafı #160'ta.
+- **Bina filtresi sunucuda yok:** çekirdek `buildingId` parametresini henüz tanımıyor (sunucu tarafı #160'ta). Bina seçimi bu yüzden kapalı ve yanında "(yakında)" yazar; #160 birleşince `reports-page.js`'teki `markBuildingFilterPending` çağrısı kaldırılır.

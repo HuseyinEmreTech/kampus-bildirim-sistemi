@@ -2,6 +2,7 @@ import { reportQuery } from './api.js';
 import {
   CATEGORY_LABELS,
   STATUS_LABELS,
+  markBuildingFilterPending,
   normalizeBuildings,
   readFilters,
   renderPagination,
@@ -51,7 +52,9 @@ async function loadBuildings() {
   if (!result.ok) return;
   const buildings = normalizeBuildings(result.data);
   addOptions(form.buildingId, buildings.map((b) => [b.buildingId, b.name]));
-  form.buildingId.value = filters.buildingId;
+  // #160 birleşince bu iki satır kalkar ve seçili bina yeniden adresten okunur.
+  markBuildingFilterPending(form.buildingId);
+  filters = { ...filters, buildingId: '' };
 }
 
 function start() {
