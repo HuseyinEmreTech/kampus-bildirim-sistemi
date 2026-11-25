@@ -107,6 +107,12 @@ Roller: **Student** (bildirim açar, kendi bildirimlerini görür) ve **Staff** 
 
 ## 5. Mimari
 
+### Bileşenler ve çağrı yönü
+
+(yazılacak, #227)
+
+### Dart çekirdeğinin katmanları
+
 Katmanlı mimari; bağımlılıklar içe doğru akar.
 
 ```mermaid
@@ -303,6 +309,14 @@ python -m app
 
 Servis `http://localhost:8001/health` adresinde health check sunar. CSV dışa
 aktarma isteği görevli access token'ı gerektirir.
+
+**C# istatistik servisi**
+
+(yazılacak, #227)
+
+**Web istemcisi (HTML/CSS/JS)**
+
+(yazılacak, #227)
 
 **Canlı ortam (sunucu + veritabanı konteynerde)**
 
