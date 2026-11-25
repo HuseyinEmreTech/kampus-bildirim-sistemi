@@ -52,11 +52,21 @@ final class ReportResolveUseCase {
         return Failure(mapDomainError(error));
     }
 
+    // Depo notu doğrudan yazar; sınır burada denetlenmezse veritabanı
+    // VARCHAR(500) hatası 500 olarak döner (#209).
+    final String? note;
+    switch (Report.parseResolutionNote(command.note)) {
+      case Success(value: final value):
+        note = value;
+      case Failure(error: final error):
+        return Failure(mapDomainError(error));
+    }
+
     return _repository.resolve(
       mutation.reportId,
       mutation.assigneeId,
       photo,
-      note: command.note,
+      note: note,
     );
   }
 }
