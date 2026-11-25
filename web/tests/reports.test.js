@@ -4,6 +4,7 @@ import {
   renderReportList,
   renderPagination,
   normalizeBuildings,
+  markBuildingFilterPending,
 } from '../js/reports.js';
 import { test, assertEqual, assertTrue } from './harness.js';
 
@@ -31,11 +32,26 @@ test('toplam sayfa sayısı en az 1 olur', () => {
   assertEqual(totalPages(41, 20), 3);
 });
 
-test('bina listesi dizi veya items biçiminde kabul edilir', () => {
+test('bina listesi sunucunun { items } biçiminden okunur', () => {
   const raw = [{ buildingId: 'b1', name: 'A Blok' }];
-  assertEqual(normalizeBuildings(raw), raw);
   assertEqual(normalizeBuildings({ items: raw }), raw);
+  assertEqual(normalizeBuildings(raw), [], 'düz dizi sunucu biçimi değil');
   assertEqual(normalizeBuildings(null), []);
+});
+
+// Sunucu buildingId süzgecini #160 gelene dek tanımıyor; seçen kişi liste değişmeyince hata sanmasın.
+test('bina süzgeci sunucu desteklemeyene dek devre dışı ve "yakında" yazar', () => {
+  const label = document.createElement('label');
+  label.textContent = 'Bina';
+  const select = document.createElement('select');
+  select.add(new Option('Tümü', ''));
+  select.add(new Option('A Blok', 'b1'));
+  select.value = 'b1';
+  label.append(select);
+  markBuildingFilterPending(select);
+  assertEqual(select.disabled, true);
+  assertEqual(select.value, '');
+  assertTrue(label.textContent.includes('yakında'), `etiket: ${label.textContent}`);
 });
 
 test('bildirimler kart olarak çizilir, etiketler Türkçedir', () => {

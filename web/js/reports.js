@@ -40,6 +40,9 @@ export function normalizeBuildings(data) {
   return Array.isArray(data?.items) ? data.items : [];
 }
 
+/** Sunucu bina süzgecini destekleyene dek (#160) seçimi kapatır. */
+export function markBuildingFilterPending(select) {}
+
 function element(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
