@@ -120,3 +120,4 @@ son-guncelleme: 2026-11-01
 - [2026-10-16](raporlar/yusufekenel/2026-10-16.md): Giriş ekranı ve oturum durumu, gh kurulumu
 - [2026-10-21](raporlar/yusufekenel/2026-10-21.md): #84-86 ve #89 birleşti; oturum durumu ve Üstlen + filtre PR'ları hazırlandı
 - [2026-10-22](raporlar/yusufekenel/2026-10-22.md): Haftalık görev durumu tablosu, plandaki kutular işaretlendi
+- [2026-11-25](raporlar/yusufekenel/2026-11-25.md): #195/#199/#200 güncellendi, görev adımları, #170 kabuk zinciri hazırlandı

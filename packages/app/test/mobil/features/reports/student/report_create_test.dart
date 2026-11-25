@@ -213,6 +213,27 @@ void main() {
     expect(creator.received, isEmpty);
   });
 
+  testWidgets('errors_clear_whenFieldsFixed_afterFailedSubmit', (tester) async {
+    // Arrange: boş formla gönderilince uyarılar çıkar.
+    await openScreen(tester, FakeReportCreator(const ReportCreated()));
+    await submit(tester);
+    expect(find.text('Açıklama en az 5 karakter olmalı'), findsOneWidget);
+    expect(find.text('Fotoğraf ekleyin'), findsOneWidget);
+    expect(find.text('Kategori seçin'), findsOneWidget);
+
+    // Act: alanlar düzeltilir, yeniden gönderilmez.
+    await tester.tap(find.text('Temizlik'));
+    await tester.enterText(field('Açıklama'), validDescription);
+    await tapVisible(tester, 'Fotoğraf çek');
+    await tapVisible(tester, 'Konumumu al');
+
+    // Assert: uyarılar hemen kalkar.
+    expect(find.text('Açıklama en az 5 karakter olmalı'), findsNothing);
+    expect(find.text('Fotoğraf ekleyin'), findsNothing);
+    expect(find.text('Kategori seçin'), findsNothing);
+    expect(find.textContaining('Konum seçin'), findsNothing);
+  });
+
   testWidgets('showsValidationError_whenLocationMissing', (tester) async {
     final creator = FakeReportCreator(const ReportCreated());
     await openScreen(tester, creator);
