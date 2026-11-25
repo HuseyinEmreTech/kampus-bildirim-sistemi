@@ -131,4 +131,21 @@ void main() {
 
     expect(find.text('Gönderilemedi, tekrar deneyin'), findsOneWidget);
   });
+
+  testWidgets('photoError_clears_whenPhotoAdded_afterFailedSubmit', (
+    tester,
+  ) async {
+    // Arrange: fotoğrafsız gönderilince uyarı çıkar.
+    final resolver = FakeResolver(const ReportResolved());
+    await openScreen(tester, resolver);
+    await submit(tester);
+    expect(find.text('Sonuç fotoğrafı ekleyin'), findsOneWidget);
+
+    // Act: fotoğraf eklenir, yeniden gönderilmez.
+    await addPhoto(tester);
+
+    // Assert: uyarı hemen kalkar.
+    expect(find.text('Sonuç fotoğrafı ekleyin'), findsNothing);
+    expect(resolver.received, isEmpty);
+  });
 }

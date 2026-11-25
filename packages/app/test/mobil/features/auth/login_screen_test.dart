@@ -111,4 +111,29 @@ void main() {
 
     expect(passwordTop.dy - emailBottom.dy, greaterThanOrEqualTo(12));
   });
+
+  testWidgets('errors_clear_whenFieldsFixed_afterFailedSubmit', (tester) async {
+    // Arrange: hatalı e-posta ve kısa şifreyle gönderilince uyarılar çıkar.
+    final source = FakeAuthSource(const LoginSucceeded(session));
+    await pumpScreen(tester, source);
+    await login(tester, 'ayse', '123');
+    expect(find.text('Geçerli bir e-posta girin'), findsOneWidget);
+    expect(find.text('Şifre en az 6 karakter olmalı'), findsOneWidget);
+
+    // Act: alanlar düzeltilir, yeniden gönderilmez.
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'E-posta'),
+      'ayse@ornek.edu',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Şifre'),
+      'parola1',
+    );
+    await tester.pump();
+
+    // Assert: uyarılar hemen kalkar.
+    expect(find.text('Geçerli bir e-posta girin'), findsNothing);
+    expect(find.text('Şifre en az 6 karakter olmalı'), findsNothing);
+    expect(source.calls, 0);
+  });
 }
