@@ -1,7 +1,7 @@
 ---
 title: Campus Report - Proje Dokümantasyonu
 durum: Taslak
-son-guncelleme: 2026-10-17
+son-guncelleme: 2026-11-24
 ---
 
 # Campus Report: Proje Dokümantasyonu
@@ -16,7 +16,7 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 1. Proje ne ve neden: [Proje kapsamı ve amacı](01-project-scope.md)
 2. Bu hafta ne oldu: [Haftalık kayıtlar](haftalik/00-haftalik-index.md)
 3. Ekibe yeni katıldıysan: [Başlangıç rehberi](ekip/00-baslangic-rehberi.md)
-4. Kim ne yapıyor: [Ekip ve yol haritası](10-ekip-ve-yol-haritasi.md)
+4. Kim ne yapıyor: [Teslim planı](planlar/2026-11-24-teslim-plani.md), [Kalan işler planı](planlar/2026-11-01-kalan-isler.md), [Ekip ve yol haritası](10-ekip-ve-yol-haritasi.md)
 
 ## Tasarım dokümanları
 
@@ -33,7 +33,10 @@ Kampüs sorun bildirim sistemi. Öğrenci kampüste gördüğü sorunu fotoğraf
 | 09 | [Yapay zeka kullanımı](09-ai-usage.md) | Çalışma ilkeleri, review süresi, prompt'lar | Güncel |
 | 10 | [Ekip ve yol haritası](10-ekip-ve-yol-haritasi.md) | Ekip, roller, GitHub kullanımı, 15 haftalık plan | Onaylandı (12.10.2026: 6 kişiye güncellendi) |
 | 11 | [Kod mimarisi ve korumalar](11-kod-mimarisi-ve-korumalar.md) | Paketler, izinli bağımlılıklar, hatayı önleyen korumalar | Onaylandı |
+| - | [Görev adımları](ekip/gorev-adimlari.md) | Issue'dan birleşmeye her adım; kurulum, kanıt, kontrol betiği ve kancalar (harfiyen uygulanır) | Güncel |
 | - | [Başlangıç kuralları](ekip/BASLANGIC_KURALLARI.md) | Her üye için roller, kurallar, onay tablosu | Onaylandı |
+| - | [Uygulama planı: kalan işler](planlar/2026-11-01-kalan-isler.md) | Durum tespiti, kim ne yapıyor, bağımlılık sırası; son tarih yok; 24 Kasım güncellemesi | Güncel |
+| - | [Uygulama planı: teslime kadar](planlar/2026-11-24-teslim-plani.md) | 24 Kasım taramasında bulunan yeni işler (T1-T13), kritik yol, "bitti" tanımı, katkı dengesine göre dağılım, takvim | Güncel |
 | - | [Uygulama planı: repo iskeleti](planlar/2026-10-02-repo-iskeleti.md) | Hafta 4'ün ilk işi, adım adım | Onay bekliyor |
 | - | [ADR-01: Dart backend ve PostgreSQL](adr/01-dart-backend-postgresql.md) | Geri dönülmesi zor karar | Önerildi |
 | - | [ADR-02: Kod kalitesi aracı](adr/02-kalite-araci-sonarqube-cloud.md) | SonarQube Cloud ve yerel analiz kararı, karşılaştırma matrisi | Önerildi |
@@ -59,6 +62,7 @@ Projede olan biten her şey bu kayıtlarda tutulur.
 | [23 Ekim 2026 - SQL incelemesi](kayitlar/2026-10-23-sql-inceleme.md) | Migration ve sorguların ölçümlü incelemesi (50.000 bildirim): yavaş sorgu yok, gizli riskler ve öneriler |
 | [25-26 Ekim 2026 - PR inceleme notları](kayitlar/2026-10-26-pr-inceleme-notlari.md) | 21 açık PR'ın inceleme sonucu, kime ne yazıldığı ve gerekçeleri |
 | [1 Kasım 2026 - PR inceleme ve birleştirme turu](kayitlar/2026-11-01-pr-inceleme-ve-birlesme.md) | 40+ PR'ın tek tek incelenmesi, zincir rebase'leri, kurtarma PR'ları ve süreç önlemleri |
+| [1 Kasım 2026 - Görev dağılımı ve dokümantasyon denetimi](kayitlar/2026-11-01-gorev-dagilimi-ve-dokumantasyon-denetimi.md) | Durum tespiti, kararlar, ekip genelinde dokümantasyon denetimi ve herkesten istenenler |
 
 ## Dokümantasyon kuralları
 
@@ -91,11 +95,16 @@ Bu dokümanların güncel kalması projenin bir parçasıdır.
 | Takım büyüklüğü ve süre | 6 kişi (hoca dağıttı), 15 ders haftası | Kabul ([ekip](10-ekip-ve-yol-haritasi.md)) |
 | Konum alma | GPS; izin yoksa bina listesi | Kabul ([mimari](11-kod-mimarisi-ve-korumalar.md#5-konum)) |
 | Çözümde sonuç fotoğrafı | Zorunlu | Kabul |
-| Sunum ve teslim tarihleri | Hafta 9 ve 15 varsayımı | Hoca'ya sorulacak |
+| Teslim tarihi | 23 Aralık 2026 00:00; erişilebilir GitHub adresi paylaşılır. Teslim adayı 20 Aralık, gönderim 22 Aralık ([teslim planı](planlar/2026-11-24-teslim-plani.md)) | Kabul (hoca duyurusu, 24 Kasım) |
+| Sunum tarihleri | 2. sunum tarihi ve biçimi | Hoca'ya sorulacak |
 | Kampüs sınırı koordinatları | Yapılandırma dosyasında dikdörtgen | Açık |
 | `OUTSIDE_CAMPUS` HTTP durumu | `422` | Öneri |
 | Görevlinin üstlendikleri listesi | `assignee=me` filtresi | Öneri |
 | Fotoğraf saklama | Sunucu diski, veritabanında yol | Öneri |
 | Hesap oluşturma | İlk sürümde seed veri, kayıt ekranı yok | Öneri |
 | Dart için kalite aracı | SonarQube Cloud Free ve yerel `dart analyze` ([ADR-02](adr/02-kalite-araci-sonarqube-cloud.md)) | Hoca görüşü bekleniyor |
+| Web yüzeyi | HTML/JS istemcisi (`web/`); `lib/web/` Flutter Web dondurulur | Öneri ([plan](planlar/2026-11-01-kalan-isler.md)) |
+| Demo verisi canlı ortamda | Yüklenmez. Demo yerel ağda ve seed verisiyle yapılır; canlıda hesaplar `db/hesap/hesap-ekle.sql` ile açılır. Neden: seed parolası açık repoda yazılı, herkese açık sunucuda bu parolayla görevli hesabı olması herkesin görevli olarak girebilmesi demek | Kabul (24 Kasım, #202/#203 yorumları) |
+| Web JS için Sonar kapsamı | `web/js/**` kapsam ölçümünden çıkarıldı; kod kokusu ve güvenlik taraması sürüyor. Neden: web testleri tarayıcıda koşuyor, LCOV üretmiyor; kapsam hep %0 görünüyor ve 20 satırı aşan her web PR'ı zorunlu kontrolü kırıyordu | Kabul ([#208](kayitlar/teknoloji-degisiklikleri.md)) |
+| E2E işinin zorunlu kontrol olması | #204 birleşip birkaç kez yeşil koştuktan sonra `E2E (PostgreSQL 16)` zorunlu kontrollere eklenir. Neden: zorunlu değilse kırmızı E2E birleşmeyi durdurmaz | Öneri |
 | Bilgi grafiği aracı (Graphify) | Kod oluşunca ayrı branch'te denenecek | Değerlendiriliyor |

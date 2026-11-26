@@ -11,8 +11,9 @@ typedef FetchReportsPage = Future<ReportsPageResult> Function({
 
 /// Sayfalı bildirim listesinin durumu; ekranlar `ListenableBuilder` ile dinler.
 ///
-/// Gelen sayfa tam dolu değilse son sayfa sayılır. [reset] çağrılınca önceki
-/// isteklerin geç gelen cevabı yok sayılır (ör. sekme ya da filtre değişince).
+/// Gelen sayfa tam dolu değilse son sayfa sayılır. [reset] ya da [reload]
+/// çağrılınca önceki isteklerin geç gelen cevabı yok sayılır (ör. sekme ya da
+/// filtre değişince, üstlenmeden sonra yenilenince).
 class ReportPager extends ChangeNotifier {
   ReportPager(this._fetchPage, {this.pageSize = reportsPageSize});
 
@@ -26,7 +27,7 @@ class ReportPager extends ChangeNotifier {
   bool _isLoadingMore = false;
   bool _loadMoreFailed = false;
 
-  /// Her [reset]'te artar; eski isteğin cevabı bununla ayırt edilir.
+  /// Her [reload]'da artar; eski isteğin cevabı bununla ayırt edilir.
   int _generation = 0;
   bool _disposed = false;
 
@@ -39,16 +40,20 @@ class ReportPager extends ChangeNotifier {
 
   /// Listeyi boşaltıp yükleniyor gösterir ve ilk sayfayı ister.
   Future<void> reset() {
-    _generation++;
     _items.clear();
     _isLoading = true;
+    _hasMore = true;
+    _loadMoreFailed = false;
     _notify();
     return reload();
   }
 
   /// İlk sayfayı yeniden ister; bu sırada eldeki liste görünür kalır.
   Future<void> reload() async {
-    final generation = _generation;
+    // Süren sonraki sayfa isteği artık eski: cevabı yok sayılacak, bu yüzden
+    // sayfalama onu beklerken kilitli kalmasın.
+    final generation = ++_generation;
+    _isLoadingMore = false;
     final result = await _fetchPage(offset: 0, limit: pageSize);
     if (generation != _generation) return;
     _isLoading = false;

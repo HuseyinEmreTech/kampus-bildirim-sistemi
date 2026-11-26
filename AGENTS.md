@@ -43,6 +43,7 @@ Bu dosya, ekipteki herkesin yapay zeka aracına (Claude Code, Codex, Gemini, Cop
 5. **Sınama:** bitirmeden önce `dart format .`, `dart analyze --fatal-infos`, ilgili paketin testleri.
 6. **Özet:** sonunda ne yaptığını, hangi varsayımı yaptığını ve neyi doğrulamadığını kısaca yaz; geliştirici bunu PR'a koyacak ve hocaya anlatabilecek olmalı.
 7. Davranış değişirse ilgili doküman (`proje-bilgileri/`) aynı PR'da güncellenir.
+8. **Görev adımları harfiyen:** her görev `proje-bilgileri/ekip/gorev-adimlari.md`'deki adımlarla yürür. Commit'ten önce `bash scripts/gorev-kontrol.sh staged`, PR'dan önce `bash scripts/gorev-kontrol.sh pr <no>` çalıştırılır; hatalar `--no-verify` ile atlatılmaz. Kancalar bir kez `bash scripts/hook-kur.sh` ile kurulur. Claude Code'da aynı iş `gorev-kontrol` skill'iyle (`.claude/skills/gorev-kontrol/`) yapılır.
 
 ## Git
 
