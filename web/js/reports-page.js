@@ -2,6 +2,7 @@ import { reportQuery } from './api.js';
 import {
   CATEGORY_LABELS,
   STATUS_LABELS,
+  markBuildingFilterPending,
   normalizeBuildings,
   readFilters,
   renderPagination,
@@ -15,7 +16,6 @@ const list = document.getElementById('liste');
 const pagination = document.getElementById('sayfalama');
 
 let filters = readFilters(location.search);
-let buildings = [];
 
 function addOptions(select, entries) {
   for (const [value, label] of entries) select.add(new Option(label, value));
@@ -37,7 +37,7 @@ async function loadReports() {
     return;
   }
   const { items = [], page = filters.page, pageSize = filters.pageSize, total = 0 } = result.data ?? {};
-  renderReportList(list, items, buildings);
+  renderReportList(list, items);
   if (total > 0) renderPagination(pagination, { page, pageSize, total }, goToPage);
 }
 
@@ -50,9 +50,11 @@ function goToPage(page) {
 async function loadBuildings() {
   const result = await api.listBuildings();
   if (!result.ok) return;
-  buildings = normalizeBuildings(result.data);
+  const buildings = normalizeBuildings(result.data);
   addOptions(form.buildingId, buildings.map((b) => [b.buildingId, b.name]));
-  form.buildingId.value = filters.buildingId;
+  // #160 birleşince bu iki satır kalkar ve seçili bina yeniden adresten okunur.
+  markBuildingFilterPending(form.buildingId);
+  filters = { ...filters, buildingId: '' };
 }
 
 function start() {

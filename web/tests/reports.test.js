@@ -4,6 +4,7 @@ import {
   renderReportList,
   renderPagination,
   normalizeBuildings,
+  markBuildingFilterPending,
 } from '../js/reports.js';
 import { test, assertEqual, assertTrue } from './harness.js';
 
@@ -11,7 +12,7 @@ const REPORT = {
   reportId: 'r1',
   category: 'Ariza',
   description: 'B blok 2. kat koridor lambası yanmıyor',
-  location: { place: 'B Blok 2. kat' },
+  place: 'B Blok 2. kat',
   status: 'Yeni',
   createdAt: '2026-10-02T09:15:00Z',
 };
@@ -31,11 +32,26 @@ test('toplam sayfa sayısı en az 1 olur', () => {
   assertEqual(totalPages(41, 20), 3);
 });
 
-test('bina listesi dizi veya items biçiminde kabul edilir', () => {
+test('bina listesi sunucunun { items } biçiminden okunur', () => {
   const raw = [{ buildingId: 'b1', name: 'A Blok' }];
-  assertEqual(normalizeBuildings(raw), raw);
   assertEqual(normalizeBuildings({ items: raw }), raw);
+  assertEqual(normalizeBuildings(raw), [], 'düz dizi sunucu biçimi değil');
   assertEqual(normalizeBuildings(null), []);
+});
+
+// Sunucu buildingId süzgecini #160 gelene dek tanımıyor; seçen kişi liste değişmeyince hata sanmasın.
+test('bina süzgeci sunucu desteklemeyene dek devre dışı ve "yakında" yazar', () => {
+  const label = document.createElement('label');
+  label.textContent = 'Bina';
+  const select = document.createElement('select');
+  select.add(new Option('Tümü', ''));
+  select.add(new Option('A Blok', 'b1'));
+  select.value = 'b1';
+  label.append(select);
+  markBuildingFilterPending(select);
+  assertEqual(select.disabled, true);
+  assertEqual(select.value, '');
+  assertTrue(label.textContent.includes('yakında'), `etiket: ${label.textContent}`);
 });
 
 test('bildirimler kart olarak çizilir, etiketler Türkçedir', () => {
@@ -46,6 +62,33 @@ test('bildirimler kart olarak çizilir, etiketler Türkçedir', () => {
   assertTrue(cards[0].textContent.includes('Arıza'), 'kategori etiketi');
   assertTrue(cards[0].textContent.includes('Yeni'), 'durum etiketi');
   assertTrue(cards[0].textContent.includes('B Blok 2. kat'), 'konum');
+});
+
+// Sunucunun gerçek yanıtı (report_mapper.dart): konum düz `place` ve `buildingName` alanlarıyla gelir.
+const SERVER_REPORT = {
+  reportId: 'r2',
+  category: 'Temizlik',
+  description: 'Kütüphane girişinde çöp kutusu taşmış',
+  status: 'Ustlenildi',
+  place: 'Kütüphane girişi',
+  buildingName: 'Kütüphane',
+  photoUrl: '/files/abc.jpg',
+  assigneeId: 'u9',
+  createdAt: '2026-11-02T10:00:00.000Z',
+};
+
+test('sunucu biçiminde konum place alanından okunur', () => {
+  const container = document.createElement('div');
+  renderReportList(container, [SERVER_REPORT]);
+  const meta = container.querySelector('.report-card__meta').textContent;
+  assertTrue(meta.startsWith('Kütüphane girişi'), `konum: ${meta}`);
+});
+
+test('place yoksa bina adı gösterilir', () => {
+  const container = document.createElement('div');
+  renderReportList(container, [{ ...SERVER_REPORT, place: null }]);
+  const meta = container.querySelector('.report-card__meta').textContent;
+  assertTrue(meta.startsWith('Kütüphane ·'), `konum: ${meta}`);
 });
 
 test('açıklama HTML olarak yorumlanmaz', () => {
