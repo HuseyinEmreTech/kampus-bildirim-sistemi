@@ -6,7 +6,7 @@ son-guncelleme: 2026-10-02
 
 # Repo İskeleti ve Korumalar: Uygulama Planı
 
-← [İndeks](../00-index.md) · [Plan: Hüseyin Emre](../ekip/huseyin-emre.md)
+← [İndeks](../00-index.md) · [Plan: Hüseyin Emre](../ekip/huseyinemretech.md)
 
 > **Yapay zeka ile uygulayanlar için:** Bu planı görev görev uygula (`superpowers:executing-plans` veya `superpowers:subagent-driven-development`). Adımlar `- [ ]` ile işaretlidir.
 
@@ -601,4 +601,4 @@ Panoda "Status" alanına `Yapılacak`, `Yapılıyor`, `İncelemede`, `Bitti` se�
 
 - [ ] **Adım 5: Hafta 3-4 issue'ları**
 
-Her kişinin [plan dosyasındaki](../ekip/huseyin-emre.md) hafta 3 ve 4 maddeleri birer issue olarak `gorev.yml` şablonuyla açılır, kişiye atanır, milestone ve etiket verilir. Hafta 5 ve sonrası her Pazartesi açılır (kabul testleri o hafta hazır olur).
+Her kişinin [plan dosyasındaki](../ekip/huseyinemretech.md) hafta 3 ve 4 maddeleri birer issue olarak `gorev.yml` şablonuyla açılır, kişiye atanır, milestone ve etiket verilir. Hafta 5 ve sonrası her Pazartesi açılır (kabul testleri o hafta hazır olur).

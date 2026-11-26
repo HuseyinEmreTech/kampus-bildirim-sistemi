@@ -1,7 +1,7 @@
 ---
 title: "Görev Adımları (harfiyen uygulanır)"
 durum: Güncel
-son-guncelleme: 2026-11-25
+son-guncelleme: 2026-11-26
 ---
 
 # Görev Adımları
@@ -105,6 +105,20 @@ Kancalar `git commit --no-verify` ile atlanabilir, ama **atlanmaz**. CI aynı ko
 | 4 | **Yorumu yaz** | Karar, birleşmeden önce yapılacaklar (her biri "neden önemli" ile), iyi olur, hocanın sorabileceği sorular (cevapsız; yazar cevaplar), yapay zeka ve araç beyanı |
 | 5 | **Onayla ve birleştir** | `scripts/pr-birlesme-kontrolu.sh <PR>` → squash. Squash başlığı commit kuralına uymalı, yanlış issue bağı düzeltilmeli. `--delete-branch` |
 | 6 | **Kaydet** | Haftalık kayda (`haftalik/`) ve birleşme günlüğüne bir satır |
+
+**Liderin kendi PR'ı.** Liderin PR'ını da bir ekip üyesi inceler. Lider, PR'ı açınca alana yakın birini inceleyen olarak atar:
+
+| Alan | İnceleyen |
+| --- | --- |
+| Mobil | Yusuf |
+| Sunucu, C# | Çağdaş |
+| Veritabanı, altyapı | Ertuğrul |
+| Web, doküman | Murat |
+| Python | Müberra |
+
+İnceleyen yukarıdaki 1-4. adımları uygular ve onaylar; PR onayla birleşir. Lider onaysız (`--admin`) yalnızca iki durumda birleştirir, ikisinde de nedenini PR'a yazar:
+- 48 saat içinde inceleme gelmezse.
+- Düzeltme herkesin CI'ını ya da kancasını kırıyorsa.
 
 ## C. Kısaltılmış örnek: PR'daki "Adım kanıtı"
 

@@ -3,7 +3,7 @@ title: Skill Kataloğu
 durum: Güncel
 son-guncelleme: 2026-09-30
 ---
-l
+
 # Skill Kataloğu
 
 ← [İndeks](../00-index.md) · Kullanım günlüğü: [Skill, Plugin ve araç kullanımı](skill-ve-arac-kullanimi.md)
