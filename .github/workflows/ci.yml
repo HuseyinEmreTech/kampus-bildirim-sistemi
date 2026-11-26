@@ -64,3 +64,38 @@ jobs:
       - name: Flutter testleri
         working-directory: packages/app
         run: flutter test
+  # #250: C# servisinin testleri her PR'da çalışır; kırmızıysa PR kırılır.
+  rapor-istatistik:
+    name: C# rapor-istatistik
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: C# servis testleri
+        working-directory: services/rapor-istatistik
+        run: dotnet test RaporIstatistik.slnx
+
+  # #250: web/tests/index.html başsız Chrome'da açılır. Testler ES modülü olduğu
+  # için sayfa file:// yerine küçük bir HTTP sunucusundan verilir. Sonuç sayfadaki
+  # data-result alanından okunur (harness.js: pass / fail).
+  web:
+    name: Web testleri
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Web istemcisi testleri (başsız tarayıcı)
+        working-directory: web
+        run: |
+          python3 -m http.server 8000 >/dev/null 2>&1 &
+          for _ in $(seq 1 20); do
+            curl -sf http://localhost:8000/tests/index.html >/dev/null && break
+            sleep 0.5
+          done
+          google-chrome --headless=new --no-sandbox --disable-gpu \
+            --virtual-time-budget=10000 --dump-dom \
+            http://localhost:8000/tests/index.html > "$RUNNER_TEMP/web-test.html"
+          grep -o '<li class="[a-z]*">[^<]*</li>' "$RUNNER_TEMP/web-test.html" | sed 's/<[^>]*>//g'
+          grep -o '<p>[^<]*</p>' "$RUNNER_TEMP/web-test.html" | sed 's/<[^>]*>//g'
+          grep -q 'data-result="pass"' "$RUNNER_TEMP/web-test.html"
