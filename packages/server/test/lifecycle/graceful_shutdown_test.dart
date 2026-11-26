@@ -50,14 +50,20 @@ void main() {
         .then((request) => request.close());
     await started.future;
     var databaseClosed = false;
+    var finished = false;
 
     final closing = shutDown(
       server: server,
       closeDatabase: () async => databaseClosed = true,
       write: (_) {},
-    );
-    release.complete();
+    ).then((_) => finished = true);
+    await Future<void>.delayed(const Duration(milliseconds: 300));
 
+    // İstek sürerken kapanma bitmemeli, veritabanı açık kalmalı.
+    expect(finished, isFalse);
+    expect(databaseClosed, isFalse);
+
+    release.complete();
     final res = await response;
     expect(res.statusCode, 200);
     expect(await res.transform(utf8.decoder).join(), 'bitti');
@@ -79,6 +85,16 @@ void main() {
       InternetAddress.loopbackIPv4,
       server.port,
     );
+    final socketClosed = Completer<void>();
+    void markClosed() {
+      if (!socketClosed.isCompleted) socketClosed.complete();
+    }
+
+    socket.listen(
+      (_) {},
+      onDone: markClosed,
+      onError: (Object _) => markClosed(),
+    );
     socket.write('GET / HTTP/1.1\r\nHost: localhost\r\n\r\n');
     await socket.flush();
     await Future<void>.delayed(const Duration(milliseconds: 50));
@@ -88,16 +104,20 @@ void main() {
     await shutDown(
       server: server,
       closeDatabase: () async => databaseClosed = true,
-      grace: const Duration(milliseconds: 200),
+      grace: const Duration(milliseconds: 300),
       write: (_) {},
     );
 
+    // Süre dolana kadar beklendi, sonra bağlantı zorla kapatıldı.
+    expect(stopwatch.elapsed, greaterThanOrEqualTo(_almostGrace));
+    await socketClosed.future.timeout(const Duration(seconds: 2));
     expect(databaseClosed, isTrue);
-    expect(stopwatch.elapsed, lessThan(const Duration(seconds: 2)));
-    socket.destroy();
   });
 
-  test('shutdownSignals_alwaysIncludesSigint', () {
-    expect(shutdownSignals(), isNotEmpty);
+  test('shutdownSignals_sigtermOnlyOutsideWindows', () {
+    expect(shutdownSignals(), hasLength(Platform.isWindows ? 1 : 2));
   });
 }
+
+// Zamanlayıcı birkaç ms erken uyanabilir; 300 ms'lik süreye küçük pay.
+const _almostGrace = Duration(milliseconds: 250);
