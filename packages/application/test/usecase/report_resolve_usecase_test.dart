@@ -53,6 +53,28 @@ void main() {
     expect(error, isA<MissingResolutionPhotoError>());
   });
 
+  // #209: not depoya yazılmadan önce sınanır; önceden veritabanında patlıyordu.
+  test('execute_note501Chars_returnsValidationErrorOnNote', () async {
+    final report = await assignedReport(repository);
+
+    final result = await useCase.execute(
+      ResolveReportCommand(
+        reportId: report.id.value,
+        assigneeId: staffId,
+        role: 'Staff',
+        resolutionPhotoUrl: '/files/sonuc.jpg',
+        resolutionPhotoContentType: 'image/jpeg',
+        resolutionPhotoSizeBytes: 500000,
+        note: 'a' * 501,
+      ),
+    );
+
+    final error = (result as Failure<Unit, AppError>).error;
+    expect(error, isA<ValidationError>());
+    expect((error as ValidationError).field, 'note');
+    expect(repository.notifications, isEmpty);
+  });
+
   test('execute_resolveNewReport_returnsInvalidTransition', () async {
     final report = newReport();
     repository.seed(report);

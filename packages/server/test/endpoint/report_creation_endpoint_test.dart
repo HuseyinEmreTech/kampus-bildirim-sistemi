@@ -124,6 +124,26 @@ void main() {
     expect(reports.lastCreated, isNull);
   });
 
+  // #209: geçersiz kategori `details: "category"` döner, "description" değil.
+  test('create_invalidCategory_detailsIsCategory', () async {
+    final fields = _gpsFields()..[0] = textPart('category', 'Yok');
+    final res = await app(_create(fields));
+
+    expect(res.statusCode, 400);
+    expect((await _errorOf(res))['details'], 'category');
+    expect(reports.lastCreated, isNull);
+  });
+
+  // #209 kabul ölçütü: sunucu uzun yer tarifini `details: "place"` ile reddeder.
+  test('create_placeOver100_returns400WithPlaceDetails', () async {
+    final fields = _gpsFields()..[5] = textPart('place', 'a' * 101);
+    final res = await app(_create(fields));
+
+    expect(res.statusCode, 400);
+    expect((await _errorOf(res))['details'], 'place');
+    expect(photos.deleted, photos.saved);
+  });
+
   test('create_latitudeNotANumber_returns400', () async {
     final fields = _gpsFields()..[3] = textPart('latitude', 'kuzey');
     final res = await app(_create(fields));

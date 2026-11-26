@@ -17,6 +17,9 @@ final class Location {
   final LocationSource source;
   final String? buildingId;
 
+  /// Yer tarifi sınırı (03-domain-design, V1 `VARCHAR(100)`).
+  static const placeMaxLength = 100;
+
   static Result<Location, DomainError> create({
     required double latitude,
     required double longitude,
@@ -24,6 +27,10 @@ final class Location {
     String? place,
     String? buildingId,
   }) {
+    // NaN ile her karşılaştırma false döner; aralık denetiminden önce elenir.
+    if (!latitude.isFinite || !longitude.isFinite) {
+      return const Failure(InvalidLocation('koordinat sayı olmalı'));
+    }
     if (latitude < -90 || latitude > 90) {
       return const Failure(
         InvalidLocation('latitude -90..90 aralığında olmalı'),
@@ -56,6 +63,11 @@ final class Location {
     }
 
     final trimmedPlace = place?.trim();
+    if (trimmedPlace != null && trimmedPlace.length > placeMaxLength) {
+      return const Failure(
+        InvalidPlace('yer tarifi en fazla $placeMaxLength karakter olmalı'),
+      );
+    }
 
     return Success(
       Location._(

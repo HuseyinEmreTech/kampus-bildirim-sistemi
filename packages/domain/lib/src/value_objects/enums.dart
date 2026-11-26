@@ -18,7 +18,7 @@ Result<Category, DomainError> parseCategory(String value) {
     'temizlik' => const Success(Category.temizlik),
     'guvenlik' => const Success(Category.guvenlik),
     'diger' => const Success(Category.diger),
-    _ => const Failure(InvalidDescription('kategori geçersiz')),
+    _ => const Failure(InvalidCategory()),
   };
 }
 

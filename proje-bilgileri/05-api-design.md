@@ -1,7 +1,7 @@
 ---
 title: API Tasarımı
 durum: Taslak
-son-guncelleme: 2026-11-02
+son-guncelleme: 2026-11-25
 ---
 
 # API Tasarımı
@@ -104,7 +104,7 @@ curl -X POST "http://localhost:8080/api/reports" \
 
 Konum izni yoksa `locationSource=Building` ve `buildingId=<bina-id>` gönderilir; `latitude` ve `longitude` gönderilmez.
 
-Yalnızca öğrenci oluşturabilir (görevli `403`). Yanıt `201`: `{ "reportId", "status": "Yeni" }`. Zorunlu alan eksikse, `latitude`/`longitude` sayı değilse, fotoğraf JPEG/PNG değilse ya da 5 MB'ı geçiyorsa `400 VALIDATION_ERROR` (`details` alan adı); açıklama 5-500 karakter değilse de `400`. `Building` kaynağında koordinatlar seçilen binadan alınır; bina yoksa `422 BUILDING_NOT_FOUND` ([Rule 06](03-domain-design.md#kurallar-rules)). İstek reddedilirse kaydedilen fotoğraf silinir.
+Yalnızca öğrenci oluşturabilir (görevli `403`). Yanıt `201`: `{ "reportId", "status": "Yeni" }`. Zorunlu alan eksikse, `latitude`/`longitude` sayı değilse, fotoğraf JPEG/PNG değilse ya da 5 MB'ı geçiyorsa `400 VALIDATION_ERROR` (`details` alan adı); açıklama 5-500 karakter değilse (`details: "description"`), kategori geçersizse (`details: "category"`), yer tarifi (`place`) 100 karakteri aşarsa (`details: "place"`) ya da koordinat sonlu bir sayı değilse (NaN, sonsuz; `details: "location"`) de `400`. `Building` kaynağında koordinatlar seçilen binadan alınır; bina yoksa `422 BUILDING_NOT_FOUND` ([Rule 06](03-domain-design.md#kurallar-rules)). İstek reddedilirse kaydedilen fotoğraf silinir.
 
 ### Bildirimi üstlen
 
@@ -128,7 +128,7 @@ curl -X PUT "http://localhost:8080/api/reports/d4816d0a-cd8e-4442-98c0-65d3ba11b
   -F "resolutionPhoto=@sonuc.jpg;type=image/jpeg"
 ```
 
-Sonuç fotoğrafı zorunludur (`multipart/form-data`; alanlar `resolutionPhoto` ve isteğe bağlı `note`, en fazla 2000 bayt); yoksa, JPEG/PNG değilse ya da 5 MB'ı geçiyorsa `400 VALIDATION_ERROR` (`details: "resolutionPhoto"`). Yalnızca bildirimi üstlenen görevli çözebilir, başka görevli `403` ([Rule 03](03-domain-design.md#kurallar-rules)); bildirim `Ustlenildi` değilse `409 INVALID_TRANSITION`. Fotoğrafın türü dosyanın ilk baytlarından anlaşılır ve EXIF bilgisi silinerek kaydedilir; istek reddedilirse kaydedilen fotoğraf silinir. Başarılıysa `200`, `{ "reportId", "status": "Cozuldu" }`; öğrenci için `ReportResolved` bildirimi aynı işlemde oluşur ([Rule 04](03-domain-design.md#kurallar-rules)).
+Sonuç fotoğrafı zorunludur (`multipart/form-data`; alanlar `resolutionPhoto` ve isteğe bağlı `note`, en fazla 500 karakter, aşarsa `400 VALIDATION_ERROR` ve `details: "note"`); fotoğraf yoksa, JPEG/PNG değilse ya da 5 MB'ı geçiyorsa `400 VALIDATION_ERROR` (`details: "resolutionPhoto"`). Yalnızca bildirimi üstlenen görevli çözebilir, başka görevli `403` ([Rule 03](03-domain-design.md#kurallar-rules)); bildirim `Ustlenildi` değilse `409 INVALID_TRANSITION`. Fotoğrafın türü dosyanın ilk baytlarından anlaşılır ve EXIF bilgisi silinerek kaydedilir; istek reddedilirse kaydedilen fotoğraf silinir. Başarılıysa `200`, `{ "reportId", "status": "Cozuldu" }`; öğrenci için `ReportResolved` bildirimi aynı işlemde oluşur ([Rule 04](03-domain-design.md#kurallar-rules)).
 
 ### Bildirimlerim
 

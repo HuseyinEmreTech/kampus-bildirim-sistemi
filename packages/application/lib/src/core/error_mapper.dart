@@ -9,5 +9,8 @@ AppError mapDomainError(DomainError error) => switch (error) {
   InvalidPhoto(:final reason) => ValidationError('photo', reason),
   InvalidLocation(:final reason) => ValidationError('location', reason),
   InvalidDescription(:final reason) => ValidationError('description', reason),
+  InvalidPlace(:final reason) => ValidationError('place', reason),
+  InvalidCategory() => const ValidationError('category', 'kategori geçersiz'),
+  InvalidResolutionNote(:final reason) => ValidationError('note', reason),
   InvalidId(:final reason) => ValidationError('id', reason),
 };

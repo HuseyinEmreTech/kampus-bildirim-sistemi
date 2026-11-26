@@ -44,6 +44,23 @@ void main() {
     expect(report.reporterId.value, command.reporterId);
   });
 
+  // #209: hata hangi alanda olduğunu söylesin (API'de `details`).
+  test('execute_invalidCategory_returnsValidationErrorOnCategory', () async {
+    final result = await useCase.execute(_command(category: 'Yok'));
+
+    final error = (result as Failure<ReportId, AppError>).error;
+    expect(error, isA<ValidationError>());
+    expect((error as ValidationError).field, 'category');
+  });
+
+  test('execute_placeOver100_returnsValidationErrorOnPlace', () async {
+    final result = await useCase.execute(_command(place: 'a' * 101));
+
+    final error = (result as Failure<ReportId, AppError>).error;
+    expect(error, isA<ValidationError>());
+    expect((error as ValidationError).field, 'place');
+  });
+
   test('execute_descriptionTooShort_returnsValidationError', () async {
     final command = CreateReportCommand(
       reporterId: '5c98741b-64c8-49de-9e68-3d7a2f44802b',
@@ -86,3 +103,17 @@ void main() {
     );
   });
 }
+
+CreateReportCommand _command({String category = 'Ariza', String? place}) =>
+    CreateReportCommand(
+      reporterId: '5c98741b-64c8-49de-9e68-3d7a2f44802b',
+      category: category,
+      description: 'B blok lambası yanmıyor',
+      photoUrl: '/files/lamba.jpg',
+      photoContentType: 'image/jpeg',
+      photoSizeBytes: 812345,
+      latitude: 36.5871,
+      longitude: 36.1742,
+      locationSource: 'Gps',
+      place: place,
+    );

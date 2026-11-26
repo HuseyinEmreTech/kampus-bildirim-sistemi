@@ -170,21 +170,34 @@ final class Report {
       return const Failure(InvalidTransition());
     }
 
+    return parseResolutionNote(note).map(
+      (trimmedNote) => Success<Report, DomainError>(
+        _copy(
+          status: ReportStatus.cozuldu,
+          resolutionPhoto: resolutionPhoto,
+          resolutionNote: trimmedNote,
+          resolvedAt: resolvedAt,
+        ),
+      ),
+      (error) => Failure<Report, DomainError>(error),
+    );
+  }
+
+  /// Çözüm notu sınırı (V1 `VARCHAR(500)`).
+  static const resolutionNoteMaxLength = 500;
+
+  /// Notu kırpar; sınırı aşarsa [InvalidResolutionNote] döner. Not yazılmadan
+  /// önce kullanım senaryosu da buradan geçirir (#209).
+  static Result<String?, DomainError> parseResolutionNote(String? note) {
     final trimmedNote = note?.trim();
-    if (trimmedNote != null && trimmedNote.length > 500) {
+    if (trimmedNote != null && trimmedNote.length > resolutionNoteMaxLength) {
       return const Failure(
-        InvalidDescription('çözüm notu en fazla 500 karakter olmalı'),
+        InvalidResolutionNote(
+          'çözüm notu en fazla $resolutionNoteMaxLength karakter olmalı',
+        ),
       );
     }
-
-    return Success(
-      _copy(
-        status: ReportStatus.cozuldu,
-        resolutionPhoto: resolutionPhoto,
-        resolutionNote: trimmedNote,
-        resolvedAt: resolvedAt,
-      ),
-    );
+    return Success(trimmedNote);
   }
 
   Report _copy({
