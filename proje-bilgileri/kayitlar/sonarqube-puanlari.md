@@ -1,7 +1,7 @@
 ---
 title: SonarQube Puanları ve Bulgu Çözüm Günlüğü
 durum: Güncel
-son-guncelleme: 2026-10-25
+son-guncelleme: 2026-11-24
 ---
 
 # SonarQube Puanları ve Bulgu Çözüm Günlüğü
@@ -18,7 +18,7 @@ Her kod commit'inden sonra tarama yapılır; sonuçlar ve çözülen bulgular bu
 | SonarQube (`http://localhost:9005`) | **Doğrulandı (2026-09-30):** `sonarqube:community` 26.9.0.129388 konteyneri yaklaşık 30 saniyede `UP` oldu, arayüz `200` döndü; deneme sonrası konteyner silindi |
 | SonarQube'un Dart desteği | **Community'de yok** (yerelde doğrulandı). **Developer Edition ve SonarQube Cloud'da var**; ücretsiz Cloud planı önerildi (aşağıdaki araştırma) |
 | `dart analyze`, `flutter analyze` | Yedek: kod oluşunca her commit'te çalıştırılır |
-| Test kapsamı (coverage) | **Ölçülüyor (2026-10-24):** LCOV (`coverage/lcov.info`); Dart kapsamı %80,1. Web JS için tarayıcı testleri LCOV üretmediğinden kapsam ölçülmüyor. Python kapsam XML'i Sonar'a gönderilecek şekilde yapılandırıldı; Cloud sonucu ilk CI çalışmasında doğrulanacak |
+| Test kapsamı (coverage) | **Ölçülüyor (2026-10-24):** LCOV (`coverage/lcov.info`); Dart kapsamı %80,1. Web JS için tarayıcı testleri LCOV üretmediğinden kapsam ölçülmüyor; **2026-11-24'ten beri `web/js/**` `sonar.coverage.exclusions` ile kapsam dışı** (gerekçe: [teknoloji değişiklikleri](teknoloji-degisiklikleri.md)), kod kokusu ve güvenlik taraması sürüyor. Python kapsam XML'i Sonar'a gönderilecek şekilde yapılandırıldı; Cloud sonucu ilk CI çalışmasında doğrulanacak |
 
 ## Python servis analizi (2026-10-25)
 

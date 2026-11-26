@@ -30,16 +30,28 @@ class FakePhotoPicker implements PhotoPicker {
 
 final formKey = GlobalKey<FormState>();
 
-Future<void> pumpField(WidgetTester tester, PhotoPicker picker) async {
+Future<void> pumpField(
+  WidgetTester tester,
+  PhotoPicker picker, {
+  bool? recoverLost,
+}) async {
+  // Değer verilmezse parametre hiç geçilmez: PhotoField'ın kendi varsayılanı
+  // sınanır.
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
         body: Form(
           key: formKey,
-          child: PhotoField(
-            picker: picker,
-            requiredMessage: 'Sonuç fotoğrafı ekleyin',
-          ),
+          child: recoverLost == null
+              ? PhotoField(
+                  picker: picker,
+                  requiredMessage: 'Sonuç fotoğrafı ekleyin',
+                )
+              : PhotoField(
+                  picker: picker,
+                  requiredMessage: 'Sonuç fotoğrafı ekleyin',
+                  recoverLost: recoverLost,
+                ),
         ),
       ),
     ),
@@ -118,4 +130,51 @@ void main() {
     expect(find.byType(Image), findsNothing);
     expect(formKey.currentState!.validate(), isFalse);
   });
+
+  testWidgets('field_restoresLostPhoto_whenOpened', (tester) async {
+    await pumpField(tester, RecoveringPicker(photo()), recoverLost: true);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Image), findsOneWidget);
+    expect(find.text('Önceki çekimden kalan fotoğraf eklendi'), findsOneWidget);
+    expect(formKey.currentState!.validate(), isTrue);
+  });
+
+  testWidgets('field_doesNotRestoreLostPhoto_byDefault', (tester) async {
+    // Çözme ekranında başka bir bildirimin fotoğrafı sonuç olarak gelmesin.
+    await pumpField(tester, RecoveringPicker(photo()));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Image), findsNothing);
+    expect(formKey.currentState!.validate(), isFalse);
+  });
+
+  testWidgets('field_ignoresLostPhoto_whenItBreaksRules', (tester) async {
+    await pumpField(
+      tester,
+      RecoveringPicker(photo(contentType: 'image/gif')),
+      recoverLost: true,
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Yalnızca JPEG veya PNG fotoğraf seçilebilir'),
+      findsOneWidget,
+    );
+    expect(formKey.currentState!.validate(), isFalse);
+  });
+}
+
+/// Android'in kapattığı uygulamadan kalan fotoğrafı veren sahte seçici.
+class RecoveringPicker implements PhotoPicker, LostPhotoRecovery {
+  RecoveringPicker(this.lost);
+
+  final PickedPhoto lost;
+
+  @override
+  Future<PhotoPickResult> pick(PhotoSource source) async =>
+      const PhotoPickCancelled();
+
+  @override
+  Future<PickedPhoto?> recoverLostPhoto() async => lost;
 }

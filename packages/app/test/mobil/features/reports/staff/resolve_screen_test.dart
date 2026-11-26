@@ -19,6 +19,16 @@ class FakePicker implements PhotoPicker {
       PhotoPicked(tinyPng);
 }
 
+/// Android'in kapattığı uygulamadan kalan fotoğrafı veren sahte seçici.
+class LostPhotoPicker implements PhotoPicker, LostPhotoRecovery {
+  @override
+  Future<PhotoPickResult> pick(PhotoSource source) async =>
+      const PhotoPickCancelled();
+
+  @override
+  Future<PickedPhoto?> recoverLostPhoto() async => tinyPng;
+}
+
 /// Verilen sonucu döndüren ve gelen istekleri kaydeden sahte kaynak.
 class FakeResolver implements ReportResolver {
   FakeResolver(this.result);
@@ -38,7 +48,11 @@ class FakeResolver implements ReportResolver {
 }
 
 /// Ekranı bir önceki sayfadan açar; böylece kapanınca geri dönüş görülebilir.
-Future<void> openScreen(WidgetTester tester, ReportResolver resolver) async {
+Future<void> openScreen(
+  WidgetTester tester,
+  ReportResolver resolver, {
+  PhotoPicker? picker,
+}) async {
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
@@ -49,7 +63,7 @@ Future<void> openScreen(WidgetTester tester, ReportResolver resolver) async {
                 builder: (_) => ResolveScreen(
                   reportId: 'r7',
                   resolver: resolver,
-                  photoPicker: FakePicker(),
+                  photoPicker: picker ?? FakePicker(),
                 ),
               ),
             ),
@@ -130,5 +144,35 @@ void main() {
     await submit(tester);
 
     expect(find.text('Gönderilemedi, tekrar deneyin'), findsOneWidget);
+  });
+
+  testWidgets('resolveScreen_doesNotRestoreLostPhoto', (tester) async {
+    // Arrange / Act: önceki çekimden kalan fotoğraf var, çözme ekranı açılır.
+    await openScreen(
+      tester,
+      FakeResolver(const ReportResolved()),
+      picker: LostPhotoPicker(),
+    );
+
+    // Assert: başka bir bildirim için çekilmiş olabilir (Rule 04), konmaz.
+    expect(find.byType(Image), findsNothing);
+    expect(find.text('Önceki çekimden kalan fotoğraf eklendi'), findsNothing);
+  });
+
+  testWidgets('photoError_clears_whenPhotoAdded_afterFailedSubmit', (
+    tester,
+  ) async {
+    // Arrange: fotoğrafsız gönderilince uyarı çıkar.
+    final resolver = FakeResolver(const ReportResolved());
+    await openScreen(tester, resolver);
+    await submit(tester);
+    expect(find.text('Sonuç fotoğrafı ekleyin'), findsOneWidget);
+
+    // Act: fotoğraf eklenir, yeniden gönderilmez.
+    await addPhoto(tester);
+
+    // Assert: uyarı hemen kalkar.
+    expect(find.text('Sonuç fotoğrafı ekleyin'), findsNothing);
+    expect(resolver.received, isEmpty);
   });
 }

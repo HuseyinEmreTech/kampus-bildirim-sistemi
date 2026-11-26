@@ -29,6 +29,10 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  /// İlk başarısız gönderimden sonra alanlar her değişiklikte yeniden
+  /// denetlenir: düzeltilen alanın uyarısı hemen kalkar.
+  AutovalidateMode _autovalidate = AutovalidateMode.disabled;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
@@ -42,7 +46,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      setState(() => _autovalidate = AutovalidateMode.always);
+      return;
+    }
 
     setState(() {
       _isLoading = true;
@@ -71,6 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(title: const Text('Giriş')),
       body: Form(
         key: _formKey,
+        autovalidateMode: _autovalidate,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
