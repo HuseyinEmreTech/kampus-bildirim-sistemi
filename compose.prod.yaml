@@ -49,6 +49,26 @@ services:
     ports:
       - "${SERVER_PORT:-8080}:8080"
 
+  python-report-service:
+    profiles: ["servisler"]
+    build:
+      context: ./services/python-report-service
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_started
+    environment:
+      CORE_API_BASE_URL: http://server:8080
+      CORE_API_TIMEOUT_SECONDS: ${CORE_API_TIMEOUT_SECONDS:-10}
+      CORE_API_PAGE_SIZE: ${CORE_API_PAGE_SIZE:-100}
+      SERVICE_HOST: 0.0.0.0
+      SERVICE_PORT: 8001
+      SERVICE_HEALTHCHECK_HOST: 127.0.0.1
+      SERVICE_HEALTHCHECK_TIMEOUT_SECONDS: ${SERVICE_HEALTHCHECK_TIMEOUT_SECONDS:-2}
+      REPORT_EXPORT_FILENAME: ${REPORT_EXPORT_FILENAME:-reports.csv}
+    ports:
+      - "127.0.0.1:${PYTHON_REPORT_SERVICE_PORT:-8001}:8001"
+
 volumes:
   pgdata:
   files:

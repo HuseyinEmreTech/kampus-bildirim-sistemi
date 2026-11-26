@@ -26,12 +26,18 @@ belirteci olmalıdır; rol ve erişim doğrulamasını çekirdek API yapar.
 | `status` | Hayır | `Yeni`, `Ustlenildi`, `Cozuldu` |
 | `category` | Hayır | `Ariza`, `Temizlik`, `Guvenlik`, `Diger` |
 | `assignee` | Hayır | Çekirdek API'nin rapor listesi filtresi |
+| `buildingId` | Hayır | Bina kimliği filtresi; çekirdek desteği gelene kadar sonuçlara uygulanmaz |
 
-Servis filtreleri çekirdek API'ye iletir ve yapılandırılmış sayfa boyutuyla
+Servis `status`, `category`, `assignee` ve `buildingId` filtrelerini çekirdek
+API'ye iletir ve yapılandırılmış sayfa boyutuyla
 (çekirdek API'nin kabul ettiği üst sınır 100) tüm sayfaları alır. CSV UTF-8
 biçimindedir; sütunlar `reportId`, `category`, `description`,
 `status`, `createdAt`, `place` sırasındadır. Kullanıcı girdilerindeki e-tablo
 formülleri CSV dışa aktarımında etkisizleştirilir.
+
+Çekirdek API şu anda `buildingId` filtresini uygulamaz. Bu parametre Issue
+[#160](https://github.com/HuseyinEmreTech/kampus-bildirim-sistemi/issues/160)
+tamamlanana kadar iletilse de dışa aktarılan sonuçları daraltmaz.
 
 | Durum | Anlam |
 | --- | --- |

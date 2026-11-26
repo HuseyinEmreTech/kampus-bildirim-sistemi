@@ -1,7 +1,7 @@
 ---
 title: Fatma Müberra Yener - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-11-01
+son-guncelleme: 2026-11-26
 ---
 
 # Fatma Müberra Yener (@muberrayener) - Kişisel Plan
@@ -135,3 +135,10 @@ son-guncelleme: 2026-11-01
 - **Yusuf**: Paylaşılan widget'lar, theme, contracts DTO'lar
 - **Hüseyin Emre**: Kabul testleri (bekliyor etiketli), contract'lar
 - **Çağdaş/Ertuğrul**: API endpoint'leri hazır olmalı
+
+## Raporlar
+
+- [2026-10-18](raporlar/muberrayener/2026-10-18.md) — #74
+- [2026-10-25](raporlar/muberrayener/2026-10-25.md) — #129
+- [2026-10-26](raporlar/muberrayener/2026-10-26.md) — #129
+- [2026-11-19](raporlar/muberrayener/2026-11-19.md) — #207 Python rapor servisi canlı compose doğrulaması
