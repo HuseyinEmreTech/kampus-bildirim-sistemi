@@ -14,6 +14,7 @@ import 'package:campus_server/src/endpoint/auth_endpoints.dart';
 import 'package:campus_server/src/endpoint/building_endpoints.dart';
 import 'package:campus_server/src/endpoint/notification_endpoints.dart';
 import 'package:campus_server/src/endpoint/user_endpoints.dart';
+import 'package:campus_server/src/lifecycle/graceful_shutdown.dart';
 import 'package:campus_server/src/logging/logger.dart';
 import 'package:campus_server/src/middleware/audit_log_middleware.dart';
 import 'package:campus_server/src/middleware/body_limit_middleware.dart';
@@ -135,6 +136,16 @@ void main() async {
 
   final server = await io.serve(handler, InternetAddress.anyIPv4, 8080);
   serverLog('Server listening on port ${server.port}');
+
+  var stopping = false;
+  for (final signals in shutdownSignals()) {
+    signals.listen((_) async {
+      if (stopping) return;
+      stopping = true;
+      await shutDown(server: server, closeDatabase: db.close);
+      exit(0);
+    });
+  }
 }
 
 bool _isLogin(Request request) =>

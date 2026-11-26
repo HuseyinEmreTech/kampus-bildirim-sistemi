@@ -306,7 +306,7 @@ aktarma isteği görevli access token'ı gerektirir.
 
 **Canlı ortam (sunucu + veritabanı konteynerde)**
 
-VPS'te ya da demo bilgisayarında sunucu da konteynerde çalışır. `Dockerfile` sunucuyu tek dosyalık programa derler (imaj yaklaşık 17 MB, içinde kabuk ve kaynak kod yok, root olmayan kullanıcıyla çalışır). `compose.prod.yaml` veritabanını dışarıya açmaz; ona yalnızca sunucu ulaşır.
+VPS'te ya da demo bilgisayarında sunucu da konteynerde çalışır. `Dockerfile` sunucuyu tek dosyalık programa derler (imaj yaklaşık 17 MB, içinde kabuk ve kaynak kod yok, root olmayan kullanıcıyla çalışır). `compose.prod.yaml` veritabanını dışarıya açmaz; ona yalnızca sunucu ulaşır. Sunucu `docker stop` (SIGTERM) ya da Ctrl+C gelince yeni istek almayı bırakır, süren istekleri en çok 5 saniye bekler, veritabanı bağlantılarını kapatıp çıkar.
 
 ```bash
 cp .env.example .env     # iki ayrı güçlü şifre yaz; şifrelerde @ : / ? # kullanma
