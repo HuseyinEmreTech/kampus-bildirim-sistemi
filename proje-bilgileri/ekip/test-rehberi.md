@@ -1,7 +1,7 @@
 ---
 title: E2E Test ve Demo Rehberi
 durum: Taslak
-son-guncelleme: 2026-10-25
+son-guncelleme: 2026-11-26
 ---
 
 # E2E Test ve Demo Rehberi
@@ -37,6 +37,8 @@ python test/veri/seed_yukle.py
 `.env` içindeki değerler doldurulur ve commit'e girmez. `http://localhost:8080/health` adresinde `OK` görülmelidir. Seed zaten yüklüyse betik "zaten yüklü" der.
 
 Demo hesaplar (parola hepsinde `Demo.1234`): `ayse@ornek.edu`, `mehmet@ornek.edu` (Student); `zeynep@ornek.edu`, `ali@ornek.edu` (Staff).
+
+> **Yalnızca kendi bilgisayarında.** Bu adımlar yerel deneme içindir. Canlı sunucuya (VPS) seed **yüklenmez**: demo parolası bu repoda açık yazıyor, yani canlıda herkes `zeynep@ornek.edu` ile görevli olarak girebilir. Canlıda hesaplar hesap açma betiğiyle, her biri ayrı parolayla açılır (#203). Canlıya yanlışlıkla yüklendiyse demo hesapları hemen silinir ya da parolaları değiştirilir.
 
 ## 4. Testleri çalıştırma
 

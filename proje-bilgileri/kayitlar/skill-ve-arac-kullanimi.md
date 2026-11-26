@@ -1,7 +1,7 @@
 ---
 title: Skill, Plugin ve Araç Kullanım Günlüğü
 durum: Güncel
-son-guncelleme: 2026-11-01
+son-guncelleme: 2026-11-26
 ---
 
 # Skill, Plugin ve Araç Kullanım Günlüğü
@@ -99,6 +99,14 @@ Not: Bu haftanın günlük raporlarında **skill adı** yazılmamış; tablo ara
 | 2026-10-31 | OpenCode (GLM-5.3 Flash); `gh api` karşılaştırma (`ffd6d61...d2abbf7`) | #140,#135-144 birleşme sonrası durum taraması; #142 çakışma çözümü | Yeni commit'in onayı düşürmüştü; merge'in PR'ın kendi koduna dokunmadığı dosya düzeyinde doğrulandı | #142 yeniden onaylandı; 135, 141, 143, 144 birleşti | Yok |
 | 2026-10-31 | OpenCode (GLM-5.3 Flash); Obsidian CLI/kasası | PR inceleme turu kaydı (`02 - Proje/PR İnceleme Turu`) | İncelemenin özeti ve durum takibi vault'ta kalsın | Not yazıldı, `Home.md` bağlandı | Obsidian CLI kapalıyken direct dosya yazımı kullanıldı |
 | 2026-11-01 | Claude Code (Claude Opus 5.5); `superpowers:writing-plans`, `obsidian-cli`, `ponytail` | Proje taraması, kalan işler planı, #163-#183, dokümantasyon denetimi | Görev dağılımı ve süreç denetimi | [Kayıt](2026-11-01-gorev-dagilimi-ve-dokumantasyon-denetimi.md) | İki plan kararı kurallarla çelişti ve düzeltildi; #21 kapatma komutu izin denetimine takıldı |
+
+### Hafta 11 (24-26 Kasım 2026)
+
+| Tarih | Skill / araç | Nerede | Neden | Sonuç | Sorun |
+| --- | --- | --- | --- | --- | --- |
+| 25-26 Kasım | OpenCode GO, DeepSeek V4.1 Flash (T3 Code görev devri) | 5 PR incelemesi (#242, #244-247), 6 denetim (#249) | Olgu toplamayı paralel yürütmek; lider yalnızca doğrulasın ve karar versin | 11 ajan raporu geldi; önemli iddialar `gh` ve `git` ile doğrulandı | Ajanlar 3 yanlış bulgu getirdi (#200, #241, #207); doğrulama olmadan gönderilmedi |
+| 25 Kasım | agent-bridge `ask_opencode` | PR incelemesi | OpenCode'u Claude Code'dan çağırmak | Vazgeçildi | 5 dakikalık zaman aşımı, model 2 eşzamanlı istekle sınırlı |
+| 26 Kasım | `gorev-kontrol`, `superpowers:test-driven-development` | #248 | Kontrol betiğindeki iki hatayı önce testle göstermek | Kırmızı 16/2 → yeşil 18/0 | — |
 
 ## Planlanan
 
