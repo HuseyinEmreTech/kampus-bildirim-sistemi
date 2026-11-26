@@ -6,7 +6,9 @@ import 'package:campus_app/mobil/features/auth/data/session.dart';
 import 'package:campus_app/mobil/features/notifications/data/notifications_source.dart';
 import 'package:campus_app/mobil/features/reports/data/new_report.dart';
 import 'package:campus_app/mobil/features/reports/data/report_assigner.dart';
+import 'package:campus_app/mobil/features/reports/data/report_detail_source.dart';
 import 'package:campus_app/mobil/features/reports/data/report_list_item.dart';
+import 'package:campus_app/mobil/features/reports/data/report_resolver.dart';
 import 'package:campus_app/mobil/features/reports/data/reports_source.dart';
 import 'package:campus_app/mobil/features/reports/data/staff_reports_source.dart';
 import 'package:campus_app/mobil/shared/location/location_source.dart';
@@ -91,5 +93,91 @@ void main() {
     final after = await demo.notifications.fetchFirstPage();
     expect(marked, isTrue);
     expect((after as NotificationsLoaded).unreadCount, before.unreadCount - 1);
+  });
+
+  test('resolve_marksResolved_andNotifiesStudent', () async {
+    final demo = DemoBackend();
+    final report = (await staffList(demo, StaffReportsView.incoming)).first;
+    await demo.assigner.assign(report.id!);
+    final photo = await demo.photoPicker.pick(PhotoSource.camera);
+
+    final result = await demo.resolver.resolve(
+      reportId: report.id!,
+      photo: (photo as PhotoPicked).photo,
+      note: 'Bariyer onarıldı.',
+    );
+
+    expect(result, isA<ReportResolved>());
+    final mine = await staffList(demo, StaffReportsView.mine);
+    final resolved = mine.firstWhere((item) => item.id == report.id);
+    expect(resolved.status, ReportStatus.cozuldu);
+    final notifications = await demo.notifications.fetchFirstPage();
+    expect(
+      (notifications as NotificationsLoaded).items.first.message,
+      contains(report.place),
+    );
+  });
+
+  test('resolve_isRejected_whenNotAssigned', () async {
+    final demo = DemoBackend();
+    final report = (await staffList(demo, StaffReportsView.incoming)).first;
+    final photo = await demo.photoPicker.pick(PhotoSource.gallery);
+
+    final result = await demo.resolver.resolve(
+      reportId: report.id!,
+      photo: (photo as PhotoPicked).photo,
+    );
+
+    expect(result, isA<ReportResolveRejected>());
+  });
+
+  test('resolve_fails_whenReportUnknown', () async {
+    final demo = DemoBackend();
+    final photo = await demo.photoPicker.pick(PhotoSource.camera);
+
+    final result = await demo.resolver.resolve(
+      reportId: 'yok',
+      photo: (photo as PhotoPicked).photo,
+    );
+
+    expect(result, isA<ReportResolveFailed>());
+  });
+
+  test('reportDetail_followsAssignAndResolve', () async {
+    final demo = DemoBackend();
+    final report = (await staffList(demo, StaffReportsView.incoming)).first;
+    await demo.assigner.assign(report.id!);
+    final photo = await demo.photoPicker.pick(PhotoSource.camera);
+    await demo.resolver.resolve(
+      reportId: report.id!,
+      photo: (photo as PhotoPicked).photo,
+      note: 'Bariyer onarıldı.',
+    );
+
+    final result = await demo.reportDetail.fetch(report.id!);
+
+    final detail = (result as ReportDetailLoaded).detail;
+    expect(detail.history.map((change) => change.to), [
+      ReportStatus.yeni,
+      ReportStatus.ustlenildi,
+      ReportStatus.cozuldu,
+    ]);
+    expect(detail.resolution?.note, 'Bariyer onarıldı.');
+  });
+
+  test('reportDetail_notFound_whenUnknown', () async {
+    final result = await DemoBackend().reportDetail.fetch('yok');
+
+    expect(result, isA<ReportDetailNotFound>());
+  });
+
+  test('locationSources_giveCampusPointAndBuildings', () async {
+    final demo = DemoBackend();
+
+    final gps = await demo.gps.current();
+    final buildings = await demo.buildings.fetch();
+
+    expect(gps, isA<GpsFix>());
+    expect((buildings as BuildingsLoaded).buildings, isNotEmpty);
   });
 }
