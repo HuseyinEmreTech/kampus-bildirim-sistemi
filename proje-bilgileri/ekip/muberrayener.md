@@ -135,3 +135,7 @@ son-guncelleme: 2026-11-01
 - **Yusuf**: Paylaşılan widget'lar, theme, contracts DTO'lar
 - **Hüseyin Emre**: Kabul testleri (bekliyor etiketli), contract'lar
 - **Çağdaş/Ertuğrul**: API endpoint'leri hazır olmalı
+
+## Raporlar
+
+- [2026-11-26 — Issue #94: Contracts DTO ve API yanıt dokümantasyonu](raporlar/muberrayener/2026-11-26.md)
