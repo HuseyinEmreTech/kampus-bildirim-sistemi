@@ -120,4 +120,51 @@ void main() {
 
     expect(notified, isFalse);
   });
+
+  test('reset_unlocksLoadMore_whenOldPageStillLoading', () async {
+    // Arrange: ilk sayfa dolu, ikinci sayfa isteği askıda kalıyor.
+    final slow = Completer<ReportsPageResult>();
+    final pages = FakePages([
+      loaded(reports(20)),
+      slow.future,
+      loaded(reports(20, prefix: 'Yeni')),
+      loaded(reports(5, prefix: 'Sonraki')),
+    ]);
+    final pager = ReportPager(pages.fetch);
+    await pager.reload();
+    final pending = pager.loadMore();
+
+    // Act: sonraki sayfa beklenirken sekme değişir.
+    await pager.reset();
+    slow.complete(ReportsPageLoaded(reports(20, prefix: 'Eski')));
+    await pending;
+    await pager.loadMore();
+
+    // Assert: yeni sekmede sayfalama kilitli kalmadı.
+    expect(pager.isLoadingMore, isFalse);
+    expect(pager.items.last.place, 'Sonraki 4');
+  });
+
+  test('reload_ignoresLoadMoreThatStartedBefore', () async {
+    // Arrange
+    final slow = Completer<ReportsPageResult>();
+    final pages = FakePages([
+      loaded(reports(20)),
+      slow.future,
+      loaded(reports(20, prefix: 'Taze')),
+    ]);
+    final pager = ReportPager(pages.fetch);
+    await pager.reload();
+    final pending = pager.loadMore();
+
+    // Act: sonraki sayfa beklenirken liste yenilenir (ör. üstlenmeden sonra).
+    await pager.reload();
+    slow.complete(ReportsPageLoaded(reports(20, prefix: 'Eski')));
+    await pending;
+
+    // Assert: eski offset'le gelen sayfa yeni listeye eklenmez.
+    expect(pager.items, hasLength(20));
+    expect(pager.items.first.place, 'Taze 0');
+    expect(pager.isLoadingMore, isFalse);
+  });
 }
