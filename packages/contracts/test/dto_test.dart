@@ -21,7 +21,14 @@ void main() {
     });
 
     test('fromJson_returnsNull_onMissingField', () {
-      expect(AuthResponseDto.fromJson({}), isNull);
+      final missingField = Map<String, Object?>.of(example)
+        ..remove('refreshToken');
+
+      expect(AuthResponseDto.fromJson(missingField), isNull);
+    });
+
+    test('fromJson_returnsNull_onWronglyTypedField', () {
+      expect(AuthResponseDto.fromJson({...example, 'accessToken': 1}), isNull);
     });
   });
 
@@ -46,7 +53,14 @@ void main() {
     });
 
     test('fromJson_returnsNull_onMissingField', () {
-      expect(ReportListItemDto.fromJson({}), isNull);
+      final missingField = Map<String, Object?>.of(example)
+        ..remove('description');
+
+      expect(ReportListItemDto.fromJson(missingField), isNull);
+    });
+
+    test('fromJson_returnsNull_onWronglyTypedField', () {
+      expect(ReportListItemDto.fromJson({...example, 'createdAt': 1}), isNull);
     });
   });
 
@@ -84,7 +98,19 @@ void main() {
     });
 
     test('fromJson_returnsNull_onMissingField', () {
-      expect(ReportDetailDto.fromJson({}), isNull);
+      final missingField = Map<String, Object?>.of(example)..remove('history');
+
+      expect(ReportDetailDto.fromJson(missingField), isNull);
+    });
+
+    test('fromJson_returnsNull_onWronglyTypedField', () {
+      expect(
+        ReportDetailDto.fromJson({
+          ...example,
+          'history': ['bad'],
+        }),
+        isNull,
+      );
     });
   });
 
@@ -103,7 +129,14 @@ void main() {
     });
 
     test('fromJson_returnsNull_onMissingField', () {
-      expect(StatusChangeDto.fromJson({}), isNull);
+      final missingField = Map<String, Object?>.of(example)
+        ..remove('changedAt');
+
+      expect(StatusChangeDto.fromJson(missingField), isNull);
+    });
+
+    test('fromJson_returnsNull_onWronglyTypedField', () {
+      expect(StatusChangeDto.fromJson({...example, 'status': 1}), isNull);
     });
   });
 
@@ -134,18 +167,55 @@ void main() {
       );
 
       expect(dto, isNotNull);
+      expect(dto!.toJson(itemToJson: (item) => item.toJson()), example);
+    });
+
+    test('fromJson_readsNotificationPageApiExample', () {
+      const notificationPageExample = {
+        'unreadCount': 1,
+        'items': [
+          {
+            'notificationId': '8a1f0c3e-5b7d-4c21-9e4a-2f6b7d9c1a10',
+            'reportId': 'd4816d0a-cd8e-4442-98c0-65d3ba11be70',
+            'type': 'ReportResolved',
+            'message': 'Bildiriminiz çözüldü: B blok 2. kat koridor lambası',
+            'createdAt': '2026-10-02T11:40:00.000Z',
+            'readAt': null,
+          },
+        ],
+        'page': 1,
+        'pageSize': 20,
+      };
+      final dto = PageDto.fromJson<NotificationDto>(
+        notificationPageExample,
+        itemFromJson: NotificationDto.fromJson,
+      );
+
+      expect(dto, isNotNull);
       expect(
         dto!.toJson(itemToJson: (item) => item.toJson()),
-        example,
+        notificationPageExample,
       );
     });
 
     test('fromJson_returnsNull_onMissingField', () {
+      final missingField = Map<String, Object?>.of(example)..remove('pageSize');
+
       expect(
         PageDto.fromJson<ReportListItemDto>(
-          {},
+          missingField,
           itemFromJson: ReportListItemDto.fromJson,
         ),
+        isNull,
+      );
+    });
+
+    test('fromJson_returnsNull_onWronglyTypedField', () {
+      expect(
+        PageDto.fromJson<ReportListItemDto>({
+          ...example,
+          'pageSize': 20.5,
+        }, itemFromJson: ReportListItemDto.fromJson),
         isNull,
       );
     });
@@ -169,7 +239,13 @@ void main() {
     });
 
     test('fromJson_returnsNull_onMissingField', () {
-      expect(NotificationDto.fromJson({}), isNull);
+      final missingField = Map<String, Object?>.of(example)..remove('reportId');
+
+      expect(NotificationDto.fromJson(missingField), isNull);
+    });
+
+    test('fromJson_returnsNull_onWronglyTypedField', () {
+      expect(NotificationDto.fromJson({...example, 'readAt': 1}), isNull);
     });
   });
 
@@ -189,7 +265,14 @@ void main() {
     });
 
     test('fromJson_returnsNull_onMissingField', () {
-      expect(BuildingDto.fromJson({}), isNull);
+      final missingField = Map<String, Object?>.of(example)
+        ..remove('longitude');
+
+      expect(BuildingDto.fromJson(missingField), isNull);
+    });
+
+    test('fromJson_returnsNull_onWronglyTypedField', () {
+      expect(BuildingDto.fromJson({...example, 'latitude': '36.5871'}), isNull);
     });
   });
 
@@ -210,7 +293,21 @@ void main() {
     });
 
     test('fromJson_returnsNull_onMissingField', () {
-      expect(ApiErrorDto.fromJson({}), isNull);
+      expect(
+        ApiErrorDto.fromJson({
+          'error': {'code': 'VALIDATION_ERROR', 'details': 'description'},
+        }),
+        isNull,
+      );
+    });
+
+    test('fromJson_returnsNull_onWronglyTypedField', () {
+      expect(
+        ApiErrorDto.fromJson({
+          'error': {...example['error']!, 'message': false},
+        }),
+        isNull,
+      );
     });
   });
 }
