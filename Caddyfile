@@ -1,0 +1,27 @@
+# Canlı ortamda HTTPS (compose.prod.yaml, "https" profili). Caddy sunucunun önünde
+# durur: dışarıdan gelen isteği şifreli karşılar, içeride sunucuya (server:8080) iletir.
+# ALAN_ADI gerçek bir alan adıysa (ör. kampus.example.com) Caddy Let's Encrypt
+# sertifikasını kendisi alır ve yeniler; "localhost" ise kendi yerel sertifikasını üretir
+# (tarayıcı uyarı verir, yalnızca deneme için).
+{$ALAN_ADI:localhost} {
+	encode gzip
+
+	# Rule 07: fotoğraf en fazla 5 MB; form alanları için küçük bir pay bırakıldı.
+	# Daha büyük istek sunucuya hiç ulaşmaz.
+	request_body {
+		max_size 6MB
+	}
+
+	header {
+		# Tarayıcı bu adrese bir yıl boyunca yalnızca HTTPS ile gelir.
+		Strict-Transport-Security "max-age=31536000"
+		# Tarayıcı dosya türünü tahmin etmez; fotoğraf adresi betik gibi çalıştırılamaz.
+		X-Content-Type-Options "nosniff"
+		# Hangi yazılımların kullanıldığı söylenmez (saldırgana ipucu vermemek için).
+		-Server
+		-Via
+		-X-Powered-By
+	}
+
+	reverse_proxy server:8080
+}

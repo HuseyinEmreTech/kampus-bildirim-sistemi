@@ -47,8 +47,32 @@ services:
       # Yüklenen fotoğraflar; konteyner silinse de kalır.
       - files:/data/files
     ports:
-      - "${SERVER_PORT:-8080}:8080"
+      # HTTPS profili kullanılıyorsa .env'de SUNUCU_ADRESI=127.0.0.1 olmalı: sunucu yalnızca
+      # bu bilgisayardan erişilir, dışarıdan gelen her istek Caddy'den (HTTPS) geçer.
+      - "${SUNUCU_ADRESI:-0.0.0.0}:${SERVER_PORT:-8080}:8080"
+
+  # HTTPS (isteğe bağlı): docker compose -f compose.prod.yaml --profile https up -d
+  # 80 ve 443 portları açılır; ayarlar Caddyfile'da. ALAN_ADI .env'de verilir.
+  caddy:
+    image: docker.io/library/caddy:2-alpine
+    profiles: ["https"]
+    restart: unless-stopped
+    depends_on:
+      - server
+    environment:
+      ALAN_ADI: ${ALAN_ADI:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Sertifikalar burada kalır; her açılışta yeniden alınmaz (Let's Encrypt sınırı).
+      - caddy_data:/data
+      - caddy_config:/config
 
 volumes:
   pgdata:
   files:
+  caddy_data:
+  caddy_config:
