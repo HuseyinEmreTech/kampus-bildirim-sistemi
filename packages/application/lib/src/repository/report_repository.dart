@@ -2,6 +2,7 @@ import 'package:campus_domain/campus_domain.dart';
 
 import '../core/app_error.dart';
 import '../dto/paginated.dart';
+import '../dto/report_detail_view.dart';
 import '../dto/report_summary.dart';
 import 'report_list_filter.dart';
 
@@ -23,5 +24,7 @@ abstract interface class ReportRepository {
     required int offset,
   });
 
+  /// Detay ekranı için bildirim, bina adı ve durum geçmişi. Bildirim yoksa `null`.
+  Future<Result<ReportDetailView?, AppError>> findDetail(ReportId reportId);
   Future<Result<Report?, AppError>> findById(ReportId reportId);
 }

@@ -124,8 +124,8 @@ class _DemoAuth implements AuthSource {
   }
 }
 
-/// Öğrencinin bildirimleri ve yeni bildirim. Konum 3. parçada geleceği için
-/// yeni bildirimin yeri "Konum seçilmedi" yazılır.
+/// Öğrencinin bildirimleri ve yeni bildirim. Yer tarifi yazılmadıysa yeni
+/// bildirimin yeri "Yer tarifi yok" görünür.
 class _DemoStudentReports implements ReportsSource, ReportCreator {
   _DemoStudentReports(this._demo);
 
@@ -145,7 +145,7 @@ class _DemoStudentReports implements ReportsSource, ReportCreator {
     _demo._add(
       DemoBackend.studentId,
       report.category,
-      'Konum seçilmedi',
+      report.place ?? 'Yer tarifi yok',
       DateTime.now(),
     );
     return const ReportCreated();
@@ -160,19 +160,20 @@ class _DemoStaffReports implements StaffReportsSource, ReportAssigner {
   final DemoBackend _demo;
 
   @override
-  Future<ReportsPageResult> fetchFirstPage(
+  Future<ReportsPageResult> fetchPage(
     StaffReportsView view, {
     ReportCategory? category,
+    required int offset,
+    required int limit,
   }) async {
     bool inView(_DemoReport report) => switch (view) {
       StaffReportsView.incoming => report.status == ReportStatus.yeni,
       StaffReportsView.mine => report.assigneeId == DemoBackend.staffId,
     };
-    return ReportsPageLoaded(
-      _demo._list(
-        (r) => inView(r) && (category == null || r.category == category),
-      ),
+    final items = _demo._list(
+      (r) => inView(r) && (category == null || r.category == category),
     );
+    return ReportsPageLoaded(items.skip(offset).take(limit).toList());
   }
 
   @override

@@ -4,6 +4,7 @@ import 'package:campus_app/mobil/features/reports/data/new_report.dart';
 import 'package:campus_app/mobil/features/reports/data/report_creator.dart';
 import 'package:campus_app/mobil/features/reports/data/report_list_item.dart';
 import 'package:campus_app/mobil/features/reports/presentation/student/report_create_screen.dart';
+import 'package:campus_app/mobil/shared/location/location_source.dart';
 import 'package:campus_app/mobil/shared/photo/photo_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -35,8 +36,33 @@ class FakePicker implements PhotoPicker {
       PhotoPicked(tinyPng);
 }
 
+/// Android'in kapattığı uygulamadan kalan fotoğrafı veren sahte seçici.
+class LostPhotoPicker implements PhotoPicker, LostPhotoRecovery {
+  @override
+  Future<PhotoPickResult> pick(PhotoSource source) async =>
+      const PhotoPickCancelled();
+
+  @override
+  Future<PickedPhoto?> recoverLostPhoto() async => tinyPng;
+}
+
+class FakeGps implements LocationProvider {
+  @override
+  Future<GpsResult> current() async =>
+      const GpsFix(latitude: 36.5871, longitude: 36.1742);
+}
+
+class FakeBuildings implements BuildingsSource {
+  @override
+  Future<BuildingsResult> fetch() async => const BuildingsLoaded([]);
+}
+
 /// Ekranı bir önceki sayfadan açar; böylece kapanınca geri dönüş görülebilir.
-Future<void> openScreen(WidgetTester tester, ReportCreator creator) async {
+Future<void> openScreen(
+  WidgetTester tester,
+  ReportCreator creator, {
+  PhotoPicker? picker,
+}) async {
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
@@ -45,8 +71,12 @@ Future<void> openScreen(WidgetTester tester, ReportCreator creator) async {
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<bool>(
                 builder: (_) => ReportCreateScreen(
-                  creator: creator,
-                  photoPicker: FakePicker(),
+                  sources: ReportCreateSources(
+                    creator: creator,
+                    photoPicker: picker ?? FakePicker(),
+                    gps: FakeGps(),
+                    buildings: FakeBuildings(),
+                  ),
                 ),
               ),
             ),
@@ -69,14 +99,19 @@ Future<void> tapVisible(WidgetTester tester, String text) async {
   await tester.pumpAndSettle();
 }
 
+Finder field(String label) => find.widgetWithText(TextFormField, label);
+
 Future<void> fillForm(
   WidgetTester tester,
   String description, {
   bool withPhoto = true,
+  bool withLocation = true,
 }) async {
   await tester.tap(find.text('Temizlik'));
-  await tester.enterText(find.byType(TextFormField), description);
+  await tester.enterText(field('Açıklama'), description);
+  await tester.enterText(field('Yer tarifi'), 'B Blok 2. kat');
   if (withPhoto) await tapVisible(tester, 'Fotoğraf çek');
+  if (withLocation) await tapVisible(tester, 'Konumumu al');
 }
 
 Future<void> submit(WidgetTester tester) => tapVisible(tester, 'Gönder');
@@ -86,7 +121,7 @@ void main() {
     final creator = FakeReportCreator(const ReportCreated());
     await openScreen(tester, creator);
 
-    await tester.enterText(find.byType(TextFormField), validDescription);
+    await tester.enterText(field('Açıklama'), validDescription);
     await submit(tester);
 
     expect(find.text('Kategori seçin'), findsOneWidget);
@@ -104,6 +139,40 @@ void main() {
     expect(creator.received, isEmpty);
   });
 
+  testWidgets('submits_withoutPlace_becausePlaceIsOptional', (tester) async {
+    // Arrange
+    final creator = FakeReportCreator(const ReportCreated());
+    await openScreen(tester, creator);
+    await fillForm(tester, validDescription);
+    await tester.enterText(field('Yer tarifi'), '');
+
+    // Act
+    await submit(tester);
+
+    // Assert: domain'de place isteğe bağlı; boşsa null gönderilir.
+    expect(creator.received.single.place, isNull);
+  });
+
+  testWidgets('placeField_limitsTo100Characters', (tester) async {
+    // Arrange
+    await openScreen(tester, FakeReportCreator(const ReportCreated()));
+
+    // Act
+    await tester.enterText(
+      field('Yer tarifi'),
+      'a' * (reportPlaceMaxLength + 20),
+    );
+
+    // Assert
+    final input = tester.widget<TextField>(
+      find.descendant(
+        of: field('Yer tarifi'),
+        matching: find.byType(TextField),
+      ),
+    );
+    expect(input.controller!.text.length, reportPlaceMaxLength);
+  });
+
   testWidgets('submitsSuccessfully_withValidData', (tester) async {
     final creator = FakeReportCreator(const ReportCreated());
     await openScreen(tester, creator);
@@ -114,6 +183,8 @@ void main() {
     expect(creator.received.single.category, ReportCategory.temizlik);
     expect(creator.received.single.description, validDescription);
     expect(creator.received.single.photo, same(tinyPng));
+    expect(creator.received.single.place, 'B Blok 2. kat');
+    expect(creator.received.single.location, isA<GpsChoice>());
     expect(find.byType(ReportCreateScreen), findsNothing);
     expect(find.text('Bildirim oluşturuldu'), findsOneWidget);
   });
@@ -140,5 +211,52 @@ void main() {
 
     expect(find.text('Fotoğraf ekleyin'), findsOneWidget);
     expect(creator.received, isEmpty);
+  });
+
+  testWidgets('errors_clear_whenFieldsFixed_afterFailedSubmit', (tester) async {
+    // Arrange: boş formla gönderilince uyarılar çıkar.
+    await openScreen(tester, FakeReportCreator(const ReportCreated()));
+    await submit(tester);
+    expect(find.text('Açıklama en az 5 karakter olmalı'), findsOneWidget);
+    expect(find.text('Fotoğraf ekleyin'), findsOneWidget);
+    expect(find.text('Kategori seçin'), findsOneWidget);
+
+    // Act: alanlar düzeltilir, yeniden gönderilmez.
+    await tester.tap(find.text('Temizlik'));
+    await tester.enterText(field('Açıklama'), validDescription);
+    await tapVisible(tester, 'Fotoğraf çek');
+    await tapVisible(tester, 'Konumumu al');
+
+    // Assert: uyarılar hemen kalkar.
+    expect(find.text('Açıklama en az 5 karakter olmalı'), findsNothing);
+    expect(find.text('Fotoğraf ekleyin'), findsNothing);
+    expect(find.text('Kategori seçin'), findsNothing);
+    expect(find.textContaining('Konum seçin'), findsNothing);
+  });
+
+  testWidgets('showsValidationError_whenLocationMissing', (tester) async {
+    final creator = FakeReportCreator(const ReportCreated());
+    await openScreen(tester, creator);
+
+    await fillForm(tester, validDescription, withLocation: false);
+    await submit(tester);
+
+    expect(
+      find.text('Konum seçin: konumunuzu alın ya da bina seçin'),
+      findsOneWidget,
+    );
+    expect(creator.received, isEmpty);
+  });
+
+  testWidgets('createScreen_restoresLostPhoto', (tester) async {
+    // Arrange / Act: önceki çekimden kalan fotoğraf var, oluşturma açılır.
+    await openScreen(
+      tester,
+      FakeReportCreator(const ReportCreated()),
+      picker: LostPhotoPicker(),
+    );
+
+    // Assert: yalnızca oluşturmada geri konur ve kullanıcıya söylenir.
+    expect(find.text('Önceki çekimden kalan fotoğraf eklendi'), findsOneWidget);
   });
 }
