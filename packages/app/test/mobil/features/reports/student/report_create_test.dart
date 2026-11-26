@@ -36,6 +36,16 @@ class FakePicker implements PhotoPicker {
       PhotoPicked(tinyPng);
 }
 
+/// Android'in kapattığı uygulamadan kalan fotoğrafı veren sahte seçici.
+class LostPhotoPicker implements PhotoPicker, LostPhotoRecovery {
+  @override
+  Future<PhotoPickResult> pick(PhotoSource source) async =>
+      const PhotoPickCancelled();
+
+  @override
+  Future<PickedPhoto?> recoverLostPhoto() async => tinyPng;
+}
+
 class FakeGps implements LocationProvider {
   @override
   Future<GpsResult> current() async =>
@@ -48,7 +58,11 @@ class FakeBuildings implements BuildingsSource {
 }
 
 /// Ekranı bir önceki sayfadan açar; böylece kapanınca geri dönüş görülebilir.
-Future<void> openScreen(WidgetTester tester, ReportCreator creator) async {
+Future<void> openScreen(
+  WidgetTester tester,
+  ReportCreator creator, {
+  PhotoPicker? picker,
+}) async {
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
@@ -59,7 +73,7 @@ Future<void> openScreen(WidgetTester tester, ReportCreator creator) async {
                 builder: (_) => ReportCreateScreen(
                   sources: ReportCreateSources(
                     creator: creator,
-                    photoPicker: FakePicker(),
+                    photoPicker: picker ?? FakePicker(),
                     gps: FakeGps(),
                     buildings: FakeBuildings(),
                   ),
@@ -232,5 +246,17 @@ void main() {
       findsOneWidget,
     );
     expect(creator.received, isEmpty);
+  });
+
+  testWidgets('createScreen_restoresLostPhoto', (tester) async {
+    // Arrange / Act: önceki çekimden kalan fotoğraf var, oluşturma açılır.
+    await openScreen(
+      tester,
+      FakeReportCreator(const ReportCreated()),
+      picker: LostPhotoPicker(),
+    );
+
+    // Assert: yalnızca oluşturmada geri konur ve kullanıcıya söylenir.
+    expect(find.text('Önceki çekimden kalan fotoğraf eklendi'), findsOneWidget);
   });
 }

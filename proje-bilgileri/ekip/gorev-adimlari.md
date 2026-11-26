@@ -1,7 +1,7 @@
 ---
 title: "Görev Adımları (harfiyen uygulanır)"
 durum: Güncel
-son-guncelleme: 2026-11-24
+son-guncelleme: 2026-11-25
 ---
 
 # Görev Adımları
@@ -33,6 +33,8 @@ Elle çalıştırmak için:
 - `bash scripts/gorev-kontrol.sh staged`: commit öncesi
 - `bash scripts/gorev-kontrol.sh`: dal
 - `bash scripts/gorev-kontrol.sh pr <no>`: PR başlığı, beyan ve adım kanıtı dahil
+- Başka bir dalın PR'ını (ör. inceleyen olarak) `main`'deyken denetlemek: `GOREV_DAL=<dal> bash scripts/gorev-kontrol.sh pr <no>`. Betik `origin/<dal>` commit'lerini okur; önce `git fetch origin`.
+- Adım kanıtında bir satırın altına girintili madde yazılabilir (`7. Kontroller:` ve altında `   - komut → sonuç`); betik bu satırı dolu sayar.
 
 **Duyurudan önce açılmış PR'lar** (#236, 24 Kasım 15:10 UTC): CI'da dal adı, eski commit mesajları ve "önce test" sırası **uyarı** olarak gösterilir. Neden: bunları düzeltmek geçmişi yeniden yazmayı gerektiriyor; bunun yerine bu PR'larda açıklama (yapay zeka beyanı, Adım kanıtı, kutular) eksiksiz istenir. Yeni commit'ler kancadan ve kurallardan muaf değildir.
 

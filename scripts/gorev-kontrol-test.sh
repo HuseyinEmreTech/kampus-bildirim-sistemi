@@ -102,5 +102,34 @@ bekle "mesaj_kipi_gecer" 0 bash "$BETIK" mesaj "$f"
 echo "detay eklendi" > "$f"
 bekle "mesaj_kipi_kalir" 1 bash "$BETIK" mesaj "$f"
 
+# 12. Adım kanıtı (pr kipi): sahte gh, başlığı ve açıklamayı dosyadan verir.
+sahte=$(mktemp -d)
+cat > "$sahte/gh" <<'GH'
+#!/usr/bin/env bash
+case "$*" in
+  *title*) echo "fix: örnek düzeltme (#12)" ;;
+  *body*) cat "$SAHTE_GOVDE" ;;
+esac
+GH
+chmod +x "$sahte/gh"
+govde() { # govde <dosya> <7. satırın biçimi>
+  printf '%s\n' "Refs #12" "- Araç ve model: Claude Opus 5.5" "- Kullanılan skill: gorev-kontrol" \
+    "- Çıktıda neyi değiştirdim: testi elle düzelttim" "- Geliştirme ortamı: Fedora" \
+    "- Çalıştırılan araçlar: bash 5.3" "- Anlamadığım: awk dizisi" "" "## Adım kanıtı" "" \
+    "4. Dal: docs/12-not" "$2" "" "## Kontrol" "- [x] Bu koddaki her satırı hocaya anlatabilirim" > "$1"
+}
+d=$(depo); git -C "$d" switch -qc docs/12-not
+ekle "$d" proje-bilgileri/a.md "# a" "docs: not (#12)"
+g=$(mktemp); govde "$g" $'7. Kontroller:\n   - `bash scripts/gorev-kontrol-test.sh` → 18 geçti'
+bekle "adim_kaniti_girintili_madde_gecer" 0 env PATH="$sahte:$PATH" SAHTE_GOVDE="$g" bash -c "cd '$d' && bash '$BETIK' pr 12"
+govde "$g" $'7. Kontroller:\n8. git diff --stat: 1 file changed'
+bekle "adim_kaniti_bos_satir_kalir" 1 env PATH="$sahte:$PATH" SAHTE_GOVDE="$g" bash -c "cd '$d' && bash '$BETIK' pr 12"
+
+# 13. Yerelde main'deyken başka dal (GOREV_DAL) denetlenir: origin/<dal> commit'leri okunur.
+d=$(depo); git -C "$d" switch -qc feature/12-ornek
+ekle "$d" packages/server/lib/a.dart "int f() => 1;" "feat: örnek davranış (#12)"
+git -C "$d" update-ref refs/remotes/origin/feature/12-ornek HEAD; git -C "$d" switch -q main
+bekle "baska_dal_yerelde_denetlenir" 1 env GOREV_DAL=feature/12-ornek bash -c "cd '$d' && bash '$BETIK' dal"
+
 echo; echo "$gecen geçti, $kalan kaldı"
 [ "$kalan" -eq 0 ]
