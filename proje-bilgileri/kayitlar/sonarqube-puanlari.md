@@ -1,7 +1,7 @@
 ---
 title: SonarQube Puanları ve Bulgu Çözüm Günlüğü
 durum: Güncel
-son-guncelleme: 2026-11-24
+son-guncelleme: 2026-11-26
 ---
 
 # SonarQube Puanları ve Bulgu Çözüm Günlüğü
@@ -19,6 +19,7 @@ Her kod commit'inden sonra tarama yapılır; sonuçlar ve çözülen bulgular bu
 | SonarQube'un Dart desteği | **Community'de yok** (yerelde doğrulandı). **Developer Edition ve SonarQube Cloud'da var**; ücretsiz Cloud planı önerildi (aşağıdaki araştırma) |
 | `dart analyze`, `flutter analyze` | Yedek: kod oluşunca her commit'te çalıştırılır |
 | Test kapsamı (coverage) | **Ölçülüyor (2026-10-24):** LCOV (`coverage/lcov.info`); Dart kapsamı %80,1. Web JS için tarayıcı testleri LCOV üretmediğinden kapsam ölçülmüyor; **2026-11-24'ten beri `web/js/**` `sonar.coverage.exclusions` ile kapsam dışı** (gerekçe: [teknoloji değişiklikleri](teknoloji-degisiklikleri.md)), kod kokusu ve güvenlik taraması sürüyor. Python kapsam XML'i Sonar'a gönderilecek şekilde yapılandırıldı; Cloud sonucu ilk CI çalışmasında doğrulanacak |
+| C# servisi (`services/rapor-istatistik`) | **Sonar dışında (2026-11-26, #250).** Testleri CI'daki `C# rapor-istatistik` işinde her PR'da çalışıyor (`dotnet test`); Sonar analizi yok, gerekçesi aşağıda |
 
 ## Python servis analizi (2026-10-25)
 
@@ -28,6 +29,24 @@ ile `coverage.xml` üretiliyor; `sonar.python.coverage.reportPaths` bu dosyayı
 okuyor. Yerel Docker doğrulamasında 23 test geçti ve toplam kapsam %87 ölçüldü.
 Bu yalnızca test/rapor üretiminin doğrulamasıdır; SonarCloud analizi ve kalite
 kapısı sonucu **ilk CI taramasına kadar doğrulanmadı**.
+
+## C# ve web testleri CI'da (2026-11-26, #250)
+
+26 Kasım denetiminde (#249) web ve C# testlerinin hiçbir CI işinde çalışmadığı görüldü. `.github/workflows/ci.yml`'e iki iş eklendi:
+
+| İş | Ne yapar | Kırmızı olunca |
+| --- | --- | --- |
+| `C# rapor-istatistik` | `services/rapor-istatistik` içinde `dotnet test RaporIstatistik.slnx` (.NET 10) | PR kırılır |
+| `Web testleri` | `web/` küçük bir HTTP sunucusundan verilir, `web/tests/index.html` başsız Chrome'da açılır; sonuç `data-result` alanından (`pass` / `fail`) okunur | PR kırılır |
+
+Web işi yerelde iki yönde denendi: testler geçince 16/16 ve çıkış 0, bir test bilerek bozulunca 15/16 ve çıkış 1. CI'daki ilk çalıştırmanın sonucu PR'da.
+
+**C# Sonar dışında, çünkü** SonarQube Cloud C# kodunu yalnızca SonarScanner for .NET ile (`begin` → `dotnet build` → `end`) analiz ediyor. Bizim taramamız ise `sonarqube-scan-action` ile Dart, Python ve web kodunu tek proje anahtarında analiz ediyor. Bakılan iki yol:
+
+- **Ayrı bir Sonar projesi:** Sonar organizasyonunda proje açmak ve yeni bir belirteç (`SONAR_TOKEN`) eklemek yönetici (lider) yetkisi ister.
+- **Bütün depoyu .NET tarayıcısıyla tek analizde taramak:** Dart kapsamının ve mevcut ayarların bu yolla aynı kalıp kalmayacağı **doğrulanmadı**. Teslime dört hafta kala yeşil olan kalite kapısını riske atmak istemedik.
+
+Şimdilik C# kalitesi CI'daki testlerle ölçülüyor. Lider ayrı proje açarsa C# taraması `sonar.yml`'e ayrı bir iş olarak eklenebilir.
 
 ## Doğrulama kaydı (2026-09-30)
 
