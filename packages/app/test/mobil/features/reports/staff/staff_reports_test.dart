@@ -342,6 +342,30 @@ void main() {
     expect(find.byType(ResolveScreen), findsOneWidget);
   });
 
+  testWidgets('callsOnReportTap_whenCardTapped', (tester) async {
+    ReportListItem? tapped;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: StaffReportsScreen(
+          source: FakeStaffReportsSource({
+            StaffReportsView.incoming: [
+              ReportsPageLoaded([report('A Blok', id: 'r7')]),
+            ],
+          }),
+          assigner: FakeReportAssigner(),
+          resolver: UnusedResolver(),
+          photoPicker: UnusedPicker(),
+          onReportTap: (item) => tapped = item,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.textContaining('A Blok'));
+
+    expect(tapped?.id, 'r7');
+  });
+
   testWidgets('resolve_reloadsMine_whenResolved', (tester) async {
     // Arrange: Benimkiler önce üstlenilmiş bildirimi, çözüldükten sonra
     // boş listeyi döndürür.

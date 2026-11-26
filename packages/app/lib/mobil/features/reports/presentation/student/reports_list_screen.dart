@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../data/report_list_item.dart';
 import '../../data/reports_source.dart';
 import '../../state/report_pager.dart';
 import '../widgets/report_list_body.dart';
@@ -14,12 +15,16 @@ class ReportsListScreen extends StatefulWidget {
     super.key,
     required this.source,
     required this.createSources,
+    this.onReportTap,
   });
 
   final ReportsSource source;
 
-  /// "Bildirim oluştur" ekranına verilen kaynak.
+  /// "Bildirim oluştur" ekranına verilen kaynaklar.
   final ReportCreateSources createSources;
+
+  /// Karta dokununca (ör. detayı açmak için).
+  final ValueChanged<ReportListItem>? onReportTap;
 
   @override
   State<ReportsListScreen> createState() => _ReportsListScreenState();
@@ -72,6 +77,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
           emptyMessage: 'Henüz bildiriminiz yok',
           onRefresh: _pager.reload,
           onRetry: () => unawaited(_pager.reset()),
+          onTap: widget.onReportTap,
           controller: _scroll,
           isLoadingMore: _pager.isLoadingMore,
           loadMoreFailed: _pager.loadMoreFailed,
