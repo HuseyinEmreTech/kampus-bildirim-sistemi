@@ -14,6 +14,7 @@ import 'package:campus_server/src/endpoint/auth_endpoints.dart';
 import 'package:campus_server/src/endpoint/building_endpoints.dart';
 import 'package:campus_server/src/endpoint/notification_endpoints.dart';
 import 'package:campus_server/src/endpoint/user_endpoints.dart';
+import 'package:campus_server/src/http/route_cascade.dart';
 import 'package:campus_server/src/logging/logger.dart';
 import 'package:campus_server/src/middleware/audit_log_middleware.dart';
 import 'package:campus_server/src/middleware/body_limit_middleware.dart';
@@ -106,14 +107,14 @@ void main() async {
       .addMiddleware(authMiddleware(tokens))
       .addMiddleware(auditLog())
       .addHandler(
-        Cascade()
-            .add(users.router.call)
-            .add(buildings.router.call)
-            .add(notifications.router.call)
-            .add(reportEndpoints.router.call)
-            .add(reportCreation.router.call)
-            .add(reportResolution.router.call)
-            .handler,
+        routeAll([
+          users.router.call,
+          buildings.router.call,
+          notifications.router.call,
+          reportEndpoints.router.call,
+          reportCreation.router.call,
+          reportResolution.router.call,
+        ]),
       );
 
   final health = Router()
