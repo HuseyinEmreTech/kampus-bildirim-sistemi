@@ -1,7 +1,7 @@
 ---
 title: Çağdaş Kemal Ağca - Kişisel Plan
 durum: Taslak
-son-guncelleme: 2026-11-02
+son-guncelleme: 2026-11-26
 ---
 
 # Çağdaş Kemal Ağca (@Cagdas3307) - Kişisel Plan
@@ -120,3 +120,13 @@ son-guncelleme: 2026-11-02
 - **Hüseyin Emre**: Application UseCase'ler, Contracts DTO'lar, Hata türleri
 - **Ertuğrul**: Repository implementasyonları hazır olmalı
 - **Yusuf/Fatma**: API contract uyumu, hata mesajları UI'da nasıl gösterilecek
+
+## Raporlar
+- [2026-10-15](raporlar/cagdas3307/2026-10-15.md): Sunucu iskeleti, `GET /health`, CORS (#33)
+- [2026-10-17](raporlar/cagdas3307/2026-10-17.md): Giriş sistemi (JWT, yenileme, roller), istek sınırı, güvenlik başlıkları (#67)
+- [2026-10-19](raporlar/cagdas3307/2026-10-19.md): Giriş sisteminin kalan PR'ları, bildirim uçlarına başlangıç (#80-#82)
+- [2026-10-24](raporlar/cagdas3307/2026-10-24.md): Bildirim, bina ve bildirim uçları, gövde sınırı, C# rapor istatistik servisi (#110-#127)
+- [2026-10-31](raporlar/cagdas3307/2026-10-31.md): Proxy arkasında istek sınırı, dal taşımaları, bina detayı (#110, #138)
+- [2026-11-02](raporlar/cagdas3307/2026-11-02.md): Uçların gerçek veritabanına bağlanması, `FILES_DIR`, `unreadOnly` (#190, #191)
+- [2026-11-24](raporlar/cagdas3307/2026-11-24.md): `findDetail`, detay ucu, düzgün kapanma (#215, #216, #217)
+- [2026-11-26](raporlar/cagdas3307/2026-11-26.md): #216 çakışması, #217 düzeltmesi, 404'lerin JSON olması (#216, #217, #252)
