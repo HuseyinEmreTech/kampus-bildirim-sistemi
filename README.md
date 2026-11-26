@@ -236,12 +236,25 @@ Sahte örnek veri (5 bina, 2 öğrenci, 2 görevli, 3 bildirim; parola `Demo.123
 podman compose exec -T db psql -U campus -d campus < db/seed/001_ornek.sql
 ```
 
+Sunum için demo verisi (001'in üstüne: 5 bina, 3 öğrenci, 1 görevli, 10 bildirim). Tarihler yükleme anına göredir; sunum günü yüklenirse bildirimler "bugün", "dün" görünür. İki kez çalıştırmak güvenlidir. Bildirimlerin örnek fotoğrafları `db/seed/demo-fotolar/` klasöründedir (gerçek fotoğraf değil, düz renkli "Demo fotoğrafı" resimleri):
+
+```bash
+podman compose exec -T db psql -v ON_ERROR_STOP=1 -U campus -d campus < db/seed/002_demo.sql
+```
+
 Docker kullanan, bu komutlarda `podman` yerine `docker` yazar.
 
 Windows PowerShell `<` işaretini desteklemez (`RedirectionNotSupported` hatası verir). Komutu `cmd /c` içinde çalıştır:
 
 ```powershell
 cmd /c "docker compose exec -T db psql -U campus -d campus < db\seed\001_ornek.sql"
+cmd /c "docker compose exec -T db psql -v ON_ERROR_STOP=1 -U campus -d campus < db\seed\002_demo.sql"
+```
+
+Demo canlı ortamda (`compose.prod.yaml`) yapılıyorsa fotoğrafları sunucunun klasörüne kopyala; yoksa uygulamada resimler görünmez:
+
+```bash
+docker compose -f compose.prod.yaml cp db/seed/demo-fotolar/. server:/data/files/
 ```
 
 **Veritabanı yedeği** (ör. demodan önce)
