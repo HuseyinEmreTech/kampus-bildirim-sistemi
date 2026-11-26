@@ -7,6 +7,7 @@ ReportEndpoints reportEndpointsWith(FakeReportRepository reports) =>
     ReportEndpoints(
       listReports: ListReportsUseCase(reports),
       assignReport: ReportAssignUseCase(reports),
+      getReport: GetReportUseCase(reports),
     );
 
 /// Bellek içi sahte depo. Gelen filtreyi ve üstlenme çağrısını saklar;
@@ -74,14 +75,26 @@ class FakeReportRepository implements ReportRepository {
   Future<Result<Report?, AppError>> findById(ReportId reportId) async =>
       Success(stored);
 
-  /// Detay ucu (#159) gelene kadar yalnızca arayüzü karşılar.
+  String? storedBuildingName;
+  List<ReportStatusChange> storedHistory = const [];
+
+  /// [stored] bildirimini [storedBuildingName] ve [storedHistory] ile döner;
+  /// kimliği uymazsa bildirim yok sayılır.
   @override
   Future<Result<ReportDetailView?, AppError>> findDetail(
     ReportId reportId,
   ) async {
     final report = stored;
-    if (report == null) return const Success(null);
-    return Success(ReportDetailView(report: report, history: const []));
+    if (report == null || report.id.value != reportId.value) {
+      return const Success(null);
+    }
+    return Success(
+      ReportDetailView(
+        report: report,
+        buildingName: storedBuildingName,
+        history: storedHistory,
+      ),
+    );
   }
 }
 

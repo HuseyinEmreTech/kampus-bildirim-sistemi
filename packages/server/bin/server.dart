@@ -92,6 +92,7 @@ void main() async {
   final reportEndpoints = ReportEndpoints(
     listReports: ListReportsUseCase(reports),
     assignReport: ReportAssignUseCase(reports),
+    getReport: GetReportUseCase(reports),
   );
   final reportCreation = ReportCreationEndpoint(
     createReport: ReportCreateUseCase(reports, const SystemClock()),

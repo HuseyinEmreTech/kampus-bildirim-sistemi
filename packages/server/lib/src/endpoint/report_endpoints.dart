@@ -10,13 +10,18 @@ import '../middleware/auth_middleware.dart';
 import '../middleware/role_guard_middleware.dart';
 
 /// Bildirim uçları. Kurallar (öğrencinin yalnızca kendi bildirimlerini
-/// görmesi, Rule 02 tek üstlenen) use case'lerdedir; burası isteği okur ve
+/// görmesi (Rule 01, detayda da), Rule 02 tek üstlenen) use case'lerdedir; burası isteği okur ve
 /// sonucu JSON'a çevirir.
 class ReportEndpoints {
-  ReportEndpoints({required this._listReports, required this._assignReport});
+  ReportEndpoints({
+    required this._listReports,
+    required this._assignReport,
+    required this._getReport,
+  });
 
   final ListReportsUseCase _listReports;
   final ReportAssignUseCase _assignReport;
+  final GetReportUseCase _getReport;
 
   static const defaultPage = 1;
   static const defaultPageSize = 20;
@@ -24,7 +29,8 @@ class ReportEndpoints {
   Router get router => Router()
     ..get('/api/reports', _onlyFor('Staff', _list))
     ..get('/api/me/reports', _onlyFor('Student', _list))
-    ..put('/api/reports/<id>/assignment', _onlyFor('Staff', _assign));
+    ..put('/api/reports/<id>/assignment', _onlyFor('Staff', _assign))
+    ..get('/api/reports/<id>', _detail);
 
   static Handler _onlyFor(String role, Handler handler) =>
       const Pipeline().addMiddleware(requireRole(role)).addHandler(handler);
@@ -60,6 +66,21 @@ class ReportEndpoints {
     );
     return switch (result) {
       Success(:final value) => jsonResponse(200, reportPageToJson(value)),
+      Failure(:final error) => appErrorResponse(error),
+    };
+  }
+
+  /// `GET /api/reports/{id}`: bildirim detayı ve durum geçmişi (#159).
+  /// Öğrenci yalnızca kendi bildirimini görür; değilse 404 (Rule 01).
+  Future<Response> _detail(Request request) async {
+    final user = currentUser(request);
+    final result = await _getReport.execute(
+      reportId: request.params['id']!,
+      currentUserId: user.userId,
+      role: user.role,
+    );
+    return switch (result) {
+      Success(:final value) => jsonResponse(200, reportDetailToJson(value)),
       Failure(:final error) => appErrorResponse(error),
     };
   }
