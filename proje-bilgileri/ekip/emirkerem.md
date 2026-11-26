@@ -118,3 +118,7 @@ son-guncelleme: 2026-11-01
 ## Bağımlılıklar
 - **Hüseyin Emre**: Görev atama, code review, pair programming
 - **Tüm takım**: Yardım istediğinde 30 dk kuralı (AGENTS.md Madde 9)
+## Raporlar
+
+- [2026-11-15](raporlar/KeremC23/2026-11-15.md) — E2E, CI ve demo hazırlığı (#93, #180, #181).
+- [2026-10-25](raporlar/KeremC23/2026-10-25.md) — E2E test iskeleti (#93).
