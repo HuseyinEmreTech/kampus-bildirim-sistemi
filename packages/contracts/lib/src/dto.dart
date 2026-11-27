@@ -200,33 +200,10 @@ class ReportDetailDto {
       final createdAt = DateTime.tryParse(createdAtValue);
       if (createdAt == null) return null;
 
-      final history = <StatusChangeDto>[];
-      for (final item in historyJson) {
-        if (item is! Map<String, Object?>) return null;
-        final change = StatusChangeDto.fromJson(item);
-        if (change == null) return null;
-        history.add(change);
-      }
-
-      final hasResolutionPhoto = json.containsKey('resolutionPhotoUrl');
-      final hasResolutionNote = json.containsKey('resolutionNote');
-      if (hasResolutionPhoto != hasResolutionNote) return null;
-
-      String? resolutionPhotoUrl;
-      String? resolutionNote;
-      if (hasResolutionPhoto) {
-        final photoValue = json['resolutionPhotoUrl'];
-        final noteValue = json['resolutionNote'];
-        if (photoValue is! String) return null;
-        if (noteValue == null) {
-          resolutionNote = null;
-        } else if (noteValue is String) {
-          resolutionNote = noteValue;
-        } else {
-          return null;
-        }
-        resolutionPhotoUrl = photoValue;
-      }
+      final history = _statusChangesFromJson(historyJson);
+      if (history == null) return null;
+      final resolution = _resolutionFromJson(json);
+      if (resolution == null) return null;
 
       return ReportDetailDto(
         reportId: reportId,
@@ -238,8 +215,8 @@ class ReportDetailDto {
         photoUrl: photoUrl,
         createdAt: createdAt,
         history: history,
-        resolutionPhotoUrl: resolutionPhotoUrl,
-        resolutionNote: resolutionNote,
+        resolutionPhotoUrl: resolution.photoUrl,
+        resolutionNote: resolution.note,
       );
     }
     return null;
@@ -258,6 +235,33 @@ class ReportDetailDto {
     if (resolutionPhotoUrl != null) 'resolutionPhotoUrl': resolutionPhotoUrl,
     if (resolutionPhotoUrl != null) 'resolutionNote': resolutionNote,
   };
+}
+
+List<StatusChangeDto>? _statusChangesFromJson(List<Object?> json) {
+  final history = <StatusChangeDto>[];
+  for (final item in json) {
+    if (item is! Map<String, Object?>) return null;
+    final change = StatusChangeDto.fromJson(item);
+    if (change == null) return null;
+    history.add(change);
+  }
+  return history;
+}
+
+({String? photoUrl, String? note})? _resolutionFromJson(
+  Map<String, Object?> json,
+) {
+  final hasPhoto = json.containsKey('resolutionPhotoUrl');
+  final hasNote = json.containsKey('resolutionNote');
+  if (!hasPhoto && !hasNote) return (photoUrl: null, note: null);
+  if (hasPhoto != hasNote) return null;
+
+  final photo = json['resolutionPhotoUrl'];
+  if (photo is! String) return null;
+  final note = json['resolutionNote'];
+  if (note == null) return (photoUrl: photo, note: null);
+  if (note is! String) return null;
+  return (photoUrl: photo, note: note);
 }
 
 class PageDto<T> {
@@ -284,35 +288,16 @@ class PageDto<T> {
       'page': final int page,
       'pageSize': final int pageSize,
     }) {
-      final hasTotal = json.containsKey('total');
-      final hasUnreadCount = json.containsKey('unreadCount');
-      if (hasTotal == hasUnreadCount) return null;
-
-      int? total;
-      int? unreadCount;
-      if (hasTotal) {
-        final totalValue = json['total'];
-        if (totalValue is! int) return null;
-        total = totalValue;
-      } else {
-        final unreadCountValue = json['unreadCount'];
-        if (unreadCountValue is! int) return null;
-        unreadCount = unreadCountValue;
-      }
-
-      final items = <T>[];
-      for (final itemJson in itemsJson) {
-        if (itemJson is! Map<String, Object?>) return null;
-        final item = itemFromJson(itemJson);
-        if (item == null) return null;
-        items.add(item);
-      }
+      final metadata = _pageMetadataFromJson(json);
+      if (metadata == null) return null;
+      final items = _pageItemsFromJson(itemsJson, itemFromJson);
+      if (items == null) return null;
       return PageDto<T>(
         items: items,
         page: page,
         pageSize: pageSize,
-        total: total,
-        unreadCount: unreadCount,
+        total: metadata.total,
+        unreadCount: metadata.unreadCount,
       );
     }
     return null;
@@ -325,6 +310,38 @@ class PageDto<T> {
     if (total != null) 'total': total,
     if (unreadCount != null) 'unreadCount': unreadCount,
   };
+}
+
+({int? total, int? unreadCount})? _pageMetadataFromJson(
+  Map<String, Object?> json,
+) {
+  final hasTotal = json.containsKey('total');
+  final hasUnreadCount = json.containsKey('unreadCount');
+  if (hasTotal == hasUnreadCount) return null;
+
+  if (hasTotal) {
+    final total = json['total'];
+    if (total is! int) return null;
+    return (total: total, unreadCount: null);
+  }
+
+  final unreadCount = json['unreadCount'];
+  if (unreadCount is! int) return null;
+  return (total: null, unreadCount: unreadCount);
+}
+
+List<T>? _pageItemsFromJson<T>(
+  List<Object?> json,
+  T? Function(Map<String, Object?>) itemFromJson,
+) {
+  final items = <T>[];
+  for (final itemJson in json) {
+    if (itemJson is! Map<String, Object?>) return null;
+    final item = itemFromJson(itemJson);
+    if (item == null) return null;
+    items.add(item);
+  }
+  return items;
 }
 
 class NotificationDto {

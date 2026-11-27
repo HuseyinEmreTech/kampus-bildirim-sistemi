@@ -112,6 +112,25 @@ void main() {
         isNull,
       );
     });
+
+    test('fromJson_acceptsUnresolvedWithoutResolutionFields', () {
+      final exampleWithoutResolution = Map<String, Object?>.of(example)
+        ..['status'] = 'Yeni'
+        ..remove('resolutionPhotoUrl')
+        ..remove('resolutionNote');
+
+      final dto = ReportDetailDto.fromJson(exampleWithoutResolution);
+
+      expect(dto, isNotNull);
+      expect(dto!.toJson(), exampleWithoutResolution);
+    });
+
+    test('fromJson_returnsNull_onIncompleteResolution', () {
+      final incompleteResolution = Map<String, Object?>.of(example)
+        ..remove('resolutionNote');
+
+      expect(ReportDetailDto.fromJson(incompleteResolution), isNull);
+    });
   });
 
   group('StatusChangeDto', () {
@@ -215,6 +234,26 @@ void main() {
         PageDto.fromJson<ReportListItemDto>({
           ...example,
           'pageSize': 20.5,
+        }, itemFromJson: ReportListItemDto.fromJson),
+        isNull,
+      );
+    });
+
+    test('fromJson_returnsNull_onMalformedItem', () {
+      expect(
+        PageDto.fromJson<ReportListItemDto>({
+          ...example,
+          'items': ['bad'],
+        }, itemFromJson: ReportListItemDto.fromJson),
+        isNull,
+      );
+    });
+
+    test('fromJson_returnsNull_onConflictingMetadata', () {
+      expect(
+        PageDto.fromJson<ReportListItemDto>({
+          ...example,
+          'unreadCount': 1,
         }, itemFromJson: ReportListItemDto.fromJson),
         isNull,
       );
