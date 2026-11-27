@@ -1,7 +1,7 @@
 ---
 title: API Tasarımı
 durum: Taslak
-son-guncelleme: 2026-11-02
+son-guncelleme: 2026-11-26
 ---
 
 # API Tasarımı
@@ -161,13 +161,78 @@ Hiç bildirim yoksa `items` boş dizi, `unreadCount` 0 döner. Yalnızca öğren
 
 ### Bina listesi
 
-`GET /api/buildings` (giriş yapmış herkes): `{ "items": [ { "buildingId", "name", "latitude", "longitude" } ] }`, ada göre sıralı. Bina yoksa `items` boş dizi; belirteç yoksa `401`.
+`GET /api/buildings` (giriş yapmış herkes): ada göre sıralı. Bina yoksa `items` boş dizi; belirteç yoksa `401`.
+
+```json
+{
+  "items": [
+    {
+      "buildingId": "a0000000-0000-4000-8000-000000000003",
+      "name": "B Blok",
+      "latitude": 36.5871,
+      "longitude": 36.1742
+    }
+  ]
+}
+```
 
 `GET /api/buildings/{id}` (giriş yapmış herkes): `{ "buildingId", "name", "latitude", "longitude" }`. Bina yoksa ya da kimlik UUID değilse `404 NOT_FOUND`.
 
 ### Bildirim listesi
 
-`GET /api/reports` (görevli; `assignee=me` ile yalnızca kendi üstlendikleri) ve `GET /api/me/reports` (öğrenci; yalnızca kendi bildirimleri) aynı biçimde döner: `{ "items": [...], "page", "pageSize", "total" }`. Her öğede `reportId`, `category`, `description`, `status`, `place`, `buildingName`, `photoUrl`, `assigneeId`, `createdAt` vardır. Öğrenci `GET /api/reports`'a, görevli `GET /api/me/reports`'a istek atarsa `403 FORBIDDEN`; `page`/`pageSize` sayı değilse ya da aralık dışındaysa `400 VALIDATION_ERROR`.
+`GET /api/reports` (görevli; `assignee=me` ile yalnızca kendi üstlendikleri) ve `GET /api/me/reports` (öğrenci; yalnızca kendi bildirimleri) aynı biçimde döner. `buildingName`, `photoUrl` ve `assigneeId` değerleri henüz yoksa `null` olabilir.
+
+```json
+{
+  "items": [
+    {
+      "reportId": "d4816d0a-cd8e-4442-98c0-65d3ba11be70",
+      "category": "Ariza",
+      "description": "B blok 2. kat koridor lambası yanmıyor",
+      "status": "Yeni",
+      "place": "B blok 2. kat",
+      "buildingName": null,
+      "photoUrl": "/photos/1.jpg",
+      "assigneeId": null,
+      "createdAt": "2026-10-02T09:15:00.000Z"
+    }
+  ],
+  "page": 1,
+  "pageSize": 20,
+  "total": 1
+}
+```
+
+`GET /api/reports/{id}` yanıtında aynı temel bildirim alanlarına `history` eklenir. Her geçmiş öğesinde `status`, `changedAt` ve nullable `note` bulunur. Bildirim çözüldüyse `resolutionPhotoUrl` ve `resolutionNote` da bulunur.
+
+```json
+{
+  "reportId": "d4816d0a-cd8e-4442-98c0-65d3ba11be70",
+  "category": "Ariza",
+  "description": "B blok 2. kat koridor lambası yanmıyor",
+  "status": "Cozuldu",
+  "place": "B blok 2. kat",
+  "buildingName": "B Blok",
+  "photoUrl": "/photos/1.jpg",
+  "createdAt": "2026-10-02T09:15:00.000Z",
+  "history": [
+    {
+      "status": "Yeni",
+      "changedAt": "2026-10-02T09:15:00.000Z",
+      "note": null
+    },
+    {
+      "status": "Cozuldu",
+      "changedAt": "2026-10-02T11:40:00.000Z",
+      "note": "Lamba değiştirildi."
+    }
+  ],
+  "resolutionPhotoUrl": "/photos/resolution-1.jpg",
+  "resolutionNote": "Lamba değiştirildi."
+}
+```
+
+Öğrenci `GET /api/reports`'a, görevli `GET /api/me/reports`'a istek atarsa `403 FORBIDDEN`; `page`/`pageSize` sayı değilse ya da aralık dışındaysa `400 VALIDATION_ERROR`.
 
 Her yanıtta güvenlik başlıkları bulunur: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`, `Referrer-Policy: no-referrer`, `Strict-Transport-Security` (yalnızca HTTPS'te etkili; yerelde HTTP ile yok sayılır), `Cache-Control: no-store`.
 
